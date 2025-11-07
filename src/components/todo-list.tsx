@@ -34,7 +34,7 @@ const defaultTodos = [
 
 
 export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
-  const [todos, setTodos] = React.useState<Todo[]>([]);
+  const [todos, setTodos] = React.useState<(Todo & { isNew?: boolean })[]>([]);
   const [newTodo, setNewTodo] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [bulkLoading, setBulkLoading] = React.useState(false);
@@ -45,7 +45,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   React.useEffect(() => {
     // Pre-load the audio
     if (typeof window !== 'undefined') {
-        audioRef.current = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVoA==");
+        audioRef.current = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==");
         audioRef.current.volume = 0.5;
     }
     const uncompleted = initialTodos.filter(t => !t.completed);
@@ -59,12 +59,13 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
     if (!text) return;
 
     const tempId = `temp-${Date.now()}`;
-    const optimisticTodo: Todo = {
+    const optimisticTodo: Todo & { isNew?: boolean } = {
       id: tempId,
       domainId,
       text,
       completed: false,
       createdAt: new Date().toISOString(),
+      isNew: true,
     };
 
     setTodos(prevTodos => [optimisticTodo, ...prevTodos]);
@@ -209,16 +210,16 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
           <Loader2 className="h-6 w-6 animate-spin" />
         </div>
       ) : (
-        <div className="space-y-2">
+        <ul className="space-y-2">
           {todos.map(todo => {
             if (!todo.id) return null;
             const isCompleting = toggledTodos.includes(todo.id);
             return (
-              <div key={todo.id} className={cn("flex items-start gap-3 p-2 rounded-md bg-background/50 hover:bg-background transition-colors group", isCompleting && "slide-out-and-fade")}>
+              <li key={todo.id} className={cn("flex items-start gap-3 p-2 rounded-md bg-background/50 hover:bg-background transition-colors group", isCompleting && "slide-out-and-fade", todo.isNew && "slide-in-and-fade")}>
                 <Checkbox
                   id={`todo-${todo.id}`}
                   checked={todo.completed}
-                  onCheckedChange={() => handleToggleTodo(todo.id!)}
+                  onCheckedChange={() => !todo.completed && handleToggleTodo(todo.id!)}
                   aria-label={todo.text}
                   className={cn("mt-1", todo.completed && "completed-animation-checkbox")}
                 />
@@ -235,13 +236,13 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
                 <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => todo.id && handleDeleteTodo(todo.id)}>
                   <Trash2 className="h-4 w-4 text-destructive/80" />
                 </Button>
-              </div>
+              </li>
             )
           })}
            {todos.length === 0 && (
              <p className="text-center text-muted-foreground py-4">لا توجد مهام حتى الآن.</p>
            )}
-        </div>
+        </ul>
       )}
     </div>
   );

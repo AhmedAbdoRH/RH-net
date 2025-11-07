@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 
 
 interface GroupedTodos {
-    [domainName: string]: Todo[];
+    [domainName: string]: (Todo & { isNew?: boolean })[];
 }
 
 interface AllTodosPanelProps {
@@ -52,7 +52,7 @@ export function AllTodosPanel({ onUpdate }: AllTodosPanelProps) {
     React.useEffect(() => {
         // Pre-load the audio
         if (typeof window !== 'undefined') {
-            audioRef.current = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVoA==");
+            audioRef.current = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVoA==");
             audioRef.current.volume = 0.5;
         }
         fetchTodos();
@@ -168,9 +168,28 @@ export function AllTodosPanel({ onUpdate }: AllTodosPanelProps) {
         
         setAddingTodo(true);
         try {
-            await addTodo({ text, completed: false });
+            // Optimistic update
+            const tempId = `temp-${Date.now()}`;
+            const newTodo: Todo & { isNew?: boolean } = { 
+                text, 
+                completed: false, 
+                id: tempId, 
+                createdAt: new Date().toISOString(),
+                isNew: true
+            };
+            
+            setGroupedTodos(prev => ({
+                ...prev,
+                [GENERAL_TASKS_KEY]: [newTodo, ...(prev[GENERAL_TASKS_KEY] || [])]
+            }));
             setNewGeneralTodo('');
-            fetchTodos(); // Re-fetch to get the new list with the general todo
+
+            const addedTodo = await addTodo({ text, completed: false });
+            setGroupedTodos(prev => {
+                const newTodos = prev[GENERAL_TASKS_KEY].map(t => t.id === tempId ? addedTodo : t);
+                return { ...prev, [GENERAL_TASKS_KEY]: newTodos };
+            });
+
             onUpdate();
         } catch (error) {
              toast({
@@ -178,6 +197,7 @@ export function AllTodosPanel({ onUpdate }: AllTodosPanelProps) {
                 description: "فشل في إضافة المهمة العامة.",
                 variant: "destructive",
             });
+             fetchTodos(); // Re-fetch on error
         } finally {
             setAddingTodo(false);
         }
@@ -198,15 +218,15 @@ export function AllTodosPanel({ onUpdate }: AllTodosPanelProps) {
         key => key !== GENERAL_TASKS_KEY && groupedTodos[key].length > 0
     );
 
-    const renderTodoItem = (todo: Todo) => {
+    const renderTodoItem = (todo: Todo & { isNew?: boolean }) => {
       if (!todo.id) return null;
       const isCompleting = toggledTodos.includes(todo.id);
       return (
-        <li key={todo.id} className={cn("flex items-center gap-3 p-2 rounded-md bg-background/50 hover:bg-background transition-colors", isCompleting && "slide-out-and-fade")}>
+        <li key={todo.id} className={cn("flex items-center gap-3 p-2 rounded-md bg-background/50 hover:bg-background transition-colors", isCompleting && "slide-out-and-fade", todo.isNew && "slide-in-and-fade")}>
             <Checkbox
                 id={`all-todo-${todo.id}`}
                 checked={todo.completed}
-                onCheckedChange={() => handleToggleTodo(todo.id!)}
+                onCheckedChange={() => !todo.completed && handleToggleTodo(todo.id!)}
                 className={cn(todo.completed && "completed-animation-checkbox")}
             />
             <label htmlFor={`all-todo-${todo.id}`} className={cn("flex-1 text-sm relative", todo.completed && "strikethrough-label")}>
