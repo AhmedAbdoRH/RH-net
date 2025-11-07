@@ -11,7 +11,7 @@ import { checkDomainStatus } from '@/ai/flows/checkDomainStatus';
 import { checkApiKeyStatus } from '@/ai/flows/checkApiKeyStatus';
 import type { Domain, Todo, ApiKeyStatus } from '@/lib/types';
 import Link from 'next/link';
-import { getTodosForDomains } from '@/services/todoService';
+import { getTodosForDomains, getAllTodosGroupedByDomain } from '@/services/todoService';
 import { AllTodosPanel } from '@/components/all-todos-panel';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,7 @@ export default function WebPage() {
   const [domainStatuses, setDomainStatuses] = React.useState<Record<string, 'checking' | 'online' | 'offline'>>({});
   const [apiKeyStatuses, setApiKeyStatuses] = React.useState<ApiKeyStatus[]>([]);
   const [domainTodos, setDomainTodos] = React.useState<Record<string, Todo[]>>({});
+  const [allGroupedTodos, setAllGroupedTodos] = React.useState<Record<string, Todo[]>>({});
   const [loading, setLoading] = React.useState(true);
   const [isFaultsSheetOpen, setFaultsSheetOpen] = React.useState(false);
   const [isGeneralPaperSheetOpen, setGeneralPaperSheetOpen] = React.useState(false);
@@ -93,12 +94,15 @@ export default function WebPage() {
     try {
         const domainsFromDb = await getDomains(); // Re-fetch domains to ensure we have the latest list
         const domainIds = domainsFromDb.map(d => d.id).filter((id): id is string => !!id);
-        if (domainIds.length > 0) {
-            const todosByDomain = await getTodosForDomains(domainIds);
-            setDomainTodos(todosByDomain);
-        } else {
-            setDomainTodos({});
-        }
+        
+        const [todosByDomain, allGrouped] = await Promise.all([
+            domainIds.length > 0 ? getTodosForDomains(domainIds) : Promise.resolve({}),
+            getAllTodosGroupedByDomain()
+        ]);
+
+        setDomainTodos(todosByDomain);
+        setAllGroupedTodos(allGrouped);
+
     } catch (error) {
         console.error("Error refreshing todos:", error);
     }
@@ -128,13 +132,7 @@ export default function WebPage() {
       setApiKeyStatuses(apiKeysData.map(item => ({ key: item.key, name: item.name, status: 'checking' as const })));
 
       // Refresh todos in parallel
-      const domainIds = domainsWithProject.map(d => d.id).filter((id): id is string => !!id);
-      if (domainIds.length > 0) {
-        const todosByDomain = await getTodosForDomains(domainIds);
-        setDomainTodos(todosByDomain);
-      } else {
-        setDomainTodos({});
-      }
+      refreshTodos();
 
       // Check domain statuses
       for (const domain of domainsWithProject) {
@@ -165,7 +163,7 @@ export default function WebPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [refreshTodos]);
 
   // Initial load
   React.useEffect(() => {
@@ -236,7 +234,7 @@ export default function WebPage() {
                   <CreditCard className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="https://rhfattura.netlify.app" target="_blank" rel="noopener noreferrer">
+              <Link href="https://rhfattura.netlify.app/" target="_blank" rel="noopener noreferrer">
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -323,7 +321,11 @@ export default function WebPage() {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="mt-2">
-                <AllTodosPanel onUpdate={refreshTodos} />
+                <AllTodosPanel 
+                  onUpdate={refreshTodos} 
+                  initialGroupedTodos={allGroupedTodos}
+                  loading={loading}
+                />
               </div>
             </CollapsibleContent>
           </Collapsible>
