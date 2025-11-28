@@ -5,7 +5,7 @@ import * as React from 'react';
 import { DomainDashboard } from '@/components/domain-dashboard';
 import { StatusPanel } from '@/components/status-panel';
 import { Icons } from '@/components/icons';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDomains } from '@/services/domainService';
 import { checkDomainStatus } from '@/ai/flows/checkDomainStatus';
 import { checkApiKeyStatus } from '@/ai/flows/checkApiKeyStatus';
@@ -393,5 +393,3 @@ export default function WebPage() {
     </>
   );
 }
-
-    
