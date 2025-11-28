@@ -138,6 +138,10 @@ export default function FireflyPage() {
     return hasTodos;
   }, [domainTodos]);
 
+  const filteredDomainsForStatusPanel = React.useMemo(() => {
+    return allDomains.filter(d => d.projects?.includes('firefly'));
+  }, [allDomains]);
+
 
   return (
     <>
@@ -278,7 +282,7 @@ export default function FireflyPage() {
           </header>
 
           <Collapsible className="w-full mb-2">
-            <StatusPanel domains={allDomains} domainStatuses={domainStatuses} domainTodos={hasTodosMap} apiKeyStatuses={apiKeyStatuses} />
+            <StatusPanel domains={filteredDomainsForStatusPanel} domainStatuses={domainStatuses} domainTodos={hasTodosMap} apiKeyStatuses={apiKeyStatuses} />
             <CollapsibleTrigger asChild>
               <div className="w-full h-4 bg-card hover:bg-muted/80 border-x border-b border-border/60 rounded-b-lg flex items-center justify-center cursor-pointer">
                 <ChevronDown className="h-4 w-4 text-muted-foreground opacity-50 transition-transform data-[state=open]:rotate-180" />
@@ -316,3 +320,5 @@ export default function FireflyPage() {
     </>
   );
 }
+
+    
