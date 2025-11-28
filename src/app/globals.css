@@ -216,16 +216,16 @@
     color: white !important;
   }
   
-  @keyframes flash-red {
+  @keyframes flash-yellow {
     0%, 100% {
       background-color: transparent;
     }
     50% {
-      background-color: hsla(var(--destructive), 0.2);
+      background-color: hsla(48, 96%, 53%, 0.15);
     }
   }
 
-  .animate-flash-red {
-      animation: flash-red 1.5s infinite;
+  .animate-flash-yellow {
+      animation: flash-yellow 1.5s infinite;
   }
 }

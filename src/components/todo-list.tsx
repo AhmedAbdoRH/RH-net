@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, ListPlus, Copy, Star } from 'lucide-react';
+import { Loader2, Plus, Trash2, ListPlus, Copy, Lightbulb, LightbulbOff } from 'lucide-react';
 import { addTodo, updateTodo, deleteTodo } from '@/services/todoService';
 import type { Todo } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
@@ -53,7 +53,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   React.useEffect(() => {
     // Pre-load the audio
     if (typeof window !== 'undefined') {
-        audioRef.current = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==");
+        audioRef.current = new Audio("data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==");
         audioRef.current.volume = 0.5;
     }
     const uncompleted = initialTodos.filter(t => !t.completed);
@@ -261,7 +261,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
                   "flex items-start gap-3 p-2 rounded-md bg-background/50 hover:bg-background transition-colors group",
                   isCompleting && "slide-out-and-fade",
                   todo.isNew ? "slide-in-and-fade" : "staggered-fade-in",
-                  todo.isHighPriority && !todo.completed && "animate-flash-red"
+                  todo.isHighPriority && !todo.completed && "animate-flash-yellow"
                 )}
                 style={{ animationDelay: todo.isNew ? '0ms' : `${index * 50}ms` }}
               >
@@ -281,7 +281,10 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
                 </label>
                 <div className="flex items-center mt-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => todo.id && handleTogglePriority(todo.id, todo.isHighPriority || false)}>
-                        <Star className={cn("h-4 w-4 text-muted-foreground transition-colors", todo.isHighPriority ? "text-yellow-400 fill-yellow-400" : "hover:text-yellow-400")} />
+                        {todo.isHighPriority ? 
+                            <Lightbulb className="h-4 w-4 text-yellow-400 fill-yellow-400/70" /> :
+                            <LightbulbOff className="h-4 w-4 text-muted-foreground hover:text-yellow-400" />
+                        }
                     </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => todo.id && handleDeleteTodo(todo.id)}>
                         <Trash2 className="h-4 w-4 text-destructive/80" />
