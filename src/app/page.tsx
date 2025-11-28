@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getDomains } from '@/services/domainService';
 import { checkDomainStatus } from '@/ai/flows/checkDomainStatus';
 import { checkApiKeyStatus } from '@/ai/flows/checkApiKeyStatus';
-import type { Domain, Todo, ApiKeyStatus } from '@/lib/types';
+import type { Domain, Todo, ApiKeyStatus, Project } from '@/lib/types';
 import Link from 'next/link';
 import { getTodosForDomains, getAllTodosGroupedByDomain } from '@/services/todoService';
 import { AllTodosPanel } from '@/components/all-todos-panel';
@@ -115,10 +115,20 @@ export default function WebPage() {
       
       // Domains
       const domainsFromDb = await getDomains();
-      const domainsWithProject = domainsFromDb.map(d => ({
-        ...d,
-        projects: d.projects && d.projects.length > 0 ? d.projects as any[] : ['RHM']
-      }));
+      const domainsWithProject = domainsFromDb.map(d => {
+        let projects = d.projects || [];
+        // Legacy support for 'rehlethadaf'
+        if (projects.includes('rehlethadaf' as Project)) {
+          projects = projects.filter(p => p !== 'rehlethadaf' as Project);
+          if (!projects.includes('RHM')) {
+            projects.push('RHM');
+          }
+        }
+        return {
+          ...d,
+          projects: projects.length > 0 ? projects : ['RHM']
+        };
+      });
       setAllDomains(domainsWithProject);
 
       // Set all domains to checking initially
