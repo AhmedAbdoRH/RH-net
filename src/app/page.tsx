@@ -19,6 +19,7 @@ import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Code2, User, Receipt, 
 import { cn } from '@/lib/utils';
 import { FaultsSheet } from '@/components/faults-sheet';
 import { GeneralPaperSheet } from '@/components/general-paper-sheet';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
 const StatCard = ({ title, value, icon, className }: { title: string, value: string, icon: React.ElementType, className?: string }) => {
@@ -348,38 +349,56 @@ export default function WebPage() {
             <Card className="shadow-lg bg-card">
               <CardContent className="p-0">
                 {isSecretVisible ? (
-                  <>
-                    <div className="p-6">
-                       <h2 className="text-2xl font-bold text-foreground mb-4">مشاريع RHM</h2>
+                  <Tabs defaultValue="rhm" className="w-full">
+                    <div className="p-4 border-b border-border/60">
+                      <TabsList>
+                        <TabsTrigger value="rhm">مشاريع RHM</TabsTrigger>
+                        <TabsTrigger value="other">المشاريع الأخرى</TabsTrigger>
+                      </TabsList>
                     </div>
-                    <div className="px-6">
-                      <DomainDashboard 
-                        project="RHM"
-                        allDomains={allDomains}
-                        allTodos={domainTodos}
-                        domainStatuses={domainStatuses}
-                        loading={loading}
-                        onDomainChange={refreshAllStatuses} 
-                        onTodoChange={refreshTodos} 
-                      />
-                    </div>
-                    <div className="p-4 border-t border-border mt-4">
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <StatCard 
-                                title="صافي الربح السنوي" 
-                                value={`$${RHMStats.netProfit.toFixed(2)}`} 
-                                icon={DollarSign}
-                                className="border-green-500/30"
-                            />
-                            <StatCard 
-                                title="إجمالي الدخل السنوي" 
-                                value={`$${RHMStats.totalIncome.toFixed(2)}`} 
-                                icon={PiggyBank} 
-                                className="border-blue-500/30"
-                            />
-                        </div>
-                    </div>
-                  </>
+                    <TabsContent value="rhm" className="m-0">
+                      <div className="px-6 pt-6">
+                        <DomainDashboard 
+                          project="RHM"
+                          allDomains={allDomains}
+                          allTodos={domainTodos}
+                          domainStatuses={domainStatuses}
+                          loading={loading}
+                          onDomainChange={refreshAllStatuses} 
+                          onTodoChange={refreshTodos} 
+                        />
+                      </div>
+                      <div className="p-4 border-t border-border mt-4">
+                          <div className="grid gap-4 md:grid-cols-2">
+                              <StatCard 
+                                  title="صافي الربح السنوي" 
+                                  value={`$${RHMStats.netProfit.toFixed(2)}`} 
+                                  icon={DollarSign}
+                                  className="border-green-500/30"
+                              />
+                              <StatCard 
+                                  title="إجمالي الدخل السنوي" 
+                                  value={`$${RHMStats.totalIncome.toFixed(2)}`} 
+                                  icon={PiggyBank} 
+                                  className="border-blue-500/30"
+                              />
+                          </div>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="other" className="m-0">
+                      <div className="p-6">
+                        <DomainDashboard 
+                          project="other"
+                          allDomains={allDomains}
+                          allTodos={domainTodos}
+                          domainStatuses={domainStatuses}
+                          loading={loading}
+                          onDomainChange={refreshAllStatuses} 
+                          onTodoChange={refreshTodos} 
+                        />
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 ) : (
                   <div className="flex h-64 items-center justify-center text-muted-foreground">
                     محتوى سري، انقر على الحافة اليسرى لإظهار الأزرار ثم الشعار للكشف
@@ -387,30 +406,11 @@ export default function WebPage() {
                 )}
               </CardContent>
             </Card>
-
-             {isSecretVisible && (
-              <Card className="shadow-lg bg-card">
-                 <CardContent className="p-0 pt-6">
-                    <div className="p-6 pt-0">
-                       <h2 className="text-2xl font-bold text-foreground mb-4">المشاريع الأخرى</h2>
-                    </div>
-                    <div className="px-6 pb-6">
-                      <DomainDashboard 
-                        project="other"
-                        allDomains={allDomains}
-                        allTodos={domainTodos}
-                        domainStatuses={domainStatuses}
-                        loading={loading}
-                        onDomainChange={refreshAllStatuses} 
-                        onTodoChange={refreshTodos} 
-                      />
-                    </div>
-                 </CardContent>
-              </Card>
-             )}
           </main>
         </div>
       </div>
     </>
   );
 }
+
+    
