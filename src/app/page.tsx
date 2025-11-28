@@ -216,11 +216,6 @@ export default function WebPage() {
                   <Wind className="h-5 w-5" />
                 </Button>
               </Link>
-               <Link href="/other" passHref>
-                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground" title="Other Projects">
-                  <Globe className="h-5 w-5" />
-                </Button>
-              </Link>
               <span className="h-6 w-px bg-border/60"></span>
               <Link href="https://rh-marketing.netlify.app/sys" target="_blank" rel="noopener noreferrer">
                 <Button 
@@ -349,20 +344,25 @@ export default function WebPage() {
           </Collapsible>
 
 
-          <main className="mt-4">
+          <main className="mt-4 space-y-6">
             <Card className="shadow-lg bg-card">
-              <CardContent className="p-0 pt-6">
+              <CardContent className="p-0">
                 {isSecretVisible ? (
                   <>
-                    <DomainDashboard 
-                      project="RHM"
-                      allDomains={allDomains}
-                      allTodos={domainTodos}
-                      domainStatuses={domainStatuses}
-                      loading={loading}
-                      onDomainChange={refreshAllStatuses} 
-                      onTodoChange={refreshTodos} 
-                    />
+                    <div className="p-6">
+                       <h2 className="text-2xl font-bold text-foreground mb-4">مشاريع RHM</h2>
+                    </div>
+                    <div className="px-6">
+                      <DomainDashboard 
+                        project="RHM"
+                        allDomains={allDomains}
+                        allTodos={domainTodos}
+                        domainStatuses={domainStatuses}
+                        loading={loading}
+                        onDomainChange={refreshAllStatuses} 
+                        onTodoChange={refreshTodos} 
+                      />
+                    </div>
                     <div className="p-4 border-t border-border mt-4">
                         <div className="grid gap-4 md:grid-cols-2">
                             <StatCard 
@@ -387,6 +387,27 @@ export default function WebPage() {
                 )}
               </CardContent>
             </Card>
+
+             {isSecretVisible && (
+              <Card className="shadow-lg bg-card">
+                 <CardContent className="p-0 pt-6">
+                    <div className="p-6 pt-0">
+                       <h2 className="text-2xl font-bold text-foreground mb-4">المشاريع الأخرى</h2>
+                    </div>
+                    <div className="px-6 pb-6">
+                      <DomainDashboard 
+                        project="other"
+                        allDomains={allDomains}
+                        allTodos={domainTodos}
+                        domainStatuses={domainStatuses}
+                        loading={loading}
+                        onDomainChange={refreshAllStatuses} 
+                        onTodoChange={refreshTodos} 
+                      />
+                    </div>
+                 </CardContent>
+              </Card>
+             )}
           </main>
         </div>
       </div>

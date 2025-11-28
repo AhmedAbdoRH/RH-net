@@ -168,11 +168,6 @@ export default function PovaPage() {
                   <Wind className="h-5 w-5" />
                 </Button>
               </Link>
-               <Link href="/other" passHref>
-                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground" title="Other Projects">
-                  <Globe className="h-5 w-5" />
-                </Button>
-              </Link>
               <span className="h-6 w-px bg-border/60"></span>
               <Link href="https://rh-marketing.netlify.app/sys" target="_blank" rel="noopener noreferrer">
                 <Button 
@@ -321,5 +316,3 @@ export default function PovaPage() {
     </>
   );
 }
-
-    
