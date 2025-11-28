@@ -1,5 +1,5 @@
 
-export type Project = 'rehlethadaf' | 'pova' | 'other';
+export type Project = 'RHM' | 'pova' | 'other';
 
 export type Domain = {
   id?: string; // Firestore uses string IDs

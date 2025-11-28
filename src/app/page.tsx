@@ -86,7 +86,7 @@ export default function WebPage() {
     setClickCount(newClickCount);
     if (newClickCount >= 2) {
       setSecretVisible(true);
-      setActiveTab('rehlethadaf');
+      setActiveTab('RHM');
     }
   };
   
@@ -117,7 +117,7 @@ export default function WebPage() {
       const domainsFromDb = await getDomains();
       const domainsWithProject = domainsFromDb.map(d => ({
         ...d,
-        projects: d.projects && d.projects.length > 0 ? d.projects as any[] : ['rehlethadaf']
+        projects: d.projects && d.projects.length > 0 ? d.projects as any[] : ['RHM']
       }));
       setAllDomains(domainsWithProject);
 
@@ -178,10 +178,10 @@ export default function WebPage() {
     return hasTodos;
   }, [domainTodos]);
 
-  const rehlethadafStats = React.useMemo(() => {
-        const rehlethadafDomains = allDomains.filter(d => d.projects?.includes('rehlethadaf'));
-        const totalIncome = rehlethadafDomains.reduce((acc, domain) => acc + (Number(domain.renewalCostClient) || 0), 0);
-        const netProfit = rehlethadafDomains.reduce((acc, domain) => {
+  const RHMStats = React.useMemo(() => {
+        const RHMDomains = allDomains.filter(d => d.projects?.includes('RHM'));
+        const totalIncome = RHMDomains.reduce((acc, domain) => acc + (Number(domain.renewalCostClient) || 0), 0);
+        const netProfit = RHMDomains.reduce((acc, domain) => {
             const clientCost = Number(domain.renewalCostClient) || 0;
             const officeCost = Number(domain.renewalCostOffice) || 0;
             return acc + (clientCost - officeCost);
@@ -336,15 +336,15 @@ export default function WebPage() {
               <CardContent className="p-0 pt-0">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="rehlethadaf">رحلة هدف</TabsTrigger>
+                    <TabsTrigger value="RHM">RHM</TabsTrigger>
                     <TabsTrigger value="pova">Pova</TabsTrigger>
                     <TabsTrigger value="other">مشاريع أخرى</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="rehlethadaf">
+                  <TabsContent value="RHM">
                     {isSecretVisible ? (
                       <>
                         <DomainDashboard 
-                          project="rehlethadaf"
+                          project="RHM"
                           allDomains={allDomains}
                           allTodos={domainTodos}
                           domainStatuses={domainStatuses}
@@ -356,13 +356,13 @@ export default function WebPage() {
                             <div className="grid gap-4 md:grid-cols-2">
                                 <StatCard 
                                     title="صافي الربح السنوي" 
-                                    value={`$${rehlethadafStats.netProfit.toFixed(2)}`} 
+                                    value={`$${RHMStats.netProfit.toFixed(2)}`} 
                                     icon={DollarSign}
                                     className="border-green-500/30"
                                 />
                                 <StatCard 
                                     title="إجمالي الدخل السنوي" 
-                                    value={`$${rehlethadafStats.totalIncome.toFixed(2)}`} 
+                                    value={`$${RHMStats.totalIncome.toFixed(2)}`} 
                                     icon={PiggyBank} 
                                     className="border-blue-500/30"
                                 />

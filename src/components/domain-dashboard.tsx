@@ -46,11 +46,11 @@ type DomainStatus = 'checking' | 'online' | 'offline';
 
 
 const projectLabels: Record<Project, string> = {
-  rehlethadaf: 'رحلة هدف',
+  RHM: 'RHM',
   pova: 'Pova',
   other: 'مشاريع أخرى',
 };
-const projectOptions: Project[] = ['rehlethadaf', 'pova', 'other'];
+const projectOptions: Project[] = ['RHM', 'pova', 'other'];
 
 interface DomainDashboardProps {
   project: Project;
@@ -372,7 +372,7 @@ export function DomainDashboard({
     const details = encodeURIComponent(
       `لا تنسَ تجديد نطاق ${domain.domainName}.\n` +
       `قيمة التجديد: $${Number(domain.renewalCostClient).toFixed(2)} (${(Number(domain.renewalCostClient) * USD_TO_EGP_RATE_CLIENT).toFixed(2)} ج.م)\n` +
-      (project === 'rehlethadaf' ? `تكلفة المكتب: $${Number(domain.renewalCostOffice).toFixed(2)} (${(Number(domain.renewalCostOffice) * USD_TO_EGP_RATE_OFFICE).toFixed(2)} ج.م)` : '')
+      (project === 'RHM' ? `تكلفة المكتب: $${Number(domain.renewalCostOffice).toFixed(2)} (${(Number(domain.renewalCostOffice) * USD_TO_EGP_RATE_OFFICE).toFixed(2)} ج.م)` : '')
     );
     return `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateStr}/${dateStr}&details=${details}&sf=true&output=xml`;
   };
@@ -538,7 +538,7 @@ export function DomainDashboard({
                                 <div className="text-xs text-muted-foreground mt-1">Pova</div>
                             </div>
                           )}
-                          {(project === 'rehlethadaf' || project === 'other') && (
+                          {(project === 'RHM' || project === 'other') && (
                             <div className="text-center">
                                 <div className="text-destructive font-semibold">${Number(domain.renewalCostOffice).toFixed(2)}</div>
                                 <div className="text-xs text-muted-foreground">{(Number(domain.renewalCostOffice) * USD_TO_EGP_RATE_OFFICE).toFixed(2)} ج.م</div>
@@ -712,7 +712,7 @@ export function DomainDashboard({
                              <div className="text-xs text-muted-foreground">{(Number(domain.renewalCostClient) * USD_TO_EGP_RATE_CLIENT).toFixed(2)} ج.م</div>
                         </div>
                       )}
-                      {(project === 'rehlethadaf' || project === 'other') && (
+                      {(project === 'RHM' || project === 'other') && (
                         <div className="text-center">
                             <div className="text-destructive font-semibold">${Number(domain.renewalCostOffice).toFixed(2)}</div>
                             <div className="text-xs text-muted-foreground">{(Number(domain.renewalCostOffice) * USD_TO_EGP_RATE_OFFICE).toFixed(2)} ج.م</div>
@@ -902,7 +902,7 @@ export function DomainDashboard({
                     className="col-span-3"
                 />
             </div>
-            {newDomain.projects.includes('rehlethadaf') && (
+            {newDomain.projects.includes('RHM') && (
             <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="renewalCostOffice-add" className="text-right">تكلفة المكتب ($)</Label>
                 <Input
@@ -1049,7 +1049,7 @@ export function DomainDashboard({
                             className="col-span-3"
                         />
                     </div>
-                    {(domainToEdit.projects || []).includes('rehlethadaf') && (
+                    {(domainToEdit.projects || []).includes('RHM') && (
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="renewalCostOffice-edit" className="text-right">تكلفة المكتب ($)</Label>
                         <Input
@@ -1145,6 +1145,7 @@ export function DomainDashboard({
     
 
     
+
 
 
 
