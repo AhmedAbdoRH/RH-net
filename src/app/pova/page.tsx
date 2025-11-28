@@ -15,30 +15,12 @@ import { getTodosForDomains, getAllTodosGroupedByDomain } from '@/services/todoS
 import { AllTodosPanel } from '@/components/all-todos-panel';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from '@/components/ui/button';
-import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Code2, User, Receipt, NotebookPen, FileText, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ChevronDown, ShieldAlert, Code2, User, Receipt, NotebookPen, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss } from 'lucide-react';
 import { FaultsSheet } from '@/components/faults-sheet';
 import { GeneralPaperSheet } from '@/components/general-paper-sheet';
 
 
-const StatCard = ({ title, value, icon, className }: { title: string, value: string, icon: React.ElementType, className?: string }) => {
-    const Icon = icon;
-    return (
-        <Card className={cn("bg-card/50", className)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{value}</div>
-            </CardContent>
-        </Card>
-    );
-};
-
-
-export default function WebPage() {
-  const [isSecretVisible, setSecretVisible] = React.useState(false);
+export default function PovaPage() {
   const [clickCount, setClickCount] = React.useState(0);
   const [allDomains, setAllDomains] = React.useState<Domain[]>([]);
   const [domainStatuses, setDomainStatuses] = React.useState<Record<string, 'checking' | 'online' | 'offline'>>({});
@@ -50,21 +32,6 @@ export default function WebPage() {
   const [isGeneralPaperSheetOpen, setGeneralPaperSheetOpen] = React.useState(false);
   const [buttonsVisible, setButtonsVisible] = React.useState(false);
   
-  React.useEffect(() => {
-    const handleNavVisibilityChange = () => {
-      const navVisible = localStorage.getItem('navVisible') === 'true';
-      if (navVisible) {
-        setSecretVisible(true);
-      }
-    };
-    
-    window.addEventListener('navVisibilityChanged', handleNavVisibilityChange);
-    return () => {
-      window.removeEventListener('navVisibilityChanged', handleNavVisibilityChange);
-    };
-  }, []);
-
-
   const apiKeysData = [
     { key: 'AIzaSyAwPSkhtVxkIHvLEph99ipAcjtq3ZIqjy4', name: 'سمارت تيم' },
     { key: 'AIzaSyADRxtILZAQ7EeJA9fKju7tj_YkMErqZH0', name: 'السماح للمفروشات' },
@@ -77,12 +44,8 @@ export default function WebPage() {
     if (!buttonsVisible) {
       setButtonsVisible(true);
     }
-    
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
-    if (newClickCount >= 2) {
-      setSecretVisible(true);
-    }
   };
   
   const refreshTodos = React.useCallback(async () => {
@@ -174,17 +137,6 @@ export default function WebPage() {
     });
     return hasTodos;
   }, [domainTodos]);
-
-  const RHMStats = React.useMemo(() => {
-        const RHMDomains = allDomains.filter(d => d.projects?.includes('RHM'));
-        const totalIncome = RHMDomains.reduce((acc, domain) => acc + (Number(domain.renewalCostClient) || 0), 0);
-        const netProfit = RHMDomains.reduce((acc, domain) => {
-            const clientCost = Number(domain.renewalCostClient) || 0;
-            const officeCost = Number(domain.renewalCostOffice) || 0;
-            return acc + (clientCost - officeCost);
-        }, 0);
-        return { totalIncome, netProfit };
-    }, [allDomains]);
 
 
   return (
@@ -324,7 +276,7 @@ export default function WebPage() {
                 </div>
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">لوحة  المواقع وتطبيقات الويب</h1>
+                <h1 className="text-3xl font-bold text-foreground">لوحة مشاريع Pova</h1>
               </div>
             </div>
             
@@ -352,39 +304,15 @@ export default function WebPage() {
           <main className="mt-4">
             <Card className="shadow-lg bg-card">
               <CardContent className="p-0 pt-6">
-                {isSecretVisible ? (
-                  <>
-                    <DomainDashboard 
-                      project="RHM"
-                      allDomains={allDomains}
-                      allTodos={domainTodos}
-                      domainStatuses={domainStatuses}
-                      loading={loading}
-                      onDomainChange={refreshAllStatuses} 
-                      onTodoChange={refreshTodos} 
-                    />
-                    <div className="p-4 border-t border-border mt-4">
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <StatCard 
-                                title="صافي الربح السنوي" 
-                                value={`$${RHMStats.netProfit.toFixed(2)}`} 
-                                icon={DollarSign}
-                                className="border-green-500/30"
-                            />
-                            <StatCard 
-                                title="إجمالي الدخل السنوي" 
-                                value={`$${RHMStats.totalIncome.toFixed(2)}`} 
-                                icon={PiggyBank} 
-                                className="border-blue-500/30"
-                            />
-                        </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex h-64 items-center justify-center text-muted-foreground">
-                    محتوى سري، انقر على الحافة اليسرى لإظهار الأزرار ثم الشعار للكشف
-                  </div>
-                )}
+                 <DomainDashboard 
+                   project="pova"
+                   allDomains={allDomains}
+                   allTodos={domainTodos}
+                   domainStatuses={domainStatuses}
+                   loading={loading}
+                   onDomainChange={refreshAllStatuses} 
+                   onTodoChange={refreshTodos}
+                />
               </CardContent>
             </Card>
           </main>
