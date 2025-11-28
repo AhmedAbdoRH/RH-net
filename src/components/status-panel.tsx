@@ -12,9 +12,10 @@ interface StatusPanelProps {
   domainStatuses: Record<string, 'checking' | 'online' | 'offline'>;
   domainTodos: Record<string, boolean>;
   apiKeyStatuses: ApiKeyStatus[];
+  showGeneralStatus?: boolean;
 }
 
-export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatuses }: StatusPanelProps) {
+export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatuses, showGeneralStatus = false }: StatusPanelProps) {
   const [clickedApiKey, setClickedApiKey] = React.useState<string | null>(null);
   const [showCountdownName, setShowCountdownName] = React.useState<boolean>(false);
   const [daysRemaining, setDaysRemaining] = React.useState<number>(0);
@@ -96,6 +97,8 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
           <div 
             className={cn(
               baseClasses,
+              status === 'online' ? "bg-green-500 shadow-green-500/60" :
+              status === 'offline' ? "bg-red-500 shadow-red-500/60" :
               "bg-yellow-500 shadow-yellow-500/60 animate-pulse"
             )}
             style={{ 
@@ -128,10 +131,9 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
           <div 
             className={cn(
               baseClasses,
-              "bg-green-500 shadow-green-500/60 animate-pulse"
+              "bg-green-500 shadow-green-500/60"
             )}
             style={{ 
-              animationDuration: '2s',
               animationDelay: `${index * 100}ms`
             }}
             title="متصل"
@@ -187,47 +189,51 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
             );
           })}
         </div>
-        <div className="flex flex-row flex-wrap gap-1.5 justify-center">
-            {apiKeyStatuses.map((apiKeyStatus, index) => (
-              <div key={apiKeyStatus.key} className="relative api-key-item">
+        {showGeneralStatus && (
+          <>
+            <div className="flex flex-row flex-wrap gap-1.5 justify-center">
+                {apiKeyStatuses.map((apiKeyStatus, index) => (
+                  <div key={apiKeyStatus.key} className="relative api-key-item">
+                    <div 
+                      className="w-5 h-2.5 border border-border/40 rounded-sm flex items-center justify-center bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors"
+                      onClick={() => setClickedApiKey(clickedApiKey === apiKeyStatus.key ? null : apiKeyStatus.key)}
+                      title={`اضغط لعرض الاسم: ${apiKeyStatus.name}`}
+                    >
+                      {getStatusLight(apiKeyStatus.status, index, false, true)}
+                    </div>
+                    {clickedApiKey === apiKeyStatus.key && (
+                      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1 rounded shadow-lg border border-border/40 whitespace-nowrap z-50">
+                        {apiKeyStatus.name}
+                      </div>
+                    )}
+                  </div>
+                ))}
+            </div>
+            
+            {/* Countdown Progress Bar */}
+            <div className="flex justify-center mt-1">
+              <div className="w-24 relative countdown-bar">
                 <div 
-                  className="w-5 h-2.5 border border-border/40 rounded-sm flex items-center justify-center bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors"
-                  onClick={() => setClickedApiKey(clickedApiKey === apiKeyStatus.key ? null : apiKeyStatus.key)}
-                  title={`اضغط لعرض الاسم: ${apiKeyStatus.name}`}
+                  className="h-1 bg-gray-700/50 rounded-full overflow-hidden relative cursor-pointer hover:bg-gray-600/50 transition-colors"
+                  onClick={() => setShowCountdownName(!showCountdownName)}
+                  title={`اضغط لعرض الاسم. متبقي ${daysRemaining} يوم.`}
                 >
-                  {getStatusLight(apiKeyStatus.status, index, false, true)}
+                  <div 
+                    className="absolute top-0 right-0 h-full bg-green-500/50 transition-all duration-1000 ease-linear"
+                    style={{ 
+                      width: `${countdownPercentage}%`,
+                    }}
+                  />
                 </div>
-                {clickedApiKey === apiKeyStatus.key && (
+                {showCountdownName && (
                   <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1 rounded shadow-lg border border-border/40 whitespace-nowrap z-50">
-                    {apiKeyStatus.name}
+                    سمارت تيم ماسنجر
                   </div>
                 )}
               </div>
-            ))}
-        </div>
-        
-        {/* Countdown Progress Bar */}
-        <div className="flex justify-center mt-1">
-          <div className="w-24 relative countdown-bar">
-            <div 
-              className="h-1 bg-gray-700/50 rounded-full overflow-hidden relative cursor-pointer hover:bg-gray-600/50 transition-colors"
-              onClick={() => setShowCountdownName(!showCountdownName)}
-              title={`اضغط لعرض الاسم. متبقي ${daysRemaining} يوم.`}
-            >
-              <div 
-                className="absolute top-0 right-0 h-full bg-green-500/50 transition-all duration-1000 ease-linear"
-                style={{ 
-                  width: `${countdownPercentage}%`,
-                }}
-              />
             </div>
-            {showCountdownName && (
-              <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1 rounded shadow-lg border border-border/40 whitespace-nowrap z-50">
-                سمارت تيم ماسنجر
-              </div>
-            )}
-          </div>
-        </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

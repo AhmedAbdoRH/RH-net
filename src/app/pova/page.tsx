@@ -282,7 +282,13 @@ export default function PovaPage() {
           </header>
 
           <Collapsible className="w-full mb-2">
-            <StatusPanel domains={filteredDomainsForStatusPanel} domainStatuses={domainStatuses} domainTodos={hasTodosMap} apiKeyStatuses={apiKeyStatuses} />
+            <StatusPanel 
+              domains={filteredDomainsForStatusPanel} 
+              domainStatuses={domainStatuses} 
+              domainTodos={hasTodosMap} 
+              apiKeyStatuses={apiKeyStatuses} 
+              showGeneralStatus={false}
+            />
             <CollapsibleTrigger asChild>
               <div className="w-full h-4 bg-card hover:bg-muted/80 border-x border-b border-border/60 rounded-b-lg flex items-center justify-center cursor-pointer">
                 <ChevronDown className="h-4 w-4 text-muted-foreground opacity-50 transition-transform data-[state=open]:rotate-180" />
