@@ -30,6 +30,7 @@ const todoFromDoc = (doc: any): Todo => {
     createdAt:
       (data.createdAt as Timestamp)?.toDate().toISOString() ||
       new Date().toISOString(),
+    isHighPriority: data.isHighPriority || false,
   };
 };
 
@@ -99,6 +100,7 @@ export const addTodo = (
     const newTodoData = {
       ...todo,
       createdAt: serverTimestamp(),
+      isHighPriority: todo.isHighPriority || false,
     };
     addDoc(todosCollectionRef, newTodoData)
       .then(async (docRef) => {

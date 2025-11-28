@@ -26,6 +26,7 @@ export type Todo = {
   text: string;
   completed: boolean;
   createdAt: string; // ISO 8601 string
+  isHighPriority?: boolean;
 };
 
 export type ApiKeyStatus = {

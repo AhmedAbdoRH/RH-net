@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, ListPlus, Copy } from 'lucide-react';
+import { Loader2, Plus, Trash2, ListPlus, Copy, Star } from 'lucide-react';
 import { addTodo, updateTodo, deleteTodo } from '@/services/todoService';
 import type { Todo } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
@@ -42,14 +42,22 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
   
+  const sortTodos = (todos: (Todo & { isNew?: boolean })[]) => {
+    return todos.sort((a, b) => {
+        if (a.isHighPriority && !b.isHighPriority) return -1;
+        if (!a.isHighPriority && b.isHighPriority) return 1;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  };
+
   React.useEffect(() => {
     // Pre-load the audio
     if (typeof window !== 'undefined') {
-        audioRef.current = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==");
+        audioRef.current = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==");
         audioRef.current.volume = 0.5;
     }
     const uncompleted = initialTodos.filter(t => !t.completed);
-    setTodos(uncompleted);
+    setTodos(sortTodos(uncompleted));
   }, [initialTodos]);
 
 
@@ -65,10 +73,11 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
       text,
       completed: false,
       createdAt: new Date().toISOString(),
+      isHighPriority: false,
       isNew: true,
     };
 
-    setTodos(prevTodos => [optimisticTodo, ...prevTodos]);
+    setTodos(prevTodos => sortTodos([optimisticTodo, ...prevTodos]));
     setNewTodo('');
 
     try {
@@ -76,9 +85,10 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
         domainId,
         text,
         completed: false,
+        isHighPriority: false,
       });
       setTodos(prevTodos => 
-        prevTodos.map(t => (t.id === tempId ? addedTodo : t))
+        sortTodos(prevTodos.map(t => (t.id === tempId ? addedTodo : t)))
       );
       onUpdate();
     } catch (error) {
@@ -100,6 +110,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
           domainId,
           text: todoText,
           completed: false,
+          isHighPriority: false,
         });
       }
       onUpdate();
@@ -148,6 +159,36 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
             });
         }
     }, 800); // Duration should be a bit longer than your CSS animations
+  };
+
+  const handleTogglePriority = async (todoId: string, currentPriority: boolean) => {
+    if (!todoId || todoId.startsWith('temp-')) return;
+    
+    // Optimistic UI update
+    setTodos(prev => {
+        const updatedTodos = prev.map(t => 
+            t.id === todoId ? { ...t, isHighPriority: !currentPriority } : t
+        );
+        return sortTodos(updatedTodos); // Re-sort the list
+    });
+
+    try {
+        await updateTodo(todoId, { isHighPriority: !currentPriority });
+        onUpdate();
+    } catch (error) {
+        // Revert on failure
+        setTodos(prev => {
+            const revertedTodos = prev.map(t => 
+                t.id === todoId ? { ...t, isHighPriority: currentPriority } : t
+            );
+            return sortTodos(revertedTodos);
+        });
+        toast({
+            title: "خطأ",
+            description: "فشل في تحديث أولوية المهمة.",
+            variant: "destructive",
+        });
+    }
   };
   
   const handleDeleteTodo = async (todoId: string) => {
@@ -219,7 +260,8 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
                 className={cn(
                   "flex items-start gap-3 p-2 rounded-md bg-background/50 hover:bg-background transition-colors group",
                   isCompleting && "slide-out-and-fade",
-                  todo.isNew ? "slide-in-and-fade" : "staggered-fade-in"
+                  todo.isNew ? "slide-in-and-fade" : "staggered-fade-in",
+                  todo.isHighPriority && !todo.completed && "animate-flash-red"
                 )}
                 style={{ animationDelay: todo.isNew ? '0ms' : `${index * 50}ms` }}
               >
@@ -237,12 +279,14 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
                 >
                   {todo.text}
                 </label>
-                <span className="text-xs text-muted-foreground mt-1">
-                  {todo.createdAt ? formatDistanceToNow(new Date(todo.createdAt), { addSuffix: true, locale: ar }) : ''}
-                </span>
-                <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => todo.id && handleDeleteTodo(todo.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive/80" />
-                </Button>
+                <div className="flex items-center mt-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => todo.id && handleTogglePriority(todo.id, todo.isHighPriority || false)}>
+                        <Star className={cn("h-4 w-4 text-muted-foreground transition-colors", todo.isHighPriority ? "text-yellow-400 fill-yellow-400" : "hover:text-yellow-400")} />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => todo.id && handleDeleteTodo(todo.id)}>
+                        <Trash2 className="h-4 w-4 text-destructive/80" />
+                    </Button>
+                </div>
               </li>
             )
           })}

@@ -215,4 +215,17 @@
   .completed-animation-checkbox[data-state="checked"] > span {
     color: white !important;
   }
+  
+  @keyframes flash-red {
+    0%, 100% {
+      background-color: transparent;
+    }
+    50% {
+      background-color: hsla(var(--destructive), 0.2);
+    }
+  }
+
+  .animate-flash-red {
+      animation: flash-red 1.5s infinite;
+  }
 }
