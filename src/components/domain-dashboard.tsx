@@ -915,7 +915,7 @@ export function DomainDashboard({
                 </Popover>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="renewalCostClient-add" className="text-right">تكلفة العميل ($)</Label>
+                <Label htmlFor="renewalCostClient-add" className="text-right">التكلفة على العميل ($)</Label>
                 <Input
                     id="renewalCostClient-add"
                     type="number"
@@ -1074,7 +1074,7 @@ export function DomainDashboard({
                         </Popover>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="renewalCostClient-edit" className="text-right">تكلفة العميل ($)</Label>
+                        <Label htmlFor="renewalCostClient-edit" className="text-right">التكلفة على العميل ($)</Label>
                         <Input
                             id="renewalCostClient-edit"
                             type="number"
@@ -1191,6 +1191,7 @@ export function DomainDashboard({
     
 
     
+
 
 
 
