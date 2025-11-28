@@ -80,6 +80,17 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
   const getStatusLight = (status: 'checking' | 'online' | 'offline', index: number, hasTodos?: boolean, isApiKey: boolean = false) => {
     const baseClasses = isApiKey ? "w-4 h-1.5 rounded-sm" : "w-2.5 h-2.5 rounded-full";
     
+    // Special case for offline domain with todos
+    if (!isApiKey && status === 'offline' && hasTodos) {
+        return (
+            <div
+                className={cn(baseClasses, "animate-flash-red-blue")}
+                title="غير متصل ويحتوي على مهام"
+                style={{ animationDelay: `${index * 100}ms` }}
+            />
+        );
+    }
+    
     if (isApiKey) {
       return (
           <div 
@@ -106,6 +117,7 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
               animationDuration: '2.5s',
               animationDelay: `${index * 100}ms`
             }}
+            title="يحتوي على مهام"
           />
       );
     }
@@ -122,6 +134,7 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
               animationDuration: '2s',
               animationDelay: `${index * 100}ms`
             }}
+            title="متصل"
           />
         );
       case 'offline':
@@ -134,6 +147,7 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
             style={{
               animationDelay: `${index * 100}ms`
             }}
+            title="غير متصل"
           />
         );
       case 'checking':
@@ -147,6 +161,7 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
               animationDuration: '1.5s',
               animationDelay: `${index * 100}ms`
             }}
+            title="يتم التحقق..."
           />
         );
       default:
