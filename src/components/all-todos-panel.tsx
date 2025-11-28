@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Trash2, Plus, Lightbulb, LightbulbOff } from 'lucide-react';
+import { Loader2, Trash2, Plus, Star } from 'lucide-react';
 import { getAllTodosGroupedByDomain, deleteTodo, GENERAL_TASKS_KEY, addTodo, updateTodo } from '@/services/todoService';
 import type { Todo } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
@@ -281,10 +281,10 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
             </label>
             <div className="flex items-center gap-1">
                 <button onClick={() => handleTogglePriority(todo.id!, todo.isHighPriority || false)} className="p-1">
-                    {todo.isHighPriority ? 
-                        <Lightbulb className="h-4 w-4 text-yellow-400 fill-yellow-400/70" /> :
-                        <LightbulbOff className="h-4 w-4 text-muted-foreground hover:text-yellow-400" />
-                    }
+                    <Star className={cn(
+                        "h-4 w-4 text-muted-foreground hover:text-yellow-400",
+                        todo.isHighPriority && "text-yellow-400 fill-yellow-400/70"
+                    )} />
                 </button>
                 <button onClick={() => handleDeleteTodo(todo)}>
                     <Trash2 className="h-4 w-4 text-destructive/80" />
