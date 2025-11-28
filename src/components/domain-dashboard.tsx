@@ -48,9 +48,10 @@ type DomainStatus = 'checking' | 'online' | 'offline';
 const projectLabels: Record<Project, string> = {
   RHM: 'RHM',
   pova: 'Pova',
+  firefly: 'Firefly',
   other: 'مشاريع أخرى',
 };
-const projectOptions: Project[] = ['RHM', 'pova', 'other'];
+const projectOptions: Project[] = ['RHM', 'pova', 'firefly', 'other'];
 
 interface DomainDashboardProps {
   project: Project;
@@ -92,6 +93,7 @@ export function DomainDashboard({
     renewalCostClient: number | '';
     renewalCostOffice: number | '';
     renewalCostPova: number | '';
+    renewalCostFirefly: number | '';
     projects: Project[];
     hasInstallments: boolean;
     installmentCount: number | '';
@@ -103,6 +105,7 @@ export function DomainDashboard({
     renewalCostClient: '',
     renewalCostOffice: '',
     renewalCostPova: '',
+    renewalCostFirefly: '',
     projects: [project],
     hasInstallments: false,
     installmentCount: '',
@@ -151,6 +154,7 @@ export function DomainDashboard({
       renewalCostClient: Number(newDomain.renewalCostClient) || 0,
       renewalCostOffice: Number(newDomain.renewalCostOffice) || 0,
       renewalCostPova: Number(newDomain.renewalCostPova) || 0,
+      renewalCostFirefly: Number(newDomain.renewalCostFirefly) || 0,
       status: 'active',
       collectionDate: formatISO(new Date()),
       projects: newDomain.projects,
@@ -174,6 +178,7 @@ export function DomainDashboard({
           renewalCostClient: '',
           renewalCostOffice: '',
           renewalCostPova: '',
+          renewalCostFirefly: '',
           projects: [project],
           hasInstallments: false,
           installmentCount: '',
@@ -236,6 +241,7 @@ export function DomainDashboard({
           renewalCostClient: Number(updatedData.renewalCostClient) || 0,
           renewalCostOffice: Number(updatedData.renewalCostOffice) || 0,
           renewalCostPova: Number(updatedData.renewalCostPova) || 0,
+          renewalCostFirefly: Number(updatedData.renewalCostFirefly) || 0,
           hasInstallments: updatedData.hasInstallments,
           installmentCount: updatedData.hasInstallments ? Number(updatedData.installmentCount) || 0 : 0,
           isOnlineCatalog: updatedData.isOnlineCatalog,
@@ -322,6 +328,7 @@ export function DomainDashboard({
         renewalCostClient: domain.renewalCostClient || '',
         renewalCostOffice: domain.renewalCostOffice || '',
         renewalCostPova: domain.renewalCostPova || '',
+        renewalCostFirefly: domain.renewalCostFirefly || '',
         projects: domain.projects || [],
         hasInstallments: domain.hasInstallments || false,
         installmentCount: domain.installmentCount || '',
@@ -498,11 +505,12 @@ export function DomainDashboard({
           <TableBody>
             {sortedDomains.map(domain => {
               const progress = getRenewalProgress(domain.renewalDate);
+              const colSpan = (project === 'pova' || project === 'firefly') ? 6 : 5;
               return (
               <Collapsible asChild key={domain.id}>
                 <>
                   <TableRow>
-                    <TableCell colSpan={project === 'pova' ? 6 : 5}>
+                    <TableCell colSpan={colSpan}>
                       <div className='flex items-start'>
                         <div className='flex-grow'>
                           <div className="flex items-center gap-2">
@@ -519,7 +527,7 @@ export function DomainDashboard({
                            {renderInstallments(domain)}
                         </div>
                         <div className='flex items-center gap-4 px-4'>
-                          {project === 'pova' ? (
+                          {(project === 'pova' || project === 'firefly') ? (
                             <div className="text-center">
                                 <div className="text-destructive font-semibold">${Number(domain.renewalCostClient).toFixed(2)}</div>
                                 <div className="text-xs text-muted-foreground">{(Number(domain.renewalCostClient) * USD_TO_EGP_RATE_CLIENT).toFixed(2)} ج.م</div>
@@ -536,6 +544,13 @@ export function DomainDashboard({
                                 <div className="text-accent font-semibold">${Number(domain.renewalCostPova).toFixed(2)}</div>
                                 <div className="text-xs text-muted-foreground">{(Number(domain.renewalCostPova) * USD_TO_EGP_RATE_CLIENT).toFixed(2)} ج.م</div>
                                 <div className="text-xs text-muted-foreground mt-1">Pova</div>
+                            </div>
+                          )}
+                          {project === 'firefly' && (
+                              <div className="text-center">
+                                <div className="text-accent font-semibold">${Number(domain.renewalCostFirefly).toFixed(2)}</div>
+                                <div className="text-xs text-muted-foreground">{(Number(domain.renewalCostFirefly) * USD_TO_EGP_RATE_CLIENT).toFixed(2)} ج.م</div>
+                                <div className="text-xs text-muted-foreground mt-1">Firefly</div>
                             </div>
                           )}
                           {(project === 'RHM' || project === 'other') && (
@@ -583,7 +598,7 @@ export function DomainDashboard({
                             <CalendarPlus className="h-4 w-4 text-yellow-500" />
                           </Button>
                         </a>
-                      {project !== 'pova' && (
+                      {(project !== 'pova' && project !== 'firefly') && (
                       <Button 
                         variant="ghost" 
                         size="icon" 
@@ -643,7 +658,7 @@ export function DomainDashboard({
                   </TableRow>
                   <CollapsibleContent asChild>
                     <TableRow>
-                      <TableCell colSpan={project === 'pova' ? 6 : 5} className="p-0">
+                      <TableCell colSpan={colSpan} className="p-0">
                         <div className="p-4 bg-muted/50">
                             <TodoList 
                               domainId={domain.id!} 
@@ -695,16 +710,24 @@ export function DomainDashboard({
                   
                   <div className='flex items-center justify-between gap-4'>
                     <div className="flex items-center gap-2">
-                      {project === 'pova' ? (
+                      {(project === 'pova' || project === 'firefly') ? (
                         <>
                           <div className="text-center">
                               <div className="text-destructive font-semibold">${Number(domain.renewalCostClient).toFixed(2)}</div>
                               <div className="text-xs text-muted-foreground mt-1">B2B</div>
                           </div>
-                          <div className="text-center">
-                              <div className="text-accent font-semibold">${Number(domain.renewalCostPova).toFixed(2)}</div>
-                              <div className="text-xs text-muted-foreground mt-1">Pova</div>
-                          </div>
+                           {project === 'pova' && (
+                              <div className="text-center">
+                                  <div className="text-accent font-semibold">${Number(domain.renewalCostPova).toFixed(2)}</div>
+                                  <div className="text-xs text-muted-foreground mt-1">Pova</div>
+                              </div>
+                           )}
+                           {project === 'firefly' && (
+                              <div className="text-center">
+                                  <div className="text-accent font-semibold">${Number(domain.renewalCostFirefly).toFixed(2)}</div>
+                                  <div className="text-xs text-muted-foreground mt-1">Firefly</div>
+                              </div>
+                           )}
                         </>
                       ) : project !== 'other' && (
                         <div className="text-center">
@@ -762,7 +785,7 @@ export function DomainDashboard({
                         </a>
                     </div>
                     <div className="flex items-center gap-2">
-                        {project !== 'pova' && (
+                        {(project !== 'pova' && project !== 'firefly') && (
                         <Button 
                           variant="ghost" 
                           size="icon" 
@@ -777,8 +800,7 @@ export function DomainDashboard({
                             <AlertDialogTrigger asChild>
                                 <Button 
                                   variant="ghost" 
-                                  size="icon" 
-                                  disabled={!domain.id} 
+                                  size="icon"                                   disabled={!domain.id} 
                                   title="حذف"
                                   className="rounded-full w-8 h-8 bg-red-500/10 hover:bg-red-500/20 hover:scale-110 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/30 border border-red-500/20 hover:border-red-500/40 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
                                 >
@@ -922,6 +944,18 @@ export function DomainDashboard({
                     type="number"
                     value={newDomain.renewalCostPova}
                     onChange={e => setNewDomain({ ...newDomain, renewalCostPova: e.target.value === '' ? '' : parseFloat(e.target.value) })}
+                    className="col-span-3"
+                />
+            </div>
+            )}
+            {newDomain.projects.includes('firefly') && (
+            <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="renewalCostFirefly-add" className="text-right">تكلفة Firefly ($)</Label>
+                <Input
+                    id="renewalCostFirefly-add"
+                    type="number"
+                    value={newDomain.renewalCostFirefly}
+                    onChange={e => setNewDomain({ ...newDomain, renewalCostFirefly: e.target.value === '' ? '' : parseFloat(e.target.value) })}
                     className="col-span-3"
                 />
             </div>
@@ -1073,6 +1107,18 @@ export function DomainDashboard({
                         />
                     </div>
                     )}
+                    {(domainToEdit.projects || []).includes('firefly') && (
+                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="renewalCostFirefly-edit" className="text-right">تكلفة Firefly ($)</Label>
+                        <Input
+                            id="renewalCostFirefly-edit"
+                            type="number"
+                            value={domainToEdit.renewalCostFirefly || ''}
+                            onChange={e => setDomainToEdit({ ...domainToEdit, renewalCostFirefly: e.target.value === '' ? '' : parseFloat(e.target.value) })}
+                            className="col-span-3"
+                        />
+                    </div>
+                    )}
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="hasInstallments-edit" className="text-right">تحصيل بالأقساط</Label>
                         <div className="col-span-3 flex items-center">
@@ -1145,6 +1191,7 @@ export function DomainDashboard({
     
 
     
+
 
 
 

@@ -1,5 +1,5 @@
 
-export type Project = 'RHM' | 'pova' | 'other';
+export type Project = 'RHM' | 'pova' | 'other' | 'firefly';
 
 export type Domain = {
   id?: string; // Firestore uses string IDs
@@ -12,6 +12,7 @@ export type Domain = {
   renewalCostClient: number | '';
   renewalCostOffice: number | '';
   renewalCostPova?: number | '';
+  renewalCostFirefly?: number | '';
   projects?: Project[];
   hasInstallments?: boolean;
   installmentCount?: number | '';

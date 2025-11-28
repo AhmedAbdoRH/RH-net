@@ -73,7 +73,10 @@ export const updateDomain = (
 ): Promise<void> => {
   return new Promise(async (resolve, reject) => {
     const domainDoc = doc(db, 'domains', id);
-    updateDoc(domainDoc, updatedDomain)
+    // clean up undefined values
+    const cleanUpdatedDomain = Object.fromEntries(Object.entries(updatedDomain).filter(([_, v]) => v !== undefined));
+
+    updateDoc(domainDoc, cleanUpdatedDomain)
       .then(() => {
         resolve();
       })
@@ -81,7 +84,7 @@ export const updateDomain = (
         const permissionError = new FirestorePermissionError({
           path: domainDoc.path,
           operation: 'update',
-          requestResourceData: updatedDomain,
+          requestResourceData: cleanUpdatedDomain,
         });
         errorEmitter.emit('permission-error', permissionError);
         reject(permissionError);

@@ -335,9 +335,10 @@ export default function WebPage() {
             <Card className="shadow-lg bg-card">
               <CardContent className="p-0 pt-0">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
+                  <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="RHM">RHM</TabsTrigger>
                     <TabsTrigger value="pova">Pova</TabsTrigger>
+                    <TabsTrigger value="firefly">Firefly</TabsTrigger>
                     <TabsTrigger value="other">مشاريع أخرى</TabsTrigger>
                   </TabsList>
                   <TabsContent value="RHM">
@@ -378,6 +379,17 @@ export default function WebPage() {
                   <TabsContent value="pova">
                     <DomainDashboard 
                        project="pova"
+                       allDomains={allDomains}
+                       allTodos={domainTodos}
+                       domainStatuses={domainStatuses}
+                       loading={loading}
+                       onDomainChange={refreshAllStatuses} 
+                       onTodoChange={refreshTodos}
+                    />
+                  </TabsContent>
+                  <TabsContent value="firefly">
+                    <DomainDashboard 
+                       project="firefly"
                        allDomains={allDomains}
                        allTodos={domainTodos}
                        domainStatuses={domainStatuses}
