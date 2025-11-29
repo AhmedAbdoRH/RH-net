@@ -157,21 +157,6 @@ export default function FireflyPage() {
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
            <div className={`flex items-center justify-center gap-2 transition-opacity duration-300 h-14 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-              <Link href="/" passHref>
-                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground" title="RHM">
-                  <Rss className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/pova" passHref>
-                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground" title="Pova">
-                  <Droplets className="h-5 w-5" />
-                </Button>
-              </Link>
-               <Link href="/firefly" passHref>
-                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground" title="Firefly">
-                  <Wind className="h-5 w-5" />
-                </Button>
-              </Link>
               <span className="h-6 w-px bg-border/60"></span>
               <Link href="https://rh-marketing.netlify.app/sys" target="_blank" rel="noopener noreferrer">
                 <Button 
@@ -260,7 +245,7 @@ export default function FireflyPage() {
         <div className="container mx-auto p-4 sm:p-6 lg:p-8">
           
           <header 
-            className="my-4 flex items-center justify-between gap-4 cursor-pointer"
+            className="my-4 flex items-center justify-between cursor-pointer"
             onClick={() => {
               if (typeof window !== 'undefined') {
                 localStorage.setItem('navVisible', 'true');
@@ -268,7 +253,7 @@ export default function FireflyPage() {
               }
             }}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <div className="relative cursor-pointer" onClick={handleSecretClick}>
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
                   <Icons.logo className="h-8 w-8 text-primary-foreground" />
@@ -326,5 +311,3 @@ export default function FireflyPage() {
     </>
   );
 }
-
-    
