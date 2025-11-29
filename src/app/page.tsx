@@ -296,7 +296,7 @@ export default function WebPage() {
         <div className="container mx-auto p-4 sm:p-6 lg:p-8">
           
           <header 
-            className="my-4 flex items-center justify-between cursor-pointer"
+            className="my-2 flex items-center justify-between cursor-pointer"
             onClick={() => {
               if (typeof window !== 'undefined') {
                 localStorage.setItem('navVisible', 'true');
@@ -311,7 +311,7 @@ export default function WebPage() {
                 </div>
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">لوحة  المواقع وتطبيقات الويب</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">لوحة  المواقع وتطبيقات الويب</h1>
               </div>
             </div>
             
