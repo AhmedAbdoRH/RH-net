@@ -311,7 +311,7 @@ export default function WebPage() {
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground">لوحة  المواقع وتطبيقات الويب</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">RHM WEB-APPS PANEL</h1>
               </div>
             </div>
             
