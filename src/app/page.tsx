@@ -50,6 +50,7 @@ export default function WebPage() {
   const [isFaultsSheetOpen, setFaultsSheetOpen] = React.useState(false);
   const [isGeneralPaperSheetOpen, setGeneralPaperSheetOpen] = React.useState(false);
   const [buttonsVisible, setButtonsVisible] = React.useState(false);
+  const [isTodosPanelOpen, setTodosPanelOpen] = React.useState(true);
   
   React.useEffect(() => {
     const handleNavVisibilityChange = () => {
@@ -83,6 +84,7 @@ export default function WebPage() {
     setClickCount(newClickCount);
     if (newClickCount >= 2) {
       setSecretVisible(true);
+      setTodosPanelOpen(false); // Collapse the todos panel when revealing content
     }
   };
   
@@ -330,7 +332,11 @@ export default function WebPage() {
             
           </header>
 
-          <Collapsible className="w-full mb-2">
+          <Collapsible
+            className="w-full mb-2"
+            open={isTodosPanelOpen}
+            onOpenChange={setTodosPanelOpen}
+          >
             <StatusPanel 
               domains={filteredDomainsForStatusPanel} 
               domainStatuses={domainStatuses} 
@@ -422,6 +428,8 @@ export default function WebPage() {
     </>
   );
 }
+
+    
 
     
 
