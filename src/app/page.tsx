@@ -411,7 +411,7 @@ export default function WebPage() {
                   </Tabs>
                 ) : (
                   <div className="flex h-64 items-center justify-center text-muted-foreground">
-                    محتوى سري، انقر على الحافة اليسرى لإظهار الأزرار ثم الشعار للكشف
+                    
                   </div>
                 )}
               </CardContent>
