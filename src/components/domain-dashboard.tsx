@@ -447,11 +447,26 @@ export function DomainDashboard({
   const [sortedDomains, setSortedDomains] = React.useState<Domain[]>([]);
 
     React.useEffect(() => {
-        const filtered = allDomains
-            .filter(d => d.projects?.includes(project))
-            .sort((a, b) => differenceInDays(parseISO(a.renewalDate), new Date()) - differenceInDays(parseISO(b.renewalDate), new Date()));
-        setSortedDomains(filtered);
-    }, [allDomains, project]);
+        const filtered = allDomains.filter(d => d.projects?.includes(project));
+        
+        const domainsWithHighPriority = new Set(
+            Object.keys(allTodos).filter(domainId => 
+                allTodos[domainId]?.some(todo => todo.isHighPriority && !todo.completed)
+            )
+        );
+
+        const sorted = filtered.sort((a, b) => {
+            const aHasHighPriority = a.id ? domainsWithHighPriority.has(a.id) : false;
+            const bHasHighPriority = b.id ? domainsWithHighPriority.has(b.id) : false;
+
+            if (aHasHighPriority && !bHasHighPriority) return -1;
+            if (!aHasHighPriority && bHasHighPriority) return 1;
+
+            return differenceInDays(parseISO(a.renewalDate), new Date()) - differenceInDays(parseISO(b.renewalDate), new Date());
+        });
+        
+        setSortedDomains(sorted);
+    }, [allDomains, project, allTodos]);
 
   if (loading) {
     return (
@@ -1202,3 +1217,6 @@ export function DomainDashboard({
 
 
 
+
+
+    
