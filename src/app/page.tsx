@@ -293,29 +293,33 @@ export default function WebPage() {
 
 
       <div className="min-h-screen bg-background text-foreground pb-4">
-        <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-          
-          <header 
-            className="my-2 flex items-center justify-between cursor-pointer"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('navVisible', 'true');
-                window.dispatchEvent(new Event('navVisibilityChanged'));
-              }
-            }}
-          >
-            <div className="flex items-center gap-2">
-              <div className="relative cursor-pointer" onClick={handleSecretClick}>
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-                  <Icons.logo className="h-8 w-8 text-primary-foreground" />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground">لوحة تحكم تطبيقات الويب</h1>
-              </div>
-            </div>
-            
-          </header>
+  <div className="container mx-auto p-1 sm:p-2 lg:p-2">
+    
+    <header 
+      className="my-0 py-0 flex items-center justify-between cursor-pointer"
+      onClick={() => {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('navVisible', 'true');
+          window.dispatchEvent(new Event('navVisibilityChanged'));
+        }
+      }}
+    >
+      <div className="flex items-center gap-2">
+        <div className="relative cursor-pointer" onClick={handleSecretClick}>
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
+            <Icons.logo className="h-8 w-8 text-primary-foreground" />
+          </div>
+        </div>
+
+        <div>
+          <h1 className="text-2xl md:text-2xl font-bold text-foreground m-1 p-1">
+            لوحة تحكم تطبيقات الويب
+          </h1>
+        </div>
+      </div>
+    </header>
+
+
 
           <Collapsible
             className="w-full mb-2"
