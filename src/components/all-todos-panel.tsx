@@ -39,6 +39,30 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
     };
+    
+    const sortedGroups = React.useMemo(() => {
+        const hasHighPriority = (groupName: string) => {
+            return groupedTodos[groupName]?.some(todo => todo.isHighPriority && !todo.completed);
+        };
+        
+        const allGroupKeys = Object.keys(groupedTodos).filter(key => groupedTodos[key].length > 0);
+
+        return allGroupKeys.sort((a, b) => {
+            const aHasPrio = hasHighPriority(a);
+            const bHasPrio = hasHighPriority(b);
+            
+            if (aHasPrio && !bHasPrio) return -1;
+            if (!aHasPrio && bHasPrio) return 1;
+
+            // Keep 'مهام عامة' at the top if no priority difference
+            if (a === GENERAL_TASKS_KEY && b !== GENERAL_TASKS_KEY) return -1;
+            if (a !== GENERAL_TASKS_KEY && b === GENERAL_TASKS_KEY) return 1;
+            
+            return 0;
+        });
+
+    }, [groupedTodos]);
+
 
     React.useEffect(() => {
         const sortedInitialGroupedTodos: GroupedTodos = {};
@@ -55,25 +79,6 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
             audioRef.current.volume = 0.5;
         }
     }, []);
-
-    const domainTodoGroups = React.useMemo(() => Object.keys(groupedTodos).filter(
-        key => key !== GENERAL_TASKS_KEY && groupedTodos[key].length > 0
-    ), [groupedTodos]);
-
-    const sortedDomainTodoGroups = React.useMemo(() => {
-        const hasHighPriority = (groupName: string) => {
-            return groupedTodos[groupName]?.some(todo => todo.isHighPriority && !todo.completed);
-        };
-
-        return [...domainTodoGroups].sort((a, b) => {
-            const aHasPrio = hasHighPriority(a);
-            const bHasPrio = hasHighPriority(b);
-            if (aHasPrio && !bHasPrio) return -1;
-            if (!aHasPrio && bHasPrio) return 1;
-            return 0;
-        });
-    }, [domainTodoGroups, groupedTodos]);
-
 
     const handleToggleTodo = async (todoId: string) => {
         if (!todoId || toggledTodos.includes(todoId)) return;
@@ -269,8 +274,6 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
         );
     }
     
-    const generalTodos = groupedTodos[GENERAL_TASKS_KEY] || [];
-
     const renderTodoItem = (todo: Todo & { isNew?: boolean }, index: number) => {
       if (!todo.id) return null;
       const isCompleting = toggledTodos.includes(todo.id);
@@ -326,32 +329,20 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
                   </Button>
                 </form>
 
-                {generalTodos.length === 0 && domainTodoGroups.length === 0 ? (
+                {sortedGroups.length === 0 ? (
                     <p className="text-center text-muted-foreground py-4">لا توجد أي مهام في جميع المشاريع.</p>
                 ) : (
                     <div className="space-y-4">
-                        {generalTodos.length > 0 && (
-                            <div>
+                        {sortedGroups.map((groupName, index) => (
+                           <div key={groupName}>
                                 <h3 className="font-semibold mb-2 flex items-center gap-2">
-                                    {GENERAL_TASKS_KEY}
+                                    {groupName}
                                 </h3>
                                 <ul className="space-y-2">
-                                    {generalTodos.map(renderTodoItem)}
+                                    {groupedTodos[groupName].map(renderTodoItem)}
                                 </ul>
-                            </div>
-                        )}
-                        
-                        {generalTodos.length > 0 && sortedDomainTodoGroups.length > 0 && <div className="border-b border-border/50 my-4"></div>}
-
-                        {sortedDomainTodoGroups.map(domainName => (
-                            <div key={domainName}>
-                                <h3 className="font-semibold mb-2 flex items-center gap-2">
-                                    {domainName}
-                                </h3>
-                                <ul className="space-y-2">
-                                    {groupedTodos[domainName].map(renderTodoItem)}
-                                </ul>
-                            </div>
+                                {index < sortedGroups.length - 1 && <div className="border-b border-border/50 my-4"></div>}
+                           </div>
                         ))}
                     </div>
                 )}
@@ -359,5 +350,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
         </Card>
     );
 }
+
+    
 
     
