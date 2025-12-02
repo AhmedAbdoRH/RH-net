@@ -82,9 +82,18 @@ export default function WebPage() {
     
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
+
     if (newClickCount >= 2) {
-      setSecretVisible(true);
-      setTodosPanelOpen(false); // Collapse the todos panel when revealing content
+      if (isSecretVisible) {
+        // If it's already visible, hide it and show the todos panel
+        setSecretVisible(false);
+        setTodosPanelOpen(true);
+      } else {
+        // If it's hidden, show it and hide the todos panel
+        setSecretVisible(true);
+        setTodosPanelOpen(false);
+      }
+      setClickCount(0); // Reset click count after action
     }
   };
   
@@ -205,9 +214,22 @@ export default function WebPage() {
       <FaultsSheet open={isFaultsSheetOpen} onOpenChange={setFaultsSheetOpen} />
       <GeneralPaperSheet open={isGeneralPaperSheetOpen} onOpenChange={setGeneralPaperSheetOpen} />
 
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/60">
+      <div className="min-h-screen bg-background text-foreground pb-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-           <div className={`flex items-center justify-center gap-2 transition-opacity duration-300 h-14 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <header className="py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="relative cursor-pointer" onClick={handleSecretClick}>
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
+                  <Icons.logo className="h-8 w-8 text-primary-foreground" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                  لوحة تحكم تطبيقات الويب
+                </h1>
+              </div>
+            </div>
+             <div className={`flex items-center justify-center gap-2 transition-opacity duration-300 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
               <span className="h-6 w-px bg-border/60"></span>
               <Link href="https://rh-marketing.netlify.app/sys" target="_blank" rel="noopener noreferrer">
                 <Button 
@@ -288,38 +310,7 @@ export default function WebPage() {
                 <ShieldAlert className="h-5 w-5" />
               </Button>
             </div>
-        </div>
-      </div>
-
-
-      <div className="min-h-screen bg-background text-foreground pb-4">
-  <div className="container mx-auto p-1 sm:p-2 lg:p-2">
-    
-    <header 
-      className="my-0 py-0 flex items-center justify-between cursor-pointer"
-      onClick={() => {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('navVisible', 'true');
-          window.dispatchEvent(new Event('navVisibilityChanged'));
-        }
-      }}
-    >
-      <div className="flex items-center gap-2">
-        <div className="relative cursor-pointer" onClick={handleSecretClick}>
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-            <Icons.logo className="h-8 w-8 text-primary-foreground" />
-          </div>
-        </div>
-
-        <div>
-          <h1 className="text-2xl md:text-2xl font-bold text-foreground m-1 p-1">
-            لوحة تحكم تطبيقات الويب
-          </h1>
-        </div>
-      </div>
-    </header>
-
-
+          </header>
 
           <Collapsible
             className="w-full mb-2"
