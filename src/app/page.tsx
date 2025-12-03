@@ -202,6 +202,89 @@ export default function WebPage() {
     return allDomains.filter(d => d.projects?.includes('RHM') || d.projects?.includes('other'));
   }, [allDomains]);
 
+  const actionButtons = (
+    <>
+      <span className="h-6 w-px bg-border/60"></span>
+      <Link href="https://rh-marketing.netlify.app/sys" target="_blank" rel="noopener noreferrer">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          title="فواتير المكتب الرئيسي"
+        >
+          <Building2 className="h-5 w-5" />
+        </Button>
+      </Link>
+      <Link href="https://rh-marketing.netlify.app/oc" target="_blank" rel="noopener noreferrer">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          title="ماليات الأونلاين"
+        >
+          <LayoutGrid className="h-5 w-5" />
+        </Button>
+      </Link>
+      <Link href="https://rh-marketing.netlify.app/trns" target="_blank" rel="noopener noreferrer">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          title="المعاملات الدولية"
+        >
+          <CreditCard className="h-5 w-5" />
+        </Button>
+      </Link>
+      <Link href="https://rhfattura.netlify.app/" target="_blank" rel="noopener noreferrer">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          title="الفواتير"
+          >
+          <Receipt className="h-5 w-5" />
+        </Button>
+      </Link>
+      <Link href="https://rhsales.netlify.app" target="_blank" rel="noopener noreferrer">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          title="لوحة إدارة المبيعات"
+          >
+          <User className="h-5 w-5" />
+        </Button>
+      </Link>
+      <Link href="https://studio.firebase.google.com/u/1/studio-256607151" target="_blank" rel="noopener noreferrer">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          title="بيئة التطوير"
+          >
+          <Code2 className="h-5 w-5" />
+        </Button>
+      </Link>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+        onClick={() => setGeneralPaperSheetOpen(true)}
+        title="الورقة العامة"
+        >
+        <NotebookPen className="h-5 w-5" />
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+        onClick={() => setFaultsSheetOpen(true)}
+        title="الأعطال"
+        >
+        <ShieldAlert className="h-5 w-5" />
+      </Button>
+    </>
+  );
 
   return (
     <>
@@ -213,6 +296,14 @@ export default function WebPage() {
       
       <FaultsSheet open={isFaultsSheetOpen} onOpenChange={setFaultsSheetOpen} />
       <GeneralPaperSheet open={isGeneralPaperSheetOpen} onOpenChange={setGeneralPaperSheetOpen} />
+
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/60 md:hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+           <div className={`flex items-center justify-center gap-2 transition-opacity duration-300 h-14 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+              {actionButtons}
+            </div>
+        </div>
+      </div>
 
       <div className="min-h-screen bg-background text-foreground pb-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -229,86 +320,8 @@ export default function WebPage() {
                 </h1>
               </div>
             </div>
-             <div className={`flex items-center justify-center gap-2 transition-opacity duration-300 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-              <span className="h-6 w-px bg-border/60"></span>
-              <Link href="https://rh-marketing.netlify.app/sys" target="_blank" rel="noopener noreferrer">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  title="فواتير المكتب الرئيسي"
-                >
-                  <Building2 className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="https://rh-marketing.netlify.app/oc" target="_blank" rel="noopener noreferrer">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  title="ماليات الأونلاين"
-                >
-                  <LayoutGrid className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="https://rh-marketing.netlify.app/trns" target="_blank" rel="noopener noreferrer">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  title="المعاملات الدولية"
-                >
-                  <CreditCard className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="https://rhfattura.netlify.app/" target="_blank" rel="noopener noreferrer">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  title="الفواتير"
-                  >
-                  <Receipt className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="https://rhsales.netlify.app" target="_blank" rel="noopener noreferrer">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  title="لوحة إدارة المبيعات"
-                  >
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="https://studio.firebase.google.com/u/1/studio-256607151" target="_blank" rel="noopener noreferrer">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  title="بيئة التطوير"
-                  >
-                  <Code2 className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                onClick={() => setGeneralPaperSheetOpen(true)}
-                title="الورقة العامة"
-                >
-                <NotebookPen className="h-5 w-5" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                onClick={() => setFaultsSheetOpen(true)}
-                title="الأعطال"
-                >
-                <ShieldAlert className="h-5 w-5" />
-              </Button>
+             <div className={`hidden md:flex items-center justify-center gap-2 transition-opacity duration-300 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+              {actionButtons}
             </div>
           </header>
 
