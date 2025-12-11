@@ -1169,9 +1169,13 @@ export function DomainDashboard({
 
       {/* Data Sheet Dialog */}
       <Dialog open={isDataSheetOpen} onOpenChange={setDataSheetOpen}>
-        <DialogContent className="max-w-[90vw] md:max-w-2xl lg:max-w-4xl h-[80vh]">
-            <DialogHeader>
+        <DialogContent className="max-w-[90vw] md:max-w-2xl lg:max-w-4xl h-[80vh] flex flex-col">
+            <DialogHeader className="flex-row justify-between items-center">
                 <DialogTitle>{dataSheetContent.title}</DialogTitle>
+                <div className="flex items-center gap-2">
+                    <Button onClick={handleSaveDataSheet}>حفظ</Button>
+                    <DialogClose asChild><Button variant="ghost">إغلاق</Button></DialogClose>
+                </div>
             </DialogHeader>
              <div className="flex-grow flex flex-col py-4">
                 <Textarea
@@ -1181,30 +1185,9 @@ export function DomainDashboard({
                     rows={25}
                 />
             </div>
-            <DialogFooter>
-                <DialogClose asChild><Button variant="ghost">إغلاق</Button></DialogClose>
-                <Button onClick={handleSaveDataSheet}>حفظ</Button>
-            </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
   );
 }
 
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
