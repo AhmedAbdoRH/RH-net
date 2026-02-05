@@ -203,7 +203,7 @@ export function DomainDashboard({
       await deleteDomain(domainId);
       toast({
           title: "تم حذف النطاق",
-          description: `تم حذف ${domainToDelete.domainName} بنج.`,
+          description: `تم حذف ${domainToDelete.domainName} بنجاح.`,
           variant: "destructive"
       });
       onDomainChange();
@@ -298,7 +298,6 @@ export function DomainDashboard({
     const paidCount = domain.installmentsPaid || 0;
     const totalCount = domain.installmentCount || 0;
 
-    // Only allow collecting the next due installment
     if (installmentIndex !== paidCount) {
         toast({ title: "خطأ", description: "يرجى تحصيل الأقساط بالترتيب.", variant: "destructive" });
         return;
@@ -388,7 +387,6 @@ export function DomainDashboard({
     const renewal = parseISO(renewalDate);
     const today = new Date();
     
-    // If renewal date is in the past, progress is 100%
     if (differenceInDays(renewal, today) <= 0) {
       return 100;
     }
@@ -397,7 +395,7 @@ export function DomainDashboard({
     const totalDaysInYear = differenceInDays(renewal, lastRenewal);
     
     if (totalDaysInYear <= 0) {
-      return 0; // Or 100, depending on desired behavior for edge case
+      return 0;
     }
     
     const daysPassed = differenceInDays(today, lastRenewal);
@@ -505,13 +503,12 @@ export function DomainDashboard({
       {/* Desktop Table */}
       <div className="hidden md:block rounded-md border mt-4">
         <Table>
-          <TableBody>
             {sortedDomains.map(domain => {
               const progress = getRenewalProgress(domain.renewalDate);
               const colSpan = (project === 'pova' || project === 'firefly') ? 6 : 5;
               return (
               <Collapsible asChild key={domain.id}>
-                <>
+                <TableBody>
                   <TableRow>
                     <TableCell colSpan={colSpan}>
                       <div className='flex items-start'>
@@ -607,7 +604,7 @@ export function DomainDashboard({
                         size="icon" 
                         onClick={() => openEditDialog(domain)} 
                         title="تعديل"
-                                                className="rounded-full w-8 h-8 bg-blue-500/10 hover:bg-blue-500/20 hover:scale-110 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/30 border border-blue-500/20 hover:border-blue-500/40"
+                        className="rounded-full w-8 h-8 bg-blue-500/10 hover:bg-blue-500/20 hover:scale-110 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/30 border border-blue-500/20 hover:border-blue-500/40"
                       >
                         <Pencil className="h-4 w-4 text-blue-500" />
                       </Button>
@@ -645,7 +642,7 @@ export function DomainDashboard({
                         size="icon" 
                         onClick={() => openDataSheetDialog(domain)} 
                         title="عرض شيت البيانات"
-                                                className="rounded-full w-8 h-8 bg-purple-500/10 hover:bg-purple-500/20 hover:scale-110 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/30 border border-purple-500/20 hover:border-purple-500/40"
+                        className="rounded-full w-8 h-8 bg-purple-500/10 hover:bg-purple-500/20 hover:scale-110 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/30 border border-purple-500/20 hover:border-purple-500/40"
                       >
                          <FileText className="h-4 w-4 text-purple-500" />
                        </Button>
@@ -672,10 +669,9 @@ export function DomainDashboard({
                       </TableCell>
                     </TableRow>
                   </CollapsibleContent>
-                </>
+                </TableBody>
               </Collapsible>
             )})}
-          </TableBody>
         </Table>
       </div>
 
@@ -684,7 +680,7 @@ export function DomainDashboard({
         {sortedDomains.map(domain => {
           const progress = getRenewalProgress(domain.renewalDate);
           return (
-          <Card asChild key={domain.id}>
+          <Card key={domain.id}>
             <Collapsible>
               <div className="w-full overflow-hidden">
                 <CardContent className="p-4 space-y-4">
@@ -1190,4 +1186,3 @@ export function DomainDashboard({
     </>
   );
 }
-

@@ -53,8 +53,10 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   React.useEffect(() => {
     // Pre-load the audio
     if (typeof window !== 'undefined') {
-        audioRef.current = new Audio("data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV-");
-        audio.current.volume = 0.5;
+        audioRef.current = new Audio("data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tAnRABiFADgAANqiv//zFAREFVAAAAgAAA+jTEFImAAK4AABNEMkCSJ1YgJgAABRgAAAAnY1NTAVEAAAABAAAADkxBVkMAAAA5OC4xMDguMTAwAAAA//sQjxADeALgAABpAiv//wAAN9gAADCem8pXlRzYQCAAAAAAAAAAAAAFlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV-");
+        if (audioRef.current) {
+            audioRef.current.volume = 0.5;
+        }
     }
     const uncompleted = initialTodos.filter(t => !t.completed);
     setTodos(sortTodos(uncompleted));
@@ -133,13 +135,10 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   const handleToggleTodo = async (todoId: string) => {
     if (!todoId || todoId.startsWith('temp-') || toggledTodos.includes(todoId)) return;
     
-    // --- Immediate Visual Update ---
     setToggledTodos(prev => [...prev, todoId]);
     setTodos(prev => prev.map(t => t.id === todoId ? { ...t, completed: true } : t));
     audioRef.current?.play().catch(e => console.log("Audio play failed", e));
-    // --- End Immediate Visual Update ---
     
-    // Wait for animations to finish before removing the item from the list
     setTimeout(async () => {
         const originalTodos = todos;
         setTodos(prev => prev.filter(t => t.id !== todoId));
@@ -158,25 +157,23 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
                 variant: "destructive",
             });
         }
-    }, 800); // Duration should be a bit longer than your CSS animations
+    }, 800);
   };
 
   const handleTogglePriority = async (todoId: string, currentPriority: boolean) => {
     if (!todoId || todoId.startsWith('temp-')) return;
     
-    // Optimistic UI update
     setTodos(prev => {
         const updatedTodos = prev.map(t => 
             t.id === todoId ? { ...t, isHighPriority: !currentPriority } : t
         );
-        return sortTodos(updatedTodos); // Re-sort the list
+        return sortTodos(updatedTodos);
     });
 
     try {
         await updateTodo(todoId, { isHighPriority: !currentPriority });
         onUpdate();
     } catch (error) {
-        // Revert on failure
         setTodos(prev => {
             const revertedTodos = prev.map(t => 
                 t.id === todoId ? { ...t, isHighPriority: currentPriority } : t
@@ -301,5 +298,3 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
     </div>
   );
 }
-
-    
