@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -15,10 +14,11 @@ import { getTodosForDomains, getAllTodosGroupedByDomain } from '@/services/todoS
 import { AllTodosPanel } from '@/components/all-todos-panel';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from '@/components/ui/button';
-import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Code2, User, Receipt, NotebookPen, FileText, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss } from 'lucide-react';
+import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Code2, User, Receipt, NotebookPen, FileText, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FaultsSheet } from '@/components/faults-sheet';
 import { GeneralPaperSheet } from '@/components/general-paper-sheet';
+import { LeaderboardSheet } from '@/components/leaderboard-sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
@@ -49,6 +49,7 @@ export default function WebPage() {
   const [loading, setLoading] = React.useState(true);
   const [isFaultsSheetOpen, setFaultsSheetOpen] = React.useState(false);
   const [isGeneralPaperSheetOpen, setGeneralPaperSheetOpen] = React.useState(false);
+  const [isLeaderboardSheetOpen, setLeaderboardSheetOpen] = React.useState(false);
   const [buttonsVisible, setButtonsVisible] = React.useState(false);
   const [isTodosPanelOpen, setTodosPanelOpen] = React.useState(true);
   
@@ -85,15 +86,13 @@ export default function WebPage() {
 
     if (newClickCount >= 2) {
       if (isSecretVisible) {
-        // If it's already visible, hide it and show the todos panel
         setSecretVisible(false);
         setTodosPanelOpen(true);
       } else {
-        // If it's hidden, show it and hide the todos panel
         setSecretVisible(true);
         setTodosPanelOpen(false);
       }
-      setClickCount(0); // Reset click count after action
+      setClickCount(0);
     }
   };
   
@@ -278,6 +277,15 @@ export default function WebPage() {
         variant="ghost" 
         size="icon" 
         className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+        onClick={() => setLeaderboardSheetOpen(true)}
+        title="لوحة المتصدرين"
+        >
+        <Trophy className="h-5 w-5" />
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
         onClick={() => setFaultsSheetOpen(true)}
         title="الأعطال"
         >
@@ -296,6 +304,7 @@ export default function WebPage() {
       
       <FaultsSheet open={isFaultsSheetOpen} onOpenChange={setFaultsSheetOpen} />
       <GeneralPaperSheet open={isGeneralPaperSheetOpen} onOpenChange={setGeneralPaperSheetOpen} />
+      <LeaderboardSheet open={isLeaderboardSheetOpen} onOpenChange={setLeaderboardSheetOpen} />
 
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/60 md:hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

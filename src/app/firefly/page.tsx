@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -15,9 +14,10 @@ import { getTodosForDomains, getAllTodosGroupedByDomain } from '@/services/todoS
 import { AllTodosPanel } from '@/components/all-todos-panel';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ShieldAlert, Code2, User, Receipt, NotebookPen, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss } from 'lucide-react';
+import { ChevronDown, ShieldAlert, Code2, User, Receipt, NotebookPen, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss, Trophy } from 'lucide-react';
 import { FaultsSheet } from '@/components/faults-sheet';
 import { GeneralPaperSheet } from '@/components/general-paper-sheet';
+import { LeaderboardSheet } from '@/components/leaderboard-sheet';
 
 
 export default function FireflyPage() {
@@ -30,6 +30,7 @@ export default function FireflyPage() {
   const [loading, setLoading] = React.useState(true);
   const [isFaultsSheetOpen, setFaultsSheetOpen] = React.useState(false);
   const [isGeneralPaperSheetOpen, setGeneralPaperSheetOpen] = React.useState(false);
+  const [isLeaderboardSheetOpen, setLeaderboardSheetOpen] = React.useState(false);
   const [buttonsVisible, setButtonsVisible] = React.useState(false);
   
   const apiKeysData = [
@@ -219,6 +220,15 @@ export default function FireflyPage() {
           variant="ghost" 
           size="icon" 
           className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          onClick={() => setLeaderboardSheetOpen(true)}
+          title="لوحة المتصدرين"
+          >
+          <Trophy className="h-5 w-5" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
           onClick={() => setFaultsSheetOpen(true)}
           title="الأعطال"
           >
@@ -237,6 +247,7 @@ export default function FireflyPage() {
       
       <FaultsSheet open={isFaultsSheetOpen} onOpenChange={setFaultsSheetOpen} />
       <GeneralPaperSheet open={isGeneralPaperSheetOpen} onOpenChange={setGeneralPaperSheetOpen} />
+      <LeaderboardSheet open={isLeaderboardSheetOpen} onOpenChange={setLeaderboardSheetOpen} />
 
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/60 md:hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
