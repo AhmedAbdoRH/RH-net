@@ -74,8 +74,8 @@ export function ArenaLeaderboard() {
   const maxScore = Math.max(...parsedData.map(d => d.numericScore));
 
   return (
-    <Card className="w-full bg-black text-neutral-200 border-neutral-800 shadow-2xl overflow-hidden relative">
-      <CardHeader className="flex flex-row items-center justify-between py-6 border-b border-neutral-800/60 relative z-10 bg-black/90 backdrop-blur-xl">
+    <Card className="w-full bg-black/20 backdrop-blur-md text-neutral-200 border-neutral-800/50 shadow-2xl overflow-hidden relative">
+      <CardHeader className="flex flex-row items-center justify-between py-6 border-b border-neutral-800/30 relative z-10 bg-black/10 backdrop-blur-xl">
         <div className="flex items-center gap-2 text-xs font-mono text-neutral-500 bg-neutral-900/50 px-3 py-1 rounded-full border border-neutral-800">
           <RefreshCw className="h-3 w-3 animate-spin-slow" />
           <span>SYNC: {new Date(data.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
@@ -111,7 +111,7 @@ export function ArenaLeaderboard() {
                         <span className={cn("w-6 text-center text-neutral-600 text-xs", isTop3 && "text-white/90 font-black")}>#{index + 1}</span>
                         <span className="uppercase tracking-wider flex items-center gap-2">
                           {row.model}
-                          <span className="text-neutral-300 text-xs font-bold opacity-90">({row.score})</span>
+                          <span className="text-neutral-400 text-xs font-medium opacity-70">({row.score})</span>
                         </span> 
                       </span>
                     </div>
