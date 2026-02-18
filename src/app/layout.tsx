@@ -5,6 +5,7 @@ import '../styles/micro-interactions.css';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseProvider } from '@/firebase/provider';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { LeaderboardFooter } from '@/components/leaderboard-footer';
 
 export const metadata: Metadata = {
   title: 'لوحة تحكم النطاقات',
@@ -21,16 +22,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning className="dark">
-        <head>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
-        </head>
-
-      <body className="font-sans antialiased">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-sans antialiased min-h-screen flex flex-col bg-background relative">
         <FirebaseProvider>
           <FirebaseClientProvider>
-            {children}
+            <main className="flex-1">
+              {children}
+            </main>
+            <LeaderboardFooter />
           </FirebaseClientProvider>
         </FirebaseProvider>
         <Toaster />
