@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseProvider } from '@/firebase/provider';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { LeaderboardFooter } from '@/components/leaderboard-footer';
 
 export const metadata: Metadata = {
   title: 'لوحة تحكم النطاقات',
@@ -24,10 +25,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased min-h-screen flex flex-col bg-background">
         <FirebaseProvider>
           <FirebaseClientProvider>
-            {children}
+            <main className="flex-1">
+              {children}
+            </main>
+            <LeaderboardFooter />
           </FirebaseClientProvider>
         </FirebaseProvider>
         <Toaster />
