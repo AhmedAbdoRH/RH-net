@@ -75,7 +75,7 @@ export function ArenaLeaderboard() {
 
   return (
     <Card className="w-full bg-black/20 backdrop-blur-md text-neutral-200 border-neutral-800/50 shadow-2xl overflow-hidden relative">
-      <CardHeader className="flex flex-row items-center justify-between py-6 border-b border-neutral-800/30 relative z-10 bg-black/10 backdrop-blur-xl">
+      <CardHeader className="flex flex-row items-center justify-between py-3 border-b border-neutral-800/30 relative z-10 bg-black/10 backdrop-blur-xl">
         <div className="flex items-center gap-2 text-xs font-mono text-neutral-500 bg-neutral-900/50 px-3 py-1 rounded-full border border-neutral-800">
           <RefreshCw className="h-3 w-3 animate-spin-slow" />
           <span>SYNC: {new Date(data.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
@@ -90,7 +90,7 @@ export function ArenaLeaderboard() {
             
             return (
               <div key={index} className="flex items-center w-full group relative hover:bg-white/[0.02] transition-colors duration-300">
-                <div className="w-full h-10 relative flex items-center">
+                <div className="w-full h-8 relative flex items-center">
                   
                   {/* Background Track */}
                   <div className="absolute inset-0 border-b border-neutral-900/50" />
@@ -122,7 +122,7 @@ export function ArenaLeaderboard() {
           })}
         </div>
         
-        <div className="p-4 text-[10px] text-center text-neutral-700 font-mono tracking-widest uppercase border-t border-neutral-900 bg-black">
+        <div className="p-2 text-[10px] text-center text-neutral-700 font-mono tracking-widest uppercase border-t border-neutral-900 bg-black">
            DATA SOURCE: <a href={data.source} target="_blank" rel="noreferrer" className="text-neutral-600 hover:text-neutral-400 transition-colors">ARENA.AI CODE LEADERBOARD // LIVE FEED</a>
         </div>
       </CardContent>
