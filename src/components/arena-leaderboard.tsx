@@ -111,7 +111,7 @@ export function ArenaLeaderboard() {
                         <span className={cn("w-6 text-center text-neutral-600 text-xs", isTop3 && "text-white/90 font-black")}>#{index + 1}</span>
                         <span className="uppercase tracking-wider flex items-center gap-2">
                           {row.model}
-                          <span className="text-neutral-600 text-xs font-medium">({row.score})</span>
+                          <span className="text-neutral-300 text-xs font-bold opacity-90">({row.score})</span>
                         </span> 
                       </span>
                     </div>
