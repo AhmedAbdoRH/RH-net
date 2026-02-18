@@ -99,10 +99,10 @@ export function ArenaLeaderboard() {
                   <div 
                     className={cn(
                       "h-full absolute top-0 left-0 flex items-center px-4 overflow-hidden whitespace-nowrap transition-all duration-1000 ease-out",
-                      "bg-gradient-to-r from-black via-neutral-900 to-neutral-800",
+                      "bg-gradient-to-r from-black via-neutral-950 to-neutral-900",
                       "border-r border-y border-neutral-800/50",
                       "shadow-none group-hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]",
-                      "group-hover:from-neutral-900 group-hover:via-neutral-800 group-hover:to-neutral-700 group-hover:border-neutral-700",
+                      "group-hover:from-black group-hover:via-neutral-900 group-hover:to-neutral-800",
                     )}
                     style={{ width: animated ? `${percentage}%` : '0%' }}
                   >
