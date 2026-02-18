@@ -1,0 +1,8 @@
+{
+  "projectId": "dbab39b4-7d53-411f-81a5-232e92e8bd02",
+  "createdAt": 1739016145000,
+  "startupCommands": [
+    "npm run dev",
+    "npm run genkit:dev"
+  ]
+}

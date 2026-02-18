@@ -20,21 +20,22 @@ import { cn } from '@/lib/utils';
 import { FaultsSheet } from '@/components/faults-sheet';
 import { GeneralPaperSheet } from '@/components/general-paper-sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { InteractiveBackground } from '@/components/ui/interactive-background';
 
 
 const StatCard = ({ title, value, icon, className }: { title: string, value: string, icon: React.ElementType, className?: string }) => {
-    const Icon = icon;
-    return (
-        <Card className={cn("bg-card/50", className)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{value}</div>
-            </CardContent>
-        </Card>
-    );
+  const Icon = icon;
+  return (
+    <Card className={cn("card-base card-interactive", className)}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+      </CardContent>
+    </Card>
+  );
 };
 
 
@@ -51,7 +52,7 @@ export default function WebPage() {
   const [isGeneralPaperSheetOpen, setGeneralPaperSheetOpen] = React.useState(false);
   const [buttonsVisible, setButtonsVisible] = React.useState(false);
   const [isTodosPanelOpen, setTodosPanelOpen] = React.useState(true);
-  
+
   React.useEffect(() => {
     const handleNavVisibilityChange = () => {
       const navVisible = localStorage.getItem('navVisible') === 'true';
@@ -59,7 +60,7 @@ export default function WebPage() {
         setSecretVisible(true);
       }
     };
-    
+
     window.addEventListener('navVisibilityChanged', handleNavVisibilityChange);
     return () => {
       window.removeEventListener('navVisibilityChanged', handleNavVisibilityChange);
@@ -73,13 +74,13 @@ export default function WebPage() {
     { key: 'AIzaSyAY7XTQpSR4nws-xRIhABZn3f3kYdGIVDs', name: 'بيرفيوم امبسدور' },
     { key: 'AIzaSyDohlhUWuaygB35M2EY-JB1_F1xztx_lO4', name: 'سمارت تيم ماسنجر' }
   ];
-  
+
   const handleSecretClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!buttonsVisible) {
       setButtonsVisible(true);
     }
-    
+
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
 
@@ -96,22 +97,22 @@ export default function WebPage() {
       setClickCount(0); // Reset click count after action
     }
   };
-  
+
   const refreshTodos = React.useCallback(async () => {
     try {
-        const domainsFromDb = await getDomains();
-        const domainIds = domainsFromDb.map(d => d.id).filter((id): id is string => !!id);
-        
-        const [todosByDomain, allGrouped] = await Promise.all([
-            domainIds.length > 0 ? getTodosForDomains(domainIds) : Promise.resolve({}),
-            getAllTodosGroupedByDomain()
-        ]);
+      const domainsFromDb = await getDomains();
+      const domainIds = domainsFromDb.map(d => d.id).filter((id): id is string => !!id);
 
-        setDomainTodos(todosByDomain);
-        setAllGroupedTodos(allGrouped);
+      const [todosByDomain, allGrouped] = await Promise.all([
+        domainIds.length > 0 ? getTodosForDomains(domainIds) : Promise.resolve({}),
+        getAllTodosGroupedByDomain()
+      ]);
+
+      setDomainTodos(todosByDomain);
+      setAllGroupedTodos(allGrouped);
 
     } catch (error) {
-        console.error("Error refreshing todos:", error);
+      console.error("Error refreshing todos:", error);
     }
   }, []);
 
@@ -119,7 +120,7 @@ export default function WebPage() {
   const refreshAllStatuses = React.useCallback(async () => {
     try {
       setLoading(true);
-      
+
       const domainsFromDb = await getDomains();
       const domainsWithProject = domainsFromDb.map(d => {
         let projects = d.projects || [];
@@ -141,7 +142,7 @@ export default function WebPage() {
         if (d.id) initialDomainStatuses[d.id] = 'checking';
       });
       setDomainStatuses(initialDomainStatuses);
-      
+
       setApiKeyStatuses(apiKeysData.map(item => ({ key: item.key, name: item.name, status: 'checking' as const })));
 
       refreshTodos();
@@ -178,7 +179,7 @@ export default function WebPage() {
   React.useEffect(() => {
     refreshAllStatuses();
   }, [refreshAllStatuses]);
-  
+
   const hasTodosMap = React.useMemo(() => {
     const hasTodos: Record<string, boolean> = {};
     Object.keys(domainTodos).forEach(domainId => {
@@ -188,15 +189,15 @@ export default function WebPage() {
   }, [domainTodos]);
 
   const RHMStats = React.useMemo(() => {
-        const RHMDomains = allDomains.filter(d => d.projects?.includes('RHM'));
-        const totalIncome = RHMDomains.reduce((acc, domain) => acc + (Number(domain.renewalCostClient) || 0), 0);
-        const netProfit = RHMDomains.reduce((acc, domain) => {
-            const clientCost = Number(domain.renewalCostClient) || 0;
-            const officeCost = Number(domain.renewalCostOffice) || 0;
-            return acc + (clientCost - officeCost);
-        }, 0);
-        return { totalIncome, netProfit };
-    }, [allDomains]);
+    const RHMDomains = allDomains.filter(d => d.projects?.includes('RHM'));
+    const totalIncome = RHMDomains.reduce((acc, domain) => acc + (Number(domain.renewalCostClient) || 0), 0);
+    const netProfit = RHMDomains.reduce((acc, domain) => {
+      const clientCost = Number(domain.renewalCostClient) || 0;
+      const officeCost = Number(domain.renewalCostOffice) || 0;
+      return acc + (clientCost - officeCost);
+    }, 0);
+    return { totalIncome, netProfit };
+  }, [allDomains]);
 
   const filteredDomainsForStatusPanel = React.useMemo(() => {
     return allDomains.filter(d => d.projects?.includes('RHM') || d.projects?.includes('other'));
@@ -206,9 +207,9 @@ export default function WebPage() {
     <>
       <span className="h-6 w-px bg-border/60"></span>
       <Link href="https://rh-marketing.netlify.app/sys" target="_blank" rel="noopener noreferrer">
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
           title="فواتير المكتب الرئيسي"
         >
@@ -216,9 +217,9 @@ export default function WebPage() {
         </Button>
       </Link>
       <Link href="https://rh-marketing.netlify.app/oc" target="_blank" rel="noopener noreferrer">
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
           title="ماليات الأونلاين"
         >
@@ -226,9 +227,9 @@ export default function WebPage() {
         </Button>
       </Link>
       <Link href="https://rh-marketing.netlify.app/trns" target="_blank" rel="noopener noreferrer">
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
           title="المعاملات الدولية"
         >
@@ -236,51 +237,51 @@ export default function WebPage() {
         </Button>
       </Link>
       <Link href="https://rhfattura.netlify.app/" target="_blank" rel="noopener noreferrer">
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
           title="الفواتير"
-          >
+        >
           <Receipt className="h-5 w-5" />
         </Button>
       </Link>
       <Link href="https://rhsales.netlify.app" target="_blank" rel="noopener noreferrer">
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
           title="لوحة إدارة المبيعات"
-          >
+        >
           <User className="h-5 w-5" />
         </Button>
       </Link>
       <Link href="https://studio.firebase.google.com/u/1/studio-256607151" target="_blank" rel="noopener noreferrer">
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
           title="بيئة التطوير"
-          >
+        >
           <Code2 className="h-5 w-5" />
         </Button>
       </Link>
-      <Button 
-        variant="ghost" 
-        size="icon" 
+      <Button
+        variant="ghost"
+        size="icon"
         className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
         onClick={() => setGeneralPaperSheetOpen(true)}
         title="الورقة العامة"
-        >
+      >
         <NotebookPen className="h-5 w-5" />
       </Button>
-      <Button 
-        variant="ghost" 
-        size="icon" 
+      <Button
+        variant="ghost"
+        size="icon"
         className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
         onClick={() => setFaultsSheetOpen(true)}
         title="الأعطال"
-        >
+      >
         <ShieldAlert className="h-5 w-5" />
       </Button>
     </>
@@ -288,20 +289,22 @@ export default function WebPage() {
 
   return (
     <>
-      <div 
-        onClick={handleSecretClick} 
+      <InteractiveBackground quality="medium" />
+      
+      <div
+        onClick={handleSecretClick}
         className="fixed left-0 top-0 h-full w-4 cursor-pointer z-20"
         title="Secret"
       />
-      
+
       <FaultsSheet open={isFaultsSheetOpen} onOpenChange={setFaultsSheetOpen} />
       <GeneralPaperSheet open={isGeneralPaperSheetOpen} onOpenChange={setGeneralPaperSheetOpen} />
 
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/60 md:hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-           <div className={`flex items-center justify-center gap-2 transition-opacity duration-300 h-14 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-              {actionButtons}
-            </div>
+          <div className={`flex items-center justify-center gap-2 transition-opacity duration-300 h-14 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            {actionButtons}
+          </div>
         </div>
       </div>
 
@@ -320,7 +323,7 @@ export default function WebPage() {
                 </h1>
               </div>
             </div>
-             <div className={`hidden md:flex items-center justify-center gap-2 transition-opacity duration-300 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className={`hidden md:flex items-center justify-center gap-2 transition-opacity duration-300 ${buttonsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
               {actionButtons}
             </div>
           </header>
@@ -330,10 +333,10 @@ export default function WebPage() {
             open={isTodosPanelOpen}
             onOpenChange={setTodosPanelOpen}
           >
-            <StatusPanel 
-              domains={filteredDomainsForStatusPanel} 
-              domainStatuses={domainStatuses} 
-              domainTodos={hasTodosMap} 
+            <StatusPanel
+              domains={filteredDomainsForStatusPanel}
+              domainStatuses={domainStatuses}
+              domainTodos={hasTodosMap}
               apiKeyStatuses={apiKeyStatuses}
               showGeneralStatus={true}
             />
@@ -344,8 +347,8 @@ export default function WebPage() {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="mt-2">
-                <AllTodosPanel 
-                  onUpdate={refreshTodos} 
+                <AllTodosPanel
+                  onUpdate={refreshTodos}
                   initialGroupedTodos={allGroupedTodos}
                   loading={loading}
                 />
@@ -355,7 +358,7 @@ export default function WebPage() {
 
 
           <main className="mt-4 space-y-6">
-            <Card className="shadow-lg bg-card">
+            <Card className="card-base shadow-lg">
               <CardContent className="p-0">
                 {isSecretVisible ? (
                   <Tabs defaultValue="rhm" className="w-full">
@@ -367,50 +370,50 @@ export default function WebPage() {
                     </div>
                     <TabsContent value="rhm" className="m-0">
                       <div className="px-6 pt-6">
-                        <DomainDashboard 
+                        <DomainDashboard
                           project="RHM"
                           allDomains={allDomains}
                           allTodos={domainTodos}
                           domainStatuses={domainStatuses}
                           loading={loading}
-                          onDomainChange={refreshAllStatuses} 
-                          onTodoChange={refreshTodos} 
+                          onDomainChange={refreshAllStatuses}
+                          onTodoChange={refreshTodos}
                         />
                       </div>
                       <div className="p-4 border-t border-border mt-4">
-                          <div className="grid gap-4 md:grid-cols-2">
-                              <StatCard 
-                                  title="صافي الربح السنوي" 
-                                  value={`$${RHMStats.netProfit.toFixed(2)}`} 
-                                  icon={DollarSign}
-                                  className="border-green-500/30"
-                              />
-                              <StatCard 
-                                  title="إجمالي الدخل السنوي" 
-                                  value={`$${RHMStats.totalIncome.toFixed(2)}`} 
-                                  icon={PiggyBank} 
-                                  className="border-blue-500/30"
-                              />
-                          </div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <StatCard
+                            title="صافي الربح السنوي"
+                            value={`$${RHMStats.netProfit.toFixed(2)}`}
+                            icon={DollarSign}
+                            className="border-green-500/30"
+                          />
+                          <StatCard
+                            title="إجمالي الدخل السنوي"
+                            value={`$${RHMStats.totalIncome.toFixed(2)}`}
+                            icon={PiggyBank}
+                            className="border-blue-500/30"
+                          />
+                        </div>
                       </div>
                     </TabsContent>
                     <TabsContent value="other" className="m-0">
                       <div className="p-6">
-                        <DomainDashboard 
+                        <DomainDashboard
                           project="other"
                           allDomains={allDomains}
                           allTodos={domainTodos}
                           domainStatuses={domainStatuses}
                           loading={loading}
-                          onDomainChange={refreshAllStatuses} 
-                          onTodoChange={refreshTodos} 
+                          onDomainChange={refreshAllStatuses}
+                          onTodoChange={refreshTodos}
                         />
                       </div>
                     </TabsContent>
                   </Tabs>
                 ) : (
                   <div className="flex h-64 items-center justify-center text-muted-foreground">
-                    
+
                   </div>
                 )}
               </CardContent>

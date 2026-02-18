@@ -1,11 +1,10 @@
-
 "use client";
 
 import * as React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { Domain, ApiKeyStatus } from '@/lib/types';
-import { differenceInDays, addDays, getMonth, getYear, subMonths, startOfMonth, endOfMonth, differenceInCalendarDays, sub, add } from 'date-fns';
+import { differenceInDays, startOfMonth, endOfMonth, differenceInCalendarDays } from 'date-fns';
 
 interface StatusPanelProps {
   domains: Domain[];
@@ -45,7 +44,7 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
 
       // We want the bar to be full at the beginning and empty at the end.
       const percentage = totalDaysInPeriod > 0 ? (validRemainingDays / totalDaysInPeriod) * 100 : 0;
-      
+
       setDaysRemaining(validRemainingDays);
       setCountdownPercentage(percentage);
     };
@@ -77,63 +76,63 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [clickedApiKey, showCountdownName]);
-  
+
   const getStatusLight = (status: 'checking' | 'online' | 'offline', index: number, hasTodos?: boolean, isApiKey: boolean = false) => {
     const baseClasses = isApiKey ? "w-4 h-1.5 rounded-sm" : "w-2.5 h-2.5 rounded-full";
-    
+
     // Special case for offline domain with todos
     if (!isApiKey && status === 'offline' && hasTodos) {
-        return (
-            <div
-                className={cn(baseClasses, "animate-flash-red-blue")}
-                title="غير متصل ويحتوي على مهام"
-                style={{ animationDelay: `${index * 100}ms` }}
-            />
-        );
+      return (
+        <div
+          className={cn(baseClasses, "animate-flash-red-blue")}
+          title="غير متصل ويحتوي على مهام"
+          style={{ animationDelay: `${index * 100}ms` }}
+        />
+      );
     }
-    
+
     if (isApiKey) {
       return (
-          <div 
-            className={cn(
-              baseClasses,
-              status === 'online' ? "bg-green-500 shadow-green-500/60" :
+        <div
+          className={cn(
+            baseClasses,
+            status === 'online' ? "bg-green-500 shadow-green-500/60" :
               status === 'offline' ? "bg-red-500 shadow-red-500/60" :
-              "bg-yellow-500 shadow-yellow-500/60 animate-pulse"
-            )}
-            style={{ 
-              animationDuration: '1.5s',
-              animationDelay: `${index * 100}ms`
-            }}
-          />
+                "bg-yellow-500 shadow-yellow-500/60 animate-pulse"
+          )}
+          style={{
+            animationDuration: '1.5s',
+            animationDelay: `${index * 100}ms`
+          }}
+        />
       );
     }
 
     if (hasTodos) {
       return (
-         <div 
-            className={cn(
-              baseClasses,
-              "bg-blue-500 shadow-[0_0_8px_2px] shadow-blue-500/60 animate-pulse"
-            )}
-            style={{ 
-              animationDuration: '2.5s',
-              animationDelay: `${index * 100}ms`
-            }}
-            title="يحتوي على مهام"
-          />
+        <div
+          className={cn(
+            baseClasses,
+            "bg-blue-500 shadow-[0_0_8px_2px] shadow-blue-500/60 animate-pulse"
+          )}
+          style={{
+            animationDuration: '2.5s',
+            animationDelay: `${index * 100}ms`
+          }}
+          title="يحتوي على مهام"
+        />
       );
     }
 
     switch (status) {
       case 'online':
         return (
-          <div 
+          <div
             className={cn(
               baseClasses,
               "bg-green-500 shadow-green-500/60"
             )}
-            style={{ 
+            style={{
               animationDelay: `${index * 100}ms`
             }}
             title="متصل"
@@ -141,7 +140,7 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
         );
       case 'offline':
         return (
-          <div 
+          <div
             className={cn(
               baseClasses,
               "bg-red-500 shadow-red-500/60"
@@ -154,12 +153,12 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
         );
       case 'checking':
         return (
-          <div 
+          <div
             className={cn(
               baseClasses,
               "bg-yellow-500 shadow-yellow-500/60 animate-pulse"
             )}
-            style={{ 
+            style={{
               animationDuration: '1.5s',
               animationDelay: `${index * 100}ms`
             }}
@@ -172,7 +171,7 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
   };
 
   return (
-    <Card className="w-full bg-card backdrop-blur-md border-border/60 shadow-lg rounded-b-none">
+    <Card className="card-base w-full backdrop-blur-md shadow-lg rounded-b-none rounded-t-xl overflow-hidden">
       <CardContent className="p-2 space-y-1.5">
         <div className="flex flex-row flex-wrap gap-1.5 justify-center">
           {domains.map((domain, index) => {
@@ -180,8 +179,8 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
             const status = domainStatuses[domain.id] || 'offline';
             const hasTodos = domainTodos[domain.id] || false;
             return (
-              <div 
-                key={domain.id} 
+              <div
+                key={domain.id}
                 className="w-4 h-4 border border-border/40 rounded-sm flex items-center justify-center bg-muted/50"
               >
                 {getStatusLight(status, index, hasTodos)}
@@ -192,35 +191,35 @@ export function StatusPanel({ domains, domainStatuses, domainTodos, apiKeyStatus
         {showGeneralStatus && (
           <>
             <div className="flex flex-row flex-wrap gap-1.5 justify-center">
-                {apiKeyStatuses.map((apiKeyStatus, index) => (
-                  <div key={apiKeyStatus.key} className="relative api-key-item">
-                    <div 
-                      className="w-5 h-2.5 border border-border/40 rounded-sm flex items-center justify-center bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors"
-                      onClick={() => setClickedApiKey(clickedApiKey === apiKeyStatus.key ? null : apiKeyStatus.key)}
-                      title={`اضغط لعرض الاسم: ${apiKeyStatus.name}`}
-                    >
-                      {getStatusLight(apiKeyStatus.status, index, false, true)}
-                    </div>
-                    {clickedApiKey === apiKeyStatus.key && (
-                      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1 rounded shadow-lg border border-border/40 whitespace-nowrap z-50">
-                        {apiKeyStatus.name}
-                      </div>
-                    )}
+              {apiKeyStatuses.map((apiKeyStatus, index) => (
+                <div key={apiKeyStatus.key} className="relative api-key-item">
+                  <div
+                    className="w-5 h-2.5 border border-border/40 rounded-sm flex items-center justify-center bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors"
+                    onClick={() => setClickedApiKey(clickedApiKey === apiKeyStatus.key ? null : apiKeyStatus.key)}
+                    title={`اضغط لعرض الاسم: ${apiKeyStatus.name}`}
+                  >
+                    {getStatusLight(apiKeyStatus.status, index, false, true)}
                   </div>
-                ))}
+                  {clickedApiKey === apiKeyStatus.key && (
+                    <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1 rounded shadow-lg border border-border/40 whitespace-nowrap z-50">
+                      {apiKeyStatus.name}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-            
+
             {/* Countdown Progress Bar */}
             <div className="flex justify-center mt-1">
               <div className="w-24 relative countdown-bar">
-                <div 
+                <div
                   className="h-1 bg-gray-700/50 rounded-full overflow-hidden relative cursor-pointer hover:bg-gray-600/50 transition-colors"
                   onClick={() => setShowCountdownName(!showCountdownName)}
                   title={`اضغط لعرض الاسم. متبقي ${daysRemaining} يوم.`}
                 >
-                  <div 
+                  <div
                     className="absolute top-0 right-0 h-full bg-green-500/50 transition-all duration-1000 ease-linear"
-                    style={{ 
+                    style={{
                       width: `${countdownPercentage}%`,
                     }}
                   />
