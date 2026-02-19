@@ -49,14 +49,14 @@ export async function POST() {
       }
     });
 
-    const $ = cheerio.default.load(html);
-    const rows: any[] = [];
+    const $ = cheerio.load(html);
+    const rows: Array<{rank: string, rankSpread: string, organization: string, model: string, license: string, score: string, confidence: string}> = [];
 
-    $("table tbody tr").each((_i, el) => {
+    $("table tbody tr").each((_i: number, el: any) => {
       const tds = $(el).find("td");
       
       const rank = tds.eq(0).text().trim();
-      const rankSpread = tds.eq(1).find("span").map((_i, s) => $(s).text().trim()).get().join("-") || tds.eq(1).text().trim();
+      const rankSpread = tds.eq(1).find("span").map((_i: number, s: any) => $(s).text().trim()).get().join("-") || tds.eq(1).text().trim();
 
       const modelCell = tds.eq(2);
       const organization = modelCell.find("svg title").text().trim() || "Unknown";

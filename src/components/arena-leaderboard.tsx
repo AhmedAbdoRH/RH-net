@@ -25,26 +25,37 @@ interface LeaderboardData {
 export function ArenaLeaderboard() {
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [animated, setAnimated] = useState(false);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch('/api/arena');
-        if (!res.ok) throw new Error('Failed to fetch data');
-        const jsonData = await res.json();
-        setData(jsonData);
-        // Trigger animation after a short delay
-        setTimeout(() => setAnimated(true), 100);
-      } catch (err) {
-        console.error(err);
-        setError('تعذر تحميل البيانات. يرجى التأكد من تشغيل السكرابر.');
-      } finally {
-        setLoading(false);
-      }
+  async function fetchData(showRefreshing = false) {
+    if (showRefreshing) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
     }
+    setError(null);
+    
+    try {
+      const res = await fetch('/api/arena', { 
+        method: showRefreshing ? 'POST' : 'GET' 
+      });
+      if (!res.ok) throw new Error('Failed to fetch data');
+      const jsonData = await res.json();
+      setData(jsonData);
+      // Trigger animation after a short delay
+      setTimeout(() => setAnimated(true), 100);
+    } catch (err) {
+      console.error(err);
+      setError('تعذر تحميل البيانات. يرجى التأكد من تشغيل السكرابر.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }
 
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -77,9 +88,17 @@ export function ArenaLeaderboard() {
     <Card className="w-full bg-black/20 backdrop-blur-md text-neutral-200 border-neutral-800/50 shadow-2xl overflow-hidden relative">
       <CardHeader className="flex flex-row items-center justify-between py-3 border-b border-neutral-800/30 relative z-10 bg-black/10 backdrop-blur-xl">
         <div className="flex items-center gap-2 text-xs font-mono text-neutral-500 bg-neutral-900/50 px-3 py-1 rounded-full border border-neutral-800">
-          <RefreshCw className="h-3 w-3 animate-spin-slow" />
+          <RefreshCw className={cn("h-3 w-3", refreshing && "animate-spin")} />
           <span>SYNC: {new Date(data.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
         </div>
+        <button
+          onClick={() => fetchData(true)}
+          disabled={refreshing}
+          className="flex items-center gap-1.5 text-xs font-mono text-neutral-400 hover:text-white bg-neutral-900/50 hover:bg-neutral-800 px-3 py-1.5 rounded-full border border-neutral-800 hover:border-neutral-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <RefreshCw className={cn("h-3 w-3", refreshing && "animate-spin")} />
+          <span>{refreshing ? 'جاري التحديث...' : 'تحديث'}</span>
+        </button>
       </CardHeader>
       
       <CardContent className="p-0 relative z-10">
