@@ -128,7 +128,7 @@ export function ArenaLeaderboard() {
                     <div className="flex justify-start items-center w-full relative z-10 px-2">
                       <span className="text-sm font-bold flex gap-3 items-center tracking-wide text-neutral-400 drop-shadow-sm font-mono group-hover:text-white transition-colors">
                         <span className={cn("w-6 text-center text-neutral-600 text-xs", isTop3 && "text-white/90 font-black")}>#{index + 1}</span>
-                        <span className="uppercase tracking-wider flex items-center gap-2">
+                        <span className="uppercase tracking-wider flex items-center gap-2 text-sky-500 group-hover:text-sky-400 transition-colors">
                           {row.model}
                           <span className="text-neutral-400 text-xs font-medium opacity-70">({row.score})</span>
                         </span> 
