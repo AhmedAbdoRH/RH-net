@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { firebaseConfig } from '@/firebase/config';
+
+// Initialize Firebase
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const db = getFirestore(app);
 
 // Dynamic import for CommonJS modules
 let axios: typeof import('axios');
@@ -18,17 +25,25 @@ const DATA_FILE_PATH = path.join(process.cwd(), 'public', 'data.json');
 
 export async function GET() {
   try {
-    if (!fs.existsSync(DATA_FILE_PATH)) {
-      return NextResponse.json(
-        { error: 'Data not found. Please run the scraper script first.' },
-        { status: 404 }
-      );
+    // Try to fetch from Firestore first
+    const docRef = doc(db, "leaderboards", "arena");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return NextResponse.json(docSnap.data());
     }
 
-    const fileContents = fs.readFileSync(DATA_FILE_PATH, 'utf8');
-    const data = JSON.parse(fileContents);
+    // Fallback to local file if Firestore is empty
+    if (fs.existsSync(DATA_FILE_PATH)) {
+      const fileContents = fs.readFileSync(DATA_FILE_PATH, 'utf8');
+      const data = JSON.parse(fileContents);
+      return NextResponse.json(data);
+    }
 
-    return NextResponse.json(data);
+    return NextResponse.json(
+      { error: 'Data not found. Please run the scraper script first.' },
+      { status: 404 }
+    );
   } catch (error) {
     console.error('Error reading arena data:', error);
     return NextResponse.json(
@@ -87,21 +102,26 @@ export async function POST() {
       leaderboard: rows
     };
 
-    // Ensure public directory exists
-    const publicDir = path.dirname(DATA_FILE_PATH);
-    if (!fs.existsSync(publicDir)) {
-      fs.mkdirSync(publicDir, { recursive: true });
+    // Save to Firestore
+    await setDoc(doc(db, "leaderboards", "arena"), result);
+    console.log(`✅ Arena.ai data updated successfully in Firestore! Total entries: ${rows.length}`);
+
+    // Try to update local file as well (best effort, for dev/backup)
+    try {
+      const publicDir = path.dirname(DATA_FILE_PATH);
+      if (!fs.existsSync(publicDir)) {
+        fs.mkdirSync(publicDir, { recursive: true });
+      }
+      fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(result, null, 2), "utf-8");
+    } catch (fsError) {
+      console.warn("Could not write to local file system (expected in production):", fsError);
     }
-
-    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(result, null, 2), "utf-8");
-
-    console.log(`✅ Arena.ai data updated successfully! Total entries: ${rows.length}`);
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error scraping arena data:', error);
+    console.error('Error updating arena data:', error);
     return NextResponse.json(
-      { error: 'Failed to scrape data', details: String(error) },
+      { error: 'Internal Server Error' },
       { status: 500 }
     );
   }
