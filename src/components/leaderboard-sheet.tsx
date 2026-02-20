@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/sheet";
 import { Trophy } from 'lucide-react';
 import { ArenaLeaderboard } from './arena-leaderboard';
+import { PerformanceLeaderboard } from './performance-leaderboard';
+import { SweBenchLeaderboard } from './swe-bench-leaderboard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface LeaderboardSheetProps {
   open: boolean;
@@ -27,11 +30,30 @@ export function LeaderboardSheet({ open, onOpenChange }: LeaderboardSheetProps) 
             <SheetTitle>متصدرين SWE-bench Verified</SheetTitle>
           </div>
           <SheetDescription>
-            مقارنة أداء النماذج البرمجية بناءً على اختبارات Arena AI.
+            مقارنة أداء النماذج البرمجية بناءً على اختبارات Arena AI وتقييم Artificial Analysis.
           </SheetDescription>
         </SheetHeader>
-        <div className="flex-1 p-4">
-           <ArenaLeaderboard />
+        <div className="flex-1 p-4 pb-20">
+          <Tabs defaultValue="arena" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4 h-auto gap-2">
+              <TabsTrigger value="arena">Arena AI</TabsTrigger>
+              <TabsTrigger value="performance">Artificial Analysis</TabsTrigger>
+              <TabsTrigger value="swe-verified">SWE-Verified</TabsTrigger>
+              <TabsTrigger value="swe-pro">SWE-Pro</TabsTrigger>
+            </TabsList>
+            <TabsContent value="arena">
+              <ArenaLeaderboard />
+            </TabsContent>
+            <TabsContent value="performance">
+              <PerformanceLeaderboard />
+            </TabsContent>
+            <TabsContent value="swe-verified">
+              <SweBenchLeaderboard type="verified" />
+            </TabsContent>
+            <TabsContent value="swe-pro">
+              <SweBenchLeaderboard type="pro" />
+            </TabsContent>
+          </Tabs>
         </div>
       </SheetContent>
     </Sheet>
