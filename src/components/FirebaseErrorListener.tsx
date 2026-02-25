@@ -12,13 +12,13 @@ import { Button } from './ui/button';
 // It is designed to intercept Firestore permission errors and display them in the Next.js error overlay.
 
 export function FirebaseErrorListener() {
-  if (process.env.NODE_ENV !== 'development') {
-    return null;
-  }
-
   const [error, setError] = useState<FirestorePermissionError | null>(null);
 
   useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') {
+      return;
+    }
+
     const handleError = (e: FirestorePermissionError) => {
       console.error(
         '[@firebase/permission-error] Intercepted a Firestore permission error. See the Next.js error overlay for more details.'
@@ -32,6 +32,10 @@ export function FirebaseErrorListener() {
       errorEmitter.off('permission-error', handleError);
     };
   }, []);
+
+  if (process.env.NODE_ENV !== 'development') {
+    return null;
+  }
 
   if (error) {
     // This will be caught by the Next.js error overlay in development
