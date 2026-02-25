@@ -67,7 +67,7 @@ export async function POST() {
 
     await setDoc(doc(db, "leaderboards", "performance"), data);
 
-    return NextResponse.json({ success: true, count: INITIAL_DATA.length });
+    return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal Server Error' },
