@@ -34,10 +34,10 @@ export function PerformanceLeaderboard() {
       setLoading(true);
     }
     setError(null);
-    
+
     try {
-      const res = await fetch('/api/performance', { 
-        method: showRefreshing ? 'POST' : 'GET' 
+      const res = await fetch('/api/performance', {
+        method: showRefreshing ? 'POST' : 'GET'
       });
       if (!res.ok) throw new Error('Failed to fetch data');
       const jsonData = await res.json();
@@ -66,7 +66,7 @@ export function PerformanceLeaderboard() {
     );
   }
 
-  if (error || !data) {
+  if (error || !data || !Array.isArray(data.models)) {
     return (
       <div className="text-center p-8 text-muted-foreground">
         <p>{error || 'لا توجد بيانات متاحة حالياً'}</p>
@@ -83,7 +83,7 @@ export function PerformanceLeaderboard() {
           <TrendingUp className="h-5 w-5 text-purple-500" />
           <CardTitle className="text-base font-medium">الأداء العام (Artificial Analysis)</CardTitle>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 text-xs font-mono text-neutral-500 bg-neutral-900/50 px-3 py-1 rounded-full border border-neutral-800">
             <RefreshCw className={cn("h-3 w-3", refreshing && "animate-spin")} />
@@ -99,22 +99,22 @@ export function PerformanceLeaderboard() {
           </button>
         </div>
       </CardHeader>
-      
+
       <CardContent className="p-0 relative z-10">
         <div className="flex flex-col w-full">
           {data.models.map((row, index) => {
             const percentage = (row.score / maxScore) * 100;
             const isTop3 = index < 3;
-            
+
             return (
               <div key={index} className="flex items-center w-full group relative hover:bg-white/[0.02] transition-colors duration-300 border-b border-neutral-800/30 last:border-0">
                 <div className="w-full h-10 relative flex items-center">
-                  
+
                   {/* Background Track */}
                   <div className="absolute inset-0 bg-neutral-950/30" />
-                  
+
                   {/* The Bar */}
-                  <div 
+                  <div
                     className={cn(
                       "h-full absolute top-0 left-0 flex items-center px-4 overflow-hidden whitespace-nowrap transition-all duration-1000 ease-out",
                       "bg-gradient-to-r from-purple-950/20 via-purple-900/10 to-transparent",
@@ -142,7 +142,7 @@ export function PerformanceLeaderboard() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-mono font-bold text-purple-500 group-hover:text-purple-400 transition-colors">
                         {row.score}
@@ -154,9 +154,9 @@ export function PerformanceLeaderboard() {
             );
           })}
         </div>
-        
+
         <div className="p-2 text-[10px] text-center text-neutral-700 font-mono tracking-widest uppercase border-t border-neutral-900 bg-black">
-           DATA SOURCE: <a href={data.source} target="_blank" rel="noreferrer" className="text-neutral-600 hover:text-neutral-400 transition-colors">ARTIFICIAL ANALYSIS // QUALITY INDEX</a>
+          DATA SOURCE: <a href={data.source} target="_blank" rel="noreferrer" className="text-neutral-600 hover:text-neutral-400 transition-colors">ARTIFICIAL ANALYSIS // QUALITY INDEX</a>
         </div>
       </CardContent>
     </Card>

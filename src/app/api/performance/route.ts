@@ -58,7 +58,7 @@ export async function POST() {
   try {
     // In a real implementation, this would scrape the website.
     // Since the website is protected/complex, we are simulating a refresh with the latest known data.
-    
+
     const data = {
       source: LEADERBOARD_URL,
       updatedAt: new Date().toISOString(),
@@ -67,7 +67,7 @@ export async function POST() {
 
     await setDoc(doc(db, "leaderboards", "performance"), data);
 
-    return NextResponse.json({ success: true, count: INITIAL_DATA.length });
+    return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal Server Error' },
