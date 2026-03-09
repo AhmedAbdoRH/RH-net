@@ -12,27 +12,26 @@ export default function CatalogPage() {
       {/* الهيدر مع معلومات المستخدمين */}
       <SiteHeader />
 
-      {/* زر العودة */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <Link href="/">
-          <Button variant="outline" className="mb-4">
-            <ArrowLeft className="w-4 h-4 ml-2" />
-            العودة للوحة التحكم
-          </Button>
-        </Link>
+      {/* المحتوى الرئيسي */}
+      <div className="container mx-auto px-3 sm:px-4 lg:px-8 py-4">
+        {/* زر العودة - محسّن للموبايل */}
+        <div className="mb-4">
+          <Link href="/">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              <ArrowLeft className="w-4 h-4 ml-2" />
+              <span className="text-sm">العودة للوحة التحكم</span>
+            </Button>
+          </Link>
+        </div>
 
         {/* محتوى صفحة الأونلاين كتالوج */}
-        <div className="space-y-6">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-               تطبيق أونلاين كتالوج
-            </h1>
-            <p className="text-muted-foreground text-lg">
-            </p>
+        <div className="space-y-4 sm:space-y-6">
+          {/* عنوان الصفحة - محسّن للموبايل */}
+          <div className="text-center mb-6 sm:mb-8">
           </div>
 
-          {/* مكون قائمة المستخدمين */}
-          <div className="max-w-6xl mx-auto">
+          {/* مكون قائمة المستخدمين - محسّن للموبايل */}
+          <div className="w-full max-w-full overflow-hidden">
             <CatalogUsers />
           </div>
         </div>
