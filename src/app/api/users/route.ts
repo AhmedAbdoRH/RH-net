@@ -22,7 +22,7 @@ export async function GET() {
     // جلب بيانات المتاجر المرتبطة بالمستخدمين
     const { data: catalogs, error: catalogsError } = await supabaseAdmin
       .from('catalogs')
-      .select('user_id, display_name, plan')
+      .select('user_id, name, display_name, plan')
 
     if (catalogsError) {
       console.error('Error fetching catalogs:', catalogsError)
@@ -31,10 +31,12 @@ export async function GET() {
     // إنشاء خرائط للمتاجر والخطط
     const catalogsMap = new Map()
     const plansMap = new Map()
+    const nameMap = new Map()
     if (catalogs) {
       catalogs.forEach(catalog => {
         catalogsMap.set(catalog.user_id, catalog.display_name)
         plansMap.set(catalog.user_id, catalog.plan)
+        nameMap.set(catalog.user_id, catalog.name)
       })
     }
 
@@ -45,6 +47,7 @@ export async function GET() {
       display_name: user.user_metadata?.display_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'غير محدد',
       store_name: catalogsMap.get(user.id) || 'لا يوجد متجر',
       store_display_name: catalogsMap.get(user.id) || null,
+      name: nameMap.get(user.id) || null,
       plan: plansMap.get(user.id) || 'free',
       created_at: user.created_at,
       user_metadata: user.user_metadata

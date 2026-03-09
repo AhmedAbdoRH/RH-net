@@ -12,6 +12,7 @@ interface User {
   display_name: string
   store_name: string
   store_display_name: string | null
+  name: string | null
   plan: string
   created_at: string
   user_metadata?: any
@@ -53,9 +54,9 @@ export function CatalogUsers() {
     }
   }
 
-  const getStoreUrl = (storeName: string, displayName: string) => {
-    // استخدم اسم المتجر من جدول catalogs
-    const finalName = storeName
+  const getStoreUrl = (name: string | null, displayName: string) => {
+    // استخدم name من جدول catalogs
+    const finalName = name || displayName
 
     // تحويل اسم المتجر إلى slug للرابط
     const slug = finalName.toLowerCase()
@@ -103,7 +104,7 @@ export function CatalogUsers() {
       {!loading && !error && (
         <>
           {/* إحصائيات سريعة */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">إجمالي المستخدمين</CardTitle>
@@ -157,7 +158,7 @@ export function CatalogUsers() {
                         <div className="flex-1 min-w-0">
                           {user.store_name !== 'لا يوجد متجر' ? (
                             <a
-                              href={getStoreUrl(user.store_name, user.display_name)}
+                              href={getStoreUrl(user.name, user.display_name)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="block group/link"
