@@ -19,6 +19,9 @@ import { cn } from '@/lib/utils';
 import { FaultsSheet } from '@/components/faults-sheet';
 import { GeneralPaperSheet } from '@/components/general-paper-sheet';
 import { LeaderboardSheet } from '@/components/leaderboard-sheet';
+import { UsersSheet } from '@/components/users-sheet';
+import { CatalogUsers } from '@/components/catalog-users';
+import { SiteHeader } from '@/components/site-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
@@ -52,6 +55,7 @@ export default function WebPage() {
   const [isLeaderboardSheetOpen, setLeaderboardSheetOpen] = React.useState(false);
   const [buttonsVisible, setButtonsVisible] = React.useState(false);
   const [isTodosPanelOpen, setTodosPanelOpen] = React.useState(true);
+  const [activeTab, setActiveTab] = React.useState("rhm");
 
   React.useEffect(() => {
     const handleNavVisibilityChange = () => {
@@ -282,6 +286,7 @@ export default function WebPage() {
         >
         <Trophy className="h-5 w-5" />
       </Button>
+      <UsersSheet />
       <Button 
         variant="ghost" 
         size="icon" 
@@ -316,6 +321,7 @@ export default function WebPage() {
 
       <div className="min-h-screen bg-background text-foreground pb-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+
           <header className="py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="relative cursor-pointer" onClick={handleSecretClick}>
@@ -333,6 +339,9 @@ export default function WebPage() {
               {actionButtons}
             </div>
           </header>
+
+          {/* هيدر الموقع الجديد - تحت العنوان الرئيسي */}
+          <SiteHeader />
 
           <Collapsible
             className="w-full mb-2"
@@ -367,11 +376,12 @@ export default function WebPage() {
             {isSecretVisible && (
               <Card className="card-base shadow-lg">
                 <CardContent className="p-0">
-                  <Tabs defaultValue="rhm" className="w-full">
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <div className="p-4 border-b border-border/60">
                       <TabsList>
                         <TabsTrigger value="rhm">مشاريع RHM</TabsTrigger>
                         <TabsTrigger value="other">المشاريع الأخرى</TabsTrigger>
+                        <TabsTrigger value="catalog">تطبيق الكتالوج</TabsTrigger>
                       </TabsList>
                     </div>
                     <TabsContent value="rhm" className="m-0">
@@ -414,6 +424,11 @@ export default function WebPage() {
                           onDomainChange={refreshAllStatuses}
                           onTodoChange={refreshTodos}
                         />
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="catalog" className="m-0">
+                      <div className="p-6">
+                        <CatalogUsers />
                       </div>
                     </TabsContent>
                   </Tabs>

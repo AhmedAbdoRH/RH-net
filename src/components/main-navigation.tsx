@@ -16,6 +16,10 @@ export function MainNavigation() {
       localStorage.setItem('navVisible', 'false');
     }
     setIsVisible(false);
+    // Prevent showing the old navigation completely
+    document.addEventListener('navVisibilityChanged', (e: any) => {
+      setIsVisible(false);
+    });
   }, []);
 
   // Handle click counter and visibility

@@ -262,13 +262,7 @@ export default function PovaPage() {
         <div className="container mx-auto p-4 sm:p-6 lg:p-8">
           
           <header 
-            className="my-2 flex items-center justify-between cursor-pointer"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('navVisible', 'true');
-                window.dispatchEvent(new Event('navVisibilityChanged'));
-              }
-            }}
+            className="my-2 flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
               <div className="relative cursor-pointer" onClick={handleSecretClick}>
