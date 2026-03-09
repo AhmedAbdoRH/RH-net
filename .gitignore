@@ -47,3 +47,4 @@ firestore-debug.log
 # Backups
 backup_*.zip
 firestore_backup_*.json
+.env
