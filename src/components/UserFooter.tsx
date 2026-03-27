@@ -47,11 +47,12 @@ export default function UserFooter() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+    const date = new Date(dateString)
+    const day = date.getDate()
+    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+    const month = months[date.getMonth()]
+    const year = date.getFullYear()
+    return `${day} ${month} ${year}`
   }
 
   return (
@@ -139,7 +140,14 @@ export default function UserFooter() {
         )}
 
         <div className="border-t border-gray-700 pt-6 text-center text-sm text-gray-400">
-          <p>© 2026 جميع الحقوق محفوظة | تم التحديث: {new Date().toLocaleDateString('ar-SA')}</p>
+          <p>© 2026 جميع الحقوق محفوظة | تم التحديث: {(() => {
+            const date = new Date()
+            const day = date.getDate()
+            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+            const month = months[date.getMonth()]
+            const year = date.getFullYear()
+            return `${day} ${month} ${year}`
+          })()}</p>
         </div>
       </div>
     </footer>

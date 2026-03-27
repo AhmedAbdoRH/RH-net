@@ -45,10 +45,13 @@ export function SiteHeader() {
         setStats({
           totalUsers: users.length,
           proUsers,
-          lastUserDate: lastUser ? new Date(lastUser.created_at).toLocaleDateString('ar-SA', {
-            month: 'short',
-            day: 'numeric'
-          }) : '-'
+          lastUserDate: lastUser ? (() => {
+            const date = new Date(lastUser.created_at)
+            const day = date.getDate()
+            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+            const month = months[date.getMonth()]
+            return `${day} ${month}`
+          })() : '-'
         })
       }
     } catch (error) {
@@ -59,11 +62,12 @@ export function SiteHeader() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+    const date = new Date(dateString)
+    const day = date.getDate()
+    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+    const month = months[date.getMonth()]
+    const year = date.getFullYear()
+    return `${day} ${month} ${year}`
   }
 
   return (

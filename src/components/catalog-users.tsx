@@ -12,20 +12,59 @@ interface User {
   display_name: string
   store_name: string
   store_display_name: string | null
-  name: string | null
   plan: string
   created_at: string
   user_metadata?: any
+}
+
+interface UserProduct {
+  userId: string
+  productCount: number
+  type: 'خامل' | 'مبتدئ' | 'نشط' | 'قوي' | 'سوبر'
 }
 
 export function CatalogUsers() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [traderData, setTraderData] = useState<UserProduct[]>([])
+  const [traderStats, setTraderStats] = useState<any>(null)
 
   useEffect(() => {
     fetchUsers()
+    fetchTraderData()
   }, [])
+
+  const fetchTraderData = async () => {
+    try {
+      const response = await fetch('/api/traders')
+      if (!response.ok) {
+        throw new Error('فشل في جلب بيانات التجار')
+      }
+      
+      const data = await response.json()
+      
+      if (data.error) {
+        console.error('API Error:', data.error)
+        setError(data.error)
+        return
+      }
+
+      setTraderData(data.traders || [])
+      setTraderStats({
+        stats: data.stats,
+        percentages: data.percentages
+      })
+      
+      console.log('Trader data loaded:', {
+        traders: data.traders?.length,
+        stats: data.stats,
+        percentages: data.percentages
+      })
+    } catch (err) {
+      console.error('Error fetching trader data:', err)
+    }
+  }
 
   const fetchUsers = async () => {
     try {
@@ -54,9 +93,9 @@ export function CatalogUsers() {
     }
   }
 
-  const getStoreUrl = (name: string | null, displayName: string) => {
-    // استخدم name من جدول catalogs
-    const finalName = name || displayName
+  const getStoreUrl = (storeName: string, displayName: string) => {
+    // استخدم اسم المتجر من جدول catalogs
+    const finalName = storeName
 
     // تحويل اسم المتجر إلى slug للرابط
     const slug = finalName.toLowerCase()
@@ -68,11 +107,85 @@ export function CatalogUsers() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+    const date = new Date(dateString)
+    const day = date.getDate()
+    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+    const month = months[date.getMonth()]
+    const year = date.getFullYear()
+    return `${day} ${month} ${year}`
+  }
+
+  const getTraderType = (userId: string) => {
+    return traderData.find(t => t.userId === userId)
+  }
+
+  const getTraderTypeColor = (type: string) => {
+    switch (type) {
+      case 'خامل':
+        return { bg: 'bg-gray-500/20', text: 'text-gray-700', border: 'border-gray-500/30', icon: '😴' }
+      case 'مبتدئ':
+        return { bg: 'bg-blue-500/20', text: 'text-blue-700', border: 'border-blue-500/30', icon: '🌱' }
+      case 'نشط':
+        return { bg: 'bg-green-500/20', text: 'text-green-700', border: 'border-green-500/30', icon: '⚡' }
+      case 'قوي':
+        return { bg: 'bg-yellow-500/20', text: 'text-yellow-700', border: 'border-yellow-500/30', icon: '💪' }
+      case 'سوبر':
+        return { bg: 'bg-red-500/20', text: 'text-red-700', border: 'border-red-500/30', icon: '🚀' }
+      default:
+        return { bg: 'bg-gray-500/20', text: 'text-gray-700', border: 'border-gray-500/30', icon: '❓' }
+    }
+  }
+
+  const ChartBar = () => {
+    if (!traderStats) return null
+
+    const { percentages, stats } = traderStats
+    const colors = [
+      { name: 'خامل', percent: percentages.خامل, color: 'bg-gray-500', count: stats.خامل },
+      { name: 'مبتدئ', percent: percentages.مبتدئ, color: 'bg-blue-500', count: stats.مبتدئ },
+      { name: 'نشط', percent: percentages.نشط, color: 'bg-green-500', count: stats.نشط },
+      { name: 'قوي', percent: percentages.قوي, color: 'bg-yellow-500', count: stats.قوي },
+      { name: 'سوبر', percent: percentages.سوبر, color: 'bg-red-500', count: stats.سوبر }
+    ]
+
+    return (
+      <div className="space-y-4">
+        {/* الخط الموزع بألوان موحد */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-foreground">توزيع التجار</span>
+            <span className="text-xs text-muted-foreground">29 تاجر</span>
+          </div>
+          <div className="w-full h-8 bg-muted rounded-full overflow-hidden flex">
+            {colors.map((item) => (
+              item.percent > 0 && (
+                <div
+                  key={item.name}
+                  className={`${item.color} h-full transition-all duration-500 flex items-center justify-center`}
+                  style={{ width: `${item.percent}%` }}
+                  title={`${item.name}: ${item.percent}% (${item.count} تاجر)`}
+                >
+                  {item.percent >= 10 && (
+                    <span className="text-xs font-bold text-white drop-shadow">{item.percent}%</span>
+                  )}
+                </div>
+              )
+            ))}
+          </div>
+        </div>
+
+        {/* وسيط توضيحي تحت الخط */}
+        <div className="flex flex-wrap gap-3 justify-center pt-2">
+          {colors.map((item) => (
+            <div key={item.name} className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${item.color}`}></div>
+              <span className="text-xs font-medium">{item.name}</span>
+              <span className="text-xs text-muted-foreground">({item.count})</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -103,7 +216,18 @@ export function CatalogUsers() {
 
       {!loading && !error && (
         <>
-          {/* إحصائيات سريعة */}
+          {/* شارت توزيع أنواع التجار */}
+          {traderStats && (
+            <Card className="border-2 border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold">توزيع أنواع التجار</CardTitle>
+                <p className="text-sm text-muted-foreground mt-2">النسبة المئوية لكل فئة</p>
+              </CardHeader>
+              <CardContent>
+                <ChartBar />
+              </CardContent>
+            </Card>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -138,6 +262,95 @@ export function CatalogUsers() {
             </Card>
           </div>
 
+          {/* إحصائيات إضافية - 5 خانات */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">المستخدمون الأساسيون</CardTitle>
+                <span className="text-lg">💎</span>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-600">{users.filter(u => u.plan === 'basic' || u.plan !== 'pro').length}</div>
+                <p className="text-xs text-muted-foreground mt-1">خطط أساسية</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">إجمالي المتاجر</CardTitle>
+                <span className="text-lg">🏪</span>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">
+                  {users.filter(u => u.store_name !== 'لا يوجد متجر').length}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">متاجر نشطة</p>
+              </CardContent>
+            </Card>
+
+
+          </div>
+
+          {/* إحصائيات التجار */}
+          {traderStats && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">تجار خاملون</CardTitle>
+                  <span className="text-lg">😴</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-600">{traderStats.stats.خامل}</div>
+                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.خامل}% من الإجمالي</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">تجار مبتدئون</CardTitle>
+                  <span className="text-lg">🌱</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-600">{traderStats.stats.مبتدئ}</div>
+                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.مبتدئ}% من الإجمالي</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">تجار نشطون</CardTitle>
+                  <span className="text-lg">⚡</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">{traderStats.stats.نشط}</div>
+                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.نشط}% من الإجمالي</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">تجار قويون</CardTitle>
+                  <span className="text-lg">💪</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">{traderStats.stats.قوي}</div>
+                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.قوي}% من الإجمالي</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">تجار سوبر</CardTitle>
+                  <span className="text-lg">🚀</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-600">{traderStats.stats.سوبر}</div>
+                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.سوبر}% من الإجمالي</p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {/* قائمة المستخدمين المضغوطة مع المعلومات */}
           {users.length > 0 && (
             <div className="space-y-3 rtl" dir="rtl">
@@ -158,7 +371,7 @@ export function CatalogUsers() {
                         <div className="flex-1 min-w-0">
                           {user.store_name !== 'لا يوجد متجر' ? (
                             <a
-                              href={getStoreUrl(user.name, user.display_name)}
+                              href={getStoreUrl(user.store_name, user.display_name)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="block group/link"
@@ -185,7 +398,25 @@ export function CatalogUsers() {
                       </div>
 
                       {/* معلومات إضافية */}
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {/* نوع التاجر */}
+                        {getTraderType(user.id) && (() => {
+                          const trader = getTraderType(user.id)!
+                          const typeColor = getTraderTypeColor(trader.type)
+                          return (
+                            <div className={cn(
+                              "px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1 whitespace-nowrap",
+                              typeColor.bg,
+                              typeColor.text,
+                              typeColor.border
+                            )}>
+                              <span>{typeColor.icon}</span>
+                              <span>{trader.type}</span>
+                              <span className="text-xs">({trader.productCount})</span>
+                            </div>
+                          )
+                        })()}
+                        
                         {/* نوع الخطة */}
                         <div className={cn(
                           "px-2 py-1 rounded-full text-xs font-bold border",

@@ -55,11 +55,12 @@ export function UsersSheet({ inTab = false }: { inTab?: boolean }) {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+    const date = new Date(dateString)
+    const day = date.getDate()
+    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+    const month = months[date.getMonth()]
+    const year = date.getFullYear()
+    return `${day} ${month} ${year}`
   }
 
   return (
