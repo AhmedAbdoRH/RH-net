@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState, useEffect } from "react"
-import { Users, UserCheck, Calendar, Mail } from "lucide-react"
+import { Users, Mail } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
@@ -93,12 +93,9 @@ export function CatalogUsers() {
     }
   }
 
-  const getStoreUrl = (storeName: string, displayName: string) => {
-    // استخدم اسم المتجر من جدول catalogs
-    const finalName = storeName
-
-    // تحويل اسم المتجر إلى slug للرابط
-    const slug = finalName.toLowerCase()
+  const getStoreUrl = (storeName: string) => {
+    // بناء الرابط من: رابط الموقع + name (store_name)
+    const slug = storeName.toLowerCase()
       .replace(/[^a-z0-9\u0600-\u06FF\s-]/g, '') // إزالة الأحرف الخاصة مع الحفاظ على العربية
       .replace(/\s+/g, '-') // استبدال المسافات بشرطات
       .replace(/-+/g, '-') // إزالة الشرطات المكررة
@@ -113,6 +110,20 @@ export function CatalogUsers() {
     const month = months[date.getMonth()]
     const year = date.getFullYear()
     return `${day} ${month} ${year}`
+  }
+
+  const getTimeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+    
+    if (seconds < 60) return 'منذ للتو'
+    if (seconds < 3600) return `منذ ${Math.floor(seconds / 60)} دقيقة`
+    if (seconds < 86400) return `منذ ${Math.floor(seconds / 3600)} ساعة`
+    if (seconds < 604800) return `منذ ${Math.floor(seconds / 86400)} يوم`
+    if (seconds < 2592000) return `منذ ${Math.floor(seconds / 604800)} أسبوع`
+    if (seconds < 31536000) return `منذ ${Math.floor(seconds / 2592000)} شهر`
+    return `منذ ${Math.floor(seconds / 31536000)} سنة`
   }
 
   const getTraderType = (userId: string) => {
@@ -228,128 +239,6 @@ export function CatalogUsers() {
               </CardContent>
             </Card>
           )}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">إجمالي المستخدمين</CardTitle>
-                <UserCheck className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-primary">{users.length}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">المستخدمون برو</CardTitle>
-                <span className="text-lg">👑</span>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-amber-600">{users.filter(u => u.plan === 'pro').length}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">آخر مستخدم</CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {users.length > 0 ? formatDate(users[0].created_at) : 'لا يوجد مستخدمون'}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* إحصائيات إضافية - 5 خانات */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">المستخدمون الأساسيون</CardTitle>
-                <span className="text-lg">💎</span>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{users.filter(u => u.plan === 'basic' || u.plan !== 'pro').length}</div>
-                <p className="text-xs text-muted-foreground mt-1">خطط أساسية</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">إجمالي المتاجر</CardTitle>
-                <span className="text-lg">🏪</span>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">
-                  {users.filter(u => u.store_name !== 'لا يوجد متجر').length}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">متاجر نشطة</p>
-              </CardContent>
-            </Card>
-
-
-          </div>
-
-          {/* إحصائيات التجار */}
-          {traderStats && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">تجار خاملون</CardTitle>
-                  <span className="text-lg">😴</span>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-600">{traderStats.stats.خامل}</div>
-                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.خامل}% من الإجمالي</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">تجار مبتدئون</CardTitle>
-                  <span className="text-lg">🌱</span>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">{traderStats.stats.مبتدئ}</div>
-                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.مبتدئ}% من الإجمالي</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">تجار نشطون</CardTitle>
-                  <span className="text-lg">⚡</span>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-600">{traderStats.stats.نشط}</div>
-                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.نشط}% من الإجمالي</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">تجار قويون</CardTitle>
-                  <span className="text-lg">💪</span>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-yellow-600">{traderStats.stats.قوي}</div>
-                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.قوي}% من الإجمالي</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">تجار سوبر</CardTitle>
-                  <span className="text-lg">🚀</span>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-red-600">{traderStats.stats.سوبر}</div>
-                  <p className="text-xs text-muted-foreground mt-1">{traderStats.percentages.سوبر}% من الإجمالي</p>
-                </CardContent>
-              </Card>
-            </div>
-          )}
 
           {/* قائمة المستخدمين المضغوطة مع المعلومات */}
           {users.length > 0 && (
@@ -371,7 +260,7 @@ export function CatalogUsers() {
                         <div className="flex-1 min-w-0">
                           {user.store_name !== 'لا يوجد متجر' ? (
                             <a
-                              href={getStoreUrl(user.store_name, user.display_name)}
+                              href={getStoreUrl(user.store_name)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="block group/link"

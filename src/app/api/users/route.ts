@@ -29,14 +29,14 @@ export async function GET() {
     }
 
     // إنشاء خرائط للمتاجر والخطط
-    const catalogsMap = new Map()
-    const plansMap = new Map()
     const nameMap = new Map()
+    const displayNameMap = new Map()
+    const plansMap = new Map()
     if (catalogs) {
       catalogs.forEach(catalog => {
-        catalogsMap.set(catalog.user_id, catalog.display_name)
-        plansMap.set(catalog.user_id, catalog.plan)
         nameMap.set(catalog.user_id, catalog.name)
+        displayNameMap.set(catalog.user_id, catalog.display_name)
+        plansMap.set(catalog.user_id, catalog.plan)
       })
     }
 
@@ -45,8 +45,8 @@ export async function GET() {
       id: user.id,
       email: user.email,
       display_name: user.user_metadata?.display_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'غير محدد',
-      store_name: catalogsMap.get(user.id) || 'لا يوجد متجر',
-      store_display_name: catalogsMap.get(user.id) || null,
+      store_name: nameMap.get(user.id) || 'لا يوجد متجر',
+      store_display_name: displayNameMap.get(user.id) || null,
       name: nameMap.get(user.id) || null,
       plan: plansMap.get(user.id) || 'free',
       created_at: user.created_at,

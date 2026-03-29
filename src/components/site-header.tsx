@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Users, Crown, Calendar } from "lucide-react"
+import { Users, Crown } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
 interface HeaderStats {
@@ -29,6 +29,20 @@ export function SiteHeader() {
     router.push('/catalog')
   }
 
+  const getTimeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+    
+    if (seconds < 60) return 'منذ للتو'
+    if (seconds < 3600) return `منذ ${Math.floor(seconds / 60)} دقيقة`
+    if (seconds < 86400) return `منذ ${Math.floor(seconds / 3600)} ساعة`
+    if (seconds < 604800) return `منذ ${Math.floor(seconds / 86400)} يوم`
+    if (seconds < 2592000) return `منذ ${Math.floor(seconds / 604800)} أسبوع`
+    if (seconds < 31536000) return `منذ ${Math.floor(seconds / 2592000)} شهر`
+    return `منذ ${Math.floor(seconds / 31536000)} سنة`
+  }
+
   const fetchStats = async () => {
     try {
       const response = await fetch('/api/users')
@@ -45,13 +59,7 @@ export function SiteHeader() {
         setStats({
           totalUsers: users.length,
           proUsers,
-          lastUserDate: lastUser ? (() => {
-            const date = new Date(lastUser.created_at)
-            const day = date.getDate()
-            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
-            const month = months[date.getMonth()]
-            return `${day} ${month}`
-          })() : '-'
+          lastUserDate: lastUser ? getTimeAgo(lastUser.created_at) : '-'
         })
       }
     } catch (error) {
@@ -59,15 +67,6 @@ export function SiteHeader() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const day = date.getDate()
-    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
-    const month = months[date.getMonth()]
-    const year = date.getFullYear()
-    return `${day} ${month} ${year}`
   }
 
   return (
@@ -91,13 +90,15 @@ export function SiteHeader() {
           {/* المعلومات الأساسية - على اليمين */}
           <div className="flex items-center gap-6 flex-wrap">
             {/* إجمالي المستخدمين */}
-            <div className="flex items-center gap-2 bg-primary/5 px-3 py-1 rounded-lg border border-primary/20">
-              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
-                <Users className="w-3 h-3 text-primary" />
+            <div className="flex items-center gap-2 bg-green-500/5 px-3 py-1 rounded-lg border border-green-500/20">
+              <div className="w-6 h-6 bg-green-500/10 rounded-full flex items-center justify-center">
+                <Users className="w-3 h-3 text-green-600" />
               </div>
               <div className="text-xs">
-                <div className="font-bold text-lg text-primary">{stats.totalUsers}</div>
-                <div className="text-[10px] text-muted-foreground">مستخدم</div>
+                <div className="font-bold text-lg text-green-600">{stats.totalUsers}</div>
+                <div className="text-[10px] text-muted-foreground">
+                  آخر تسجيل: {stats.lastUserDate}
+                </div>
               </div>
             </div>
 
@@ -109,17 +110,6 @@ export function SiteHeader() {
               <div className="text-xs">
                 <div className="font-bold text-lg text-amber-700">{stats.proUsers}</div>
                 <div className="text-[10px] text-muted-foreground">برو</div>
-              </div>
-            </div>
-
-            {/* آخر مستخدم */}
-            <div className="flex items-center gap-2 bg-green-500/5 px-3 py-1 rounded-lg border border-green-500/20">
-              <div className="w-6 h-6 bg-green-500/10 rounded-full flex items-center justify-center">
-                <Calendar className="w-3 h-3 text-green-600" />
-              </div>
-              <div className="text-xs">
-                <div className="font-bold text-sm text-green-700">{stats.lastUserDate}</div>
-                <div className="text-[10px] text-muted-foreground">آخر تسجيل</div>
               </div>
             </div>
 

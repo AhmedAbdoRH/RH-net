@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Users, UserCheck, Calendar, Mail } from 'lucide-react'
+import { Users, UserCheck, Mail } from 'lucide-react'
 
 interface User {
   id: string
@@ -55,6 +55,20 @@ export default function UserFooter() {
     return `${day} ${month} ${year}`
   }
 
+  const getTimeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+    
+    if (seconds < 60) return 'منذ للتو'
+    if (seconds < 3600) return `منذ ${Math.floor(seconds / 60)} دقيقة`
+    if (seconds < 86400) return `منذ ${Math.floor(seconds / 3600)} ساعة`
+    if (seconds < 604800) return `منذ ${Math.floor(seconds / 86400)} يوم`
+    if (seconds < 2592000) return `منذ ${Math.floor(seconds / 604800)} أسبوع`
+    if (seconds < 31536000) return `منذ ${Math.floor(seconds / 2592000)} شهر`
+    return `منذ ${Math.floor(seconds / 31536000)} سنة`
+  }
+
   return (
     <footer className="bg-gray-900 text-white py-8 px-4 mt-auto">
       <div className="max-w-7xl mx-auto">
@@ -89,11 +103,11 @@ export default function UserFooter() {
 
               <div className="bg-gray-800 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-5 h-5 text-blue-400" />
+                  <span className="text-lg">📅</span>
                   <span className="font-semibold">آخر مستخدم مسجل</span>
                 </div>
                 <p className="text-sm text-gray-300">
-                  {users.length > 0 ? formatDate(users[0].created_at) : 'لا يوجد مستخدمون'}
+                  {users.length > 0 ? `آخر تسجيل: ${getTimeAgo(users[0].created_at)}` : 'لا يوجد مستخدمون'}
                 </p>
               </div>
 
