@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 export interface UserProduct {
   userId: string
   productCount: number
-  type: 'خامل' | 'مبتدئ' | 'نشط' | 'قوي' | 'سوبر'
+  type: 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر'
 }
 
 export const getProductCounts = async (): Promise<UserProduct[]> => {
@@ -38,14 +38,12 @@ export const getProductCounts = async (): Promise<UserProduct[]> => {
     if (users) {
       users.forEach(user => {
         const count = productCounts[user.id] || 0
-        let type: 'خامل' | 'مبتدئ' | 'نشط' | 'قوي' | 'سوبر'
+        let type: 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر'
         
         if (count === 0) {
           type = 'خامل'
-        } else if (count >= 48) {
+        } else if (count >= 30) {
           type = 'سوبر'
-        } else if (count > 20) {
-          type = 'قوي'
         } else if (count > 3) {
           type = 'نشط'
         } else {
@@ -72,7 +70,6 @@ export const getTraderStats = async (products: UserProduct[]) => {
     خامل: 0,
     مبتدئ: 0,
     نشط: 0,
-    قوي: 0,
     سوبر: 0
   }
 
@@ -87,7 +84,6 @@ export const getTraderStats = async (products: UserProduct[]) => {
       خامل: total > 0 ? Math.round((stats.خامل / total) * 100) : 0,
       مبتدئ: total > 0 ? Math.round((stats.مبتدئ / total) * 100) : 0,
       نشط: total > 0 ? Math.round((stats.نشط / total) * 100) : 0,
-      قوي: total > 0 ? Math.round((stats.قوي / total) * 100) : 0,
       سوبر: total > 0 ? Math.round((stats.سوبر / total) * 100) : 0
     }
   }

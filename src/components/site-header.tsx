@@ -34,13 +34,13 @@ export function SiteHeader() {
     const now = new Date()
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
     
-    if (seconds < 60) return 'منذ للتو'
-    if (seconds < 3600) return `منذ ${Math.floor(seconds / 60)} دقيقة`
-    if (seconds < 86400) return `منذ ${Math.floor(seconds / 3600)} ساعة`
-    if (seconds < 604800) return `منذ ${Math.floor(seconds / 86400)} يوم`
-    if (seconds < 2592000) return `منذ ${Math.floor(seconds / 604800)} أسبوع`
-    if (seconds < 31536000) return `منذ ${Math.floor(seconds / 2592000)} شهر`
-    return `منذ ${Math.floor(seconds / 31536000)} سنة`
+    if (seconds < 60) return 'للتو'
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} دقيقة`
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} ساعة`
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)} يوم`
+    if (seconds < 2592000) return `${Math.floor(seconds / 604800)} أسبوع`
+    if (seconds < 31536000) return `${Math.floor(seconds / 2592000)} شهر`
+    return `${Math.floor(seconds / 31536000)} سنة`
   }
 
   const fetchStats = async () => {
@@ -95,9 +95,9 @@ export function SiteHeader() {
                 <Users className="w-3 h-3 text-green-600" />
               </div>
               <div className="text-xs">
-                <div className="font-bold text-lg text-green-600">{stats.totalUsers}</div>
+                <div className="font-bold text-lg text-green-600">{stats.totalUsers} <span className="text-sm text-muted-foreground">مستخدم</span></div>
                 <div className="text-[10px] text-muted-foreground">
-                  آخر تسجيل: {stats.lastUserDate}
+                  آخر تسجيل منذ: {stats.lastUserDate}
                 </div>
               </div>
             </div>

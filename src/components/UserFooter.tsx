@@ -60,13 +60,13 @@ export default function UserFooter() {
     const now = new Date()
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
     
-    if (seconds < 60) return 'منذ للتو'
-    if (seconds < 3600) return `منذ ${Math.floor(seconds / 60)} دقيقة`
-    if (seconds < 86400) return `منذ ${Math.floor(seconds / 3600)} ساعة`
-    if (seconds < 604800) return `منذ ${Math.floor(seconds / 86400)} يوم`
-    if (seconds < 2592000) return `منذ ${Math.floor(seconds / 604800)} أسبوع`
-    if (seconds < 31536000) return `منذ ${Math.floor(seconds / 2592000)} شهر`
-    return `منذ ${Math.floor(seconds / 31536000)} سنة`
+    if (seconds < 60) return 'للتو'
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} دقيقة`
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} ساعة`
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)} يوم`
+    if (seconds < 2592000) return `${Math.floor(seconds / 604800)} أسبوع`
+    if (seconds < 31536000) return `${Math.floor(seconds / 2592000)} شهر`
+    return `${Math.floor(seconds / 31536000)} سنة`
   }
 
   return (
@@ -107,7 +107,7 @@ export default function UserFooter() {
                   <span className="font-semibold">آخر مستخدم مسجل</span>
                 </div>
                 <p className="text-sm text-gray-300">
-                  {users.length > 0 ? `آخر تسجيل: ${getTimeAgo(users[0].created_at)}` : 'لا يوجد مستخدمون'}
+                  {users.length > 0 ? `آخر تسجيل منذ: ${getTimeAgo(users[0].created_at)}` : 'لا يوجد مستخدمون'}
                 </p>
               </div>
 

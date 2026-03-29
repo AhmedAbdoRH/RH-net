@@ -13,6 +13,7 @@ interface User {
   store_name: string
   store_display_name: string | null
   plan: string
+  whatsapp_number: string | null
   created_at: string
   user_metadata?: any
 }
@@ -20,7 +21,7 @@ interface User {
 interface UserProduct {
   userId: string
   productCount: number
-  type: 'خامل' | 'مبتدئ' | 'نشط' | 'قوي' | 'سوبر'
+  type: 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر'
 }
 
 export function CatalogUsers() {
@@ -29,6 +30,7 @@ export function CatalogUsers() {
   const [error, setError] = useState<string | null>(null)
   const [traderData, setTraderData] = useState<UserProduct[]>([])
   const [traderStats, setTraderStats] = useState<any>(null)
+  const [filterType, setFilterType] = useState<'الكل' | 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر' | 'برو'>('الكل')
 
   useEffect(() => {
     fetchUsers()
@@ -117,13 +119,13 @@ export function CatalogUsers() {
     const now = new Date()
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
     
-    if (seconds < 60) return 'منذ للتو'
-    if (seconds < 3600) return `منذ ${Math.floor(seconds / 60)} دقيقة`
-    if (seconds < 86400) return `منذ ${Math.floor(seconds / 3600)} ساعة`
-    if (seconds < 604800) return `منذ ${Math.floor(seconds / 86400)} يوم`
-    if (seconds < 2592000) return `منذ ${Math.floor(seconds / 604800)} أسبوع`
-    if (seconds < 31536000) return `منذ ${Math.floor(seconds / 2592000)} شهر`
-    return `منذ ${Math.floor(seconds / 31536000)} سنة`
+    if (seconds < 60) return 'للتو'
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} دقيقة`
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} ساعة`
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)} يوم`
+    if (seconds < 2592000) return `${Math.floor(seconds / 604800)} أسبوع`
+    if (seconds < 31536000) return `${Math.floor(seconds / 2592000)} شهر`
+    return `${Math.floor(seconds / 31536000)} سنة`
   }
 
   const getTraderType = (userId: string) => {
@@ -133,13 +135,12 @@ export function CatalogUsers() {
   const getTraderTypeColor = (type: string) => {
     switch (type) {
       case 'خامل':
-        return { bg: 'bg-gray-500/20', text: 'text-gray-700', border: 'border-gray-500/30', icon: '😴' }
+        return { bg: 'bg-gray-500/20', text: 'text-gray-700', border: 'border-gray-500/30', icon: '😴', label: 'غير نشط' }
       case 'مبتدئ':
         return { bg: 'bg-blue-500/20', text: 'text-blue-700', border: 'border-blue-500/30', icon: '🌱' }
       case 'نشط':
         return { bg: 'bg-green-500/20', text: 'text-green-700', border: 'border-green-500/30', icon: '⚡' }
-      case 'قوي':
-        return { bg: 'bg-yellow-500/20', text: 'text-yellow-700', border: 'border-yellow-500/30', icon: '💪' }
+
       case 'سوبر':
         return { bg: 'bg-red-500/20', text: 'text-red-700', border: 'border-red-500/30', icon: '🚀' }
       default:
@@ -152,10 +153,9 @@ export function CatalogUsers() {
 
     const { percentages, stats } = traderStats
     const colors = [
-      { name: 'خامل', percent: percentages.خامل, color: 'bg-gray-500', count: stats.خامل },
+      { name: 'غير نشط', percent: percentages.خامل, color: 'bg-gray-500', count: stats.خامل },
       { name: 'مبتدئ', percent: percentages.مبتدئ, color: 'bg-blue-500', count: stats.مبتدئ },
       { name: 'نشط', percent: percentages.نشط, color: 'bg-green-500', count: stats.نشط },
-      { name: 'قوي', percent: percentages.قوي, color: 'bg-yellow-500', count: stats.قوي },
       { name: 'سوبر', percent: percentages.سوبر, color: 'bg-red-500', count: stats.سوبر }
     ]
 
@@ -240,10 +240,83 @@ export function CatalogUsers() {
             </Card>
           )}
 
+          {/* أزرار التصفية */}
+          {users.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-center rtl" dir="rtl">
+              <button
+                onClick={() => setFilterType('خامل')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'خامل'
+                    ? 'bg-gray-500/30 text-gray-700 border-2 border-gray-500'
+                    : 'bg-gray-500/10 text-gray-700 border border-gray-500/30 hover:bg-gray-500/20'
+                }`}
+              >
+                😴 غير نشط ({traderData.filter(t => t.type === 'خامل').length})
+              </button>
+              <button
+                onClick={() => setFilterType('مبتدئ')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'مبتدئ'
+                    ? 'bg-blue-500/30 text-blue-700 border-2 border-blue-500'
+                    : 'bg-blue-500/10 text-blue-700 border border-blue-500/30 hover:bg-blue-500/20'
+                }`}
+              >
+                🌱 مبتدئ ({traderData.filter(t => t.type === 'مبتدئ').length})
+              </button>
+              <button
+                onClick={() => setFilterType('نشط')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'نشط'
+                    ? 'bg-green-500/30 text-green-700 border-2 border-green-500'
+                    : 'bg-green-500/10 text-green-700 border border-green-500/30 hover:bg-green-500/20'
+                }`}
+              >
+                ⚡ نشط ({traderData.filter(t => t.type === 'نشط').length})
+              </button>
+              <button
+                onClick={() => setFilterType('سوبر')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'سوبر'
+                    ? 'bg-red-500/30 text-red-700 border-2 border-red-500'
+                    : 'bg-red-500/10 text-red-700 border border-red-500/30 hover:bg-red-500/20'
+                }`}
+              >
+                🚀 سوبر ({traderData.filter(t => t.type === 'سوبر').length})
+              </button>
+              <button
+                onClick={() => setFilterType('برو')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'برو'
+                    ? 'bg-amber-500/30 text-amber-700 border-2 border-amber-500'
+                    : 'bg-amber-500/10 text-amber-700 border border-amber-500/30 hover:bg-amber-500/20'
+                }`}
+              >
+                👑 برو ({users.filter(u => u.plan === 'pro').length})
+              </button>
+              <button
+                onClick={() => setFilterType('الكل')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'الكل'
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                الكل ({users.length})
+              </button>
+            </div>
+          )}
+
           {/* قائمة المستخدمين المضغوطة مع المعلومات */}
           {users.length > 0 && (
             <div className="space-y-3 rtl" dir="rtl">
-              {users.map((user, index) => (
+              {users
+                .filter((user) => {
+                  if (filterType === 'الكل') return true
+                  if (filterType === 'برو') return user.plan === 'pro'
+                  const traderType = getTraderType(user.id)?.type
+                  return traderType === filterType
+                })
+                .map((user, index) => (
                 <div
                   key={user.id}
                   className="group relative bg-gradient-to-r from-card to-card/50 border border-border/50 rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-primary/30 backdrop-blur-sm"
@@ -300,7 +373,7 @@ export function CatalogUsers() {
                               typeColor.border
                             )}>
                               <span>{typeColor.icon}</span>
-                              <span>{trader.type}</span>
+                              <span>{trader.type === 'خامل' ? 'غير نشط' : trader.type}</span>
                               <span className="text-xs">({trader.productCount})</span>
                             </div>
                           )
@@ -318,21 +391,48 @@ export function CatalogUsers() {
                       </div>
                     </div>
 
-                    {/* الصف الثاني: معلومات المالك المضغوطة */}
+                    {/* الصف الثاني: معلومات المالك والأزرار */}
                     <div className="flex items-center justify-between text-xs text-muted-foreground border-t border-border/20 pt-2">
+                      {/* اليسار: معلومات المستخدم */}
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1">
                           <span className="text-xs">👤</span>
                           <span>{user.display_name}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <span className="text-xs">📧</span>
-                          <span className="truncate">{user.email}</span>
+                          <span className="text-xs">(مسجل منذ: {getTimeAgo(user.created_at)})</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs">📅</span>
-                        <span>{formatDate(user.created_at)}</span>
+                      
+                      {/* اليمين: الأزرار - ايميل ثم واتس ثم اتصال */}
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`mailto:${user.email}`}
+                          className="flex items-center gap-1 text-orange-600 hover:text-orange-700 transition-colors px-2 py-1 rounded border border-orange-600/30 hover:border-orange-600/50"
+                          title="إرسال بريد إلكتروني"
+                        >
+                          <span className="text-sm">📧</span>
+                        </a>
+                        {user.whatsapp_number && (
+                          <a
+                            href={`https://wa.me/${user.whatsapp_number.replace(/[^\d]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-green-600 hover:text-green-700 transition-colors px-2 py-1 rounded border border-green-600/30 hover:border-green-600/50"
+                            title="تواصل عبر واتساب"
+                          >
+                            <span className="text-sm">💬</span>
+                          </a>
+                        )}
+                        {user.whatsapp_number && (
+                          <a
+                            href={`tel:${user.whatsapp_number.replace(/[^\d+]/g, '')}`}
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-700 transition-colors px-2 py-1 rounded border border-blue-600/30 hover:border-blue-600/50"
+                            title="اتصال مباشر"
+                          >
+                            <span className="text-sm">📞</span>
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
