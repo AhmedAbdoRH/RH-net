@@ -163,11 +163,7 @@ export function CatalogUsers() {
       <div className="space-y-4">
         {/* الخط الموزع بألوان موحد */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-foreground">توزيع التجار</span>
-            <span className="text-xs text-muted-foreground">29 تاجر</span>
-          </div>
-          <div className="w-full h-8 bg-muted rounded-full overflow-hidden flex">
+          <div className="w-full h-4 bg-muted rounded-full overflow-hidden flex">
             {colors.map((item) => (
               item.percent > 0 && (
                 <div
@@ -176,7 +172,7 @@ export function CatalogUsers() {
                   style={{ width: `${item.percent}%` }}
                   title={`${item.name}: ${item.percent}% (${item.count} تاجر)`}
                 >
-                  {item.percent >= 10 && (
+                  {item.percent >= 8 && (
                     <span className="text-xs font-bold text-white drop-shadow">{item.percent}%</span>
                   )}
                 </div>
@@ -194,6 +190,56 @@ export function CatalogUsers() {
               <span className="text-xs text-muted-foreground">({item.count})</span>
             </div>
           ))}
+        </div>
+      </div>
+    )
+  }
+
+  const PlanChart = () => {
+    const basicCount = users.filter(u => u.plan !== 'pro').length
+    const proCount = users.filter(u => u.plan === 'pro').length
+    const totalCount = users.length
+    
+    const basicPercent = totalCount > 0 ? (basicCount / totalCount) * 100 : 0
+    const proPercent = totalCount > 0 ? (proCount / totalCount) * 100 : 0
+
+    return (
+      <div className="space-y-2 border-t border-border/20 pt-3 mt-2">
+        <div className="w-full h-3 bg-muted rounded-full overflow-hidden flex">
+          {basicCount > 0 && (
+            <div
+              className="bg-sky-500 h-full transition-all duration-500 flex items-center justify-center"
+              style={{ width: `${basicPercent}%` }}
+              title={`بيزيك: ${basicPercent.toFixed(1)}% (${basicCount} مشترك)`}
+            >
+              {basicPercent >= 8 && (
+                <span className="text-xs font-bold text-white drop-shadow">{basicPercent.toFixed(0)}%</span>
+              )}
+            </div>
+          )}
+          {proCount > 0 && (
+            <div
+              className="bg-amber-500 h-full transition-all duration-500 flex items-center justify-center"
+              style={{ width: `${proPercent}%` }}
+              title={`برو: ${proPercent.toFixed(1)}% (${proCount} مشترك)`}
+            >
+              {proPercent >= 8 && (
+                <span className="text-xs font-bold text-white drop-shadow">{proPercent.toFixed(0)}%</span>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-3 justify-center pt-2">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-sky-500"></div>
+            <span className="text-xs font-medium">بيزيك</span>
+            <span className="text-xs text-muted-foreground">({basicCount})</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+            <span className="text-xs font-medium">برو</span>
+            <span className="text-xs text-muted-foreground">({proCount})</span>
+          </div>
         </div>
       </div>
     )
@@ -227,15 +273,12 @@ export function CatalogUsers() {
 
       {!loading && !error && (
         <>
-          {/* شارت توزيع أنواع التجار */}
+          {/* شارت توزيع أنواع التجار والخطط */}
           {traderStats && (
             <Card className="border-2 border-primary/20">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold">توزيع أنواع التجار</CardTitle>
-                <p className="text-sm text-muted-foreground mt-2">النسبة المئوية لكل فئة</p>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4 pt-6">
                 <ChartBar />
+                <PlanChart />
               </CardContent>
             </Card>
           )}
@@ -319,7 +362,7 @@ export function CatalogUsers() {
                 .map((user, index) => (
                 <div
                   key={user.id}
-                  className="group relative bg-gradient-to-r from-card to-card/50 border border-border/50 rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-primary/30 backdrop-blur-sm"
+                  className="group relative bg-gradient-to-r from-card to-card/70 border border-border/60 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200 hover:border-primary/40 backdrop-blur-md"
                 >
                   {/* محتوى البطاقة */}
                   <div className="relative z-10">
