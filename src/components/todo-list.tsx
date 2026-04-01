@@ -5,8 +5,9 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ToastAction } from '@/components/ui/toast';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, ListPlus, Copy, Star } from 'lucide-react';
+import { Loader2, Plus, Trash2, ListPlus, Copy, Star, Undo2 } from 'lucide-react';
 import { addTodo, updateTodo, deleteTodo } from '@/services/todoService';
 import type { Todo } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
@@ -39,6 +40,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   const [loading, setLoading] = React.useState(false);
   const [bulkLoading, setBulkLoading] = React.useState(false);
   const [toggledTodos, setToggledTodos] = React.useState<string[]>([]);
+  const [lastDeletedTodo, setLastDeletedTodo] = React.useState<Todo | null>(null);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
   
@@ -135,6 +137,10 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   const handleToggleTodo = async (todoId: string) => {
     if (!todoId || todoId.startsWith('temp-') || toggledTodos.includes(todoId)) return;
     
+    // Save the todo before completing
+    const todoToComplete = todos.find(t => t.id === todoId);
+    if (!todoToComplete) return;
+    
     setToggledTodos(prev => [...prev, todoId]);
     setTodos(prev => prev.map(t => t.id === todoId ? { ...t, completed: true } : t));
     audioRef.current?.play().catch(e => console.log("Audio play failed", e));
@@ -147,6 +153,26 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
     
         try {
             await updateTodo(todoId, { completed: true });
+            
+            // Store the completed todo for undo
+            setLastDeletedTodo({ ...todoToComplete, completed: true });
+            
+            toast({
+                title: "تمت إضافة المهمة للمنجزة",
+                description: todoToComplete.text.slice(0, 50) + (todoToComplete.text.length > 50 ? "..." : ""),
+                action: (
+                    <ToastAction asChild altText="تراجع">
+                        <button
+                            onClick={() => handleUndoComplete(todoToComplete)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors"
+                        >
+                            <Undo2 className="h-4 w-4" />
+                            تراجع
+                        </button>
+                    </ToastAction>
+                ),
+                duration: 5000,
+            });
         } catch (error) {
             setTodos(originalTodos); 
             onUpdate();
@@ -158,6 +184,37 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
             });
         }
     }, 800);
+  };
+
+  const handleUndoComplete = async (completedTodo: Todo) => {
+    if (!completedTodo) return;
+    
+    // Add the todo back as not completed
+    setTodos(prevTodos => sortTodos([{ ...completedTodo, completed: false }, ...prevTodos]));
+    onUpdate();
+    
+    try {
+      await addTodo({
+        domainId: completedTodo.domainId,
+        text: completedTodo.text,
+        completed: false,
+        isHighPriority: completedTodo.isHighPriority || false,
+      });
+      setLastDeletedTodo(null);
+      toast({
+        title: "تم استعادة المهمة",
+        description: "تمت استعادة المهمة بنجاح.",
+      });
+      onUpdate();
+    } catch (error) {
+      setTodos(prevTodos => prevTodos.filter(t => t.id !== completedTodo.id));
+      onUpdate();
+      toast({
+        title: "خطأ",
+        description: "فشل في استعادة المهمة.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleTogglePriority = async (todoId: string, currentPriority: boolean) => {
@@ -191,16 +248,35 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   const handleDeleteTodo = async (todoId: string) => {
     if (!todoId || todoId.startsWith('temp-')) return;
   
+    // Save the todo before deleting
+    const todoToDelete = todos.find(t => t.id === todoId);
+    if (!todoToDelete) return;
+    
     const originalTodos = todos;
     setTodos(prev => prev.filter(t => t.id !== todoId));
     onUpdate();
   
     try {
       await deleteTodo(todoId);
+      
+      // Store the deleted todo for undo
+      setLastDeletedTodo(todoToDelete);
+      
       toast({
-        title: "نجاح",
-        description: "تم حذف المهمة.",
-        variant: "destructive"
+        title: "تم حذف المهمة",
+        description: todoToDelete.text.slice(0, 50) + (todoToDelete.text.length > 50 ? "..." : ""),
+        action: (
+          <ToastAction asChild altText="تراجع">
+            <button
+              onClick={() => handleUndoDelete(todoToDelete)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors"
+            >
+              <Undo2 className="h-4 w-4" />
+              تراجع
+            </button>
+          </ToastAction>
+        ),
+        duration: 5000,
       });
     } catch (error) {
       setTodos(originalTodos);
@@ -209,6 +285,36 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
       toast({
         title: "خطأ",
         description: "فشل في حذف المهمة.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUndoDelete = async (deletedTodo: Todo) => {
+    if (!deletedTodo) return;
+    
+    setTodos(prevTodos => sortTodos([deletedTodo, ...prevTodos]));
+    onUpdate();
+    
+    try {
+      await addTodo({
+        domainId: deletedTodo.domainId,
+        text: deletedTodo.text,
+        completed: deletedTodo.completed,
+        isHighPriority: deletedTodo.isHighPriority || false,
+      });
+      setLastDeletedTodo(null);
+      toast({
+        title: "تم استعادة المهمة",
+        description: "تمت استعادة المهمة بنجاح.",
+      });
+      onUpdate();
+    } catch (error) {
+      setTodos(prevTodos => prevTodos.filter(t => t.id !== deletedTodo.id));
+      onUpdate();
+      toast({
+        title: "خطأ",
+        description: "فشل في استعادة المهمة.",
         variant: "destructive",
       });
     }

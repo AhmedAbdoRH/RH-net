@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Trash2, Plus, Star } from 'lucide-react';
+import { Loader2, Trash2, Plus, Star, Undo2 } from 'lucide-react';
 import { getAllTodosGroupedByDomain, deleteTodo, GENERAL_TASKS_KEY, addTodo, updateTodo } from '@/services/todoService';
 import type { Todo } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
@@ -11,6 +11,7 @@ import { Badge } from './ui/badge';
 import { Checkbox } from './ui/checkbox';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { ToastAction } from './ui/toast';
 import { cn } from '@/lib/utils';
 
 
@@ -29,6 +30,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
     const [newGeneralTodo, setNewGeneralTodo] = React.useState('');
     const [addingTodo, setAddingTodo] = React.useState(false);
     const [toggledTodos, setToggledTodos] = React.useState<string[]>([]);
+    const [lastDeletedTodo, setLastDeletedTodo] = React.useState<Todo & { originalGroupKey?: string } | null>(null);
     const audioRef = React.useRef<HTMLAudioElement | null>(null);
     const { toast } = useToast();
 
@@ -85,6 +87,28 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
     const handleToggleTodo = async (todoId: string) => {
         if (!todoId || toggledTodos.includes(todoId)) return;
 
+        // Save the todo before completing
+        let todoToComplete: Todo | null = null;
+        for (const key in groupedTodos) {
+            if (groupedTodos[key]) {
+                const found = groupedTodos[key].find(t => t.id === todoId);
+                if (found) {
+                    todoToComplete = found;
+                    break;
+                }
+            }
+        }
+        if (!todoToComplete) return;
+        
+        // Save original group key
+        let originalGroupKey: string | null = null;
+        for (const key in groupedTodos) {
+            if (groupedTodos[key]?.find(t => t.id === todoId)) {
+                originalGroupKey = key;
+                break;
+            }
+        }
+
         setToggledTodos(prev => [...prev, todoId]);
         setGroupedTodos(prevGroups => {
             const newGroups = { ...prevGroups };
@@ -128,6 +152,26 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
 
             try {
                 await updateTodo(todoId, { completed: true });
+                
+                // Store the completed todo for undo with its original group
+                setLastDeletedTodo({ ...todoToComplete!, completed: true, originalGroupKey: originalGroupKey || undefined });
+                
+                toast({
+                    title: "تمت إضافة المهمة للمنجزة",
+                    description: todoToComplete!.text.slice(0, 50) + (todoToComplete!.text.length > 50 ? "..." : ""),
+                    action: (
+                        <ToastAction asChild altText="تراجع">
+                            <button
+                                onClick={() => handleUndoComplete(todoToComplete!, originalGroupKey || GENERAL_TASKS_KEY)}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors"
+                            >
+                                <Undo2 className="h-4 w-4" />
+                                تراجع
+                            </button>
+                        </ToastAction>
+                    ),
+                    duration: 5000,
+                });
             } catch (error) {
                 toast({
                     title: "خطأ",
@@ -137,6 +181,49 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
                 onUpdate();
             }
         }, 800);
+    };
+    
+    const handleUndoComplete = async (completedTodo: Todo, originalGroupKey: string) => {
+        if (!completedTodo) return;
+        
+        setGroupedTodos(prev => {
+            const newGroups = { ...prev };
+            if (!newGroups[originalGroupKey]) {
+                newGroups[originalGroupKey] = [];
+            }
+            newGroups[originalGroupKey] = sortTodos([{ ...completedTodo, completed: false }, ...newGroups[originalGroupKey]]);
+            return newGroups;
+        });
+        onUpdate();
+        
+        try {
+            await addTodo({
+                domainId: completedTodo.domainId,
+                text: completedTodo.text,
+                completed: false,
+                isHighPriority: completedTodo.isHighPriority || false,
+            });
+            setLastDeletedTodo(null);
+            toast({
+                title: "تم استعادة المهمة",
+                description: "تمت استعادة المهمة بنجاح.",
+            });
+            onUpdate();
+        } catch (error) {
+            setGroupedTodos(prev => {
+                const newGroups = { ...prev };
+                if (newGroups[originalGroupKey]) {
+                    newGroups[originalGroupKey] = newGroups[originalGroupKey].filter(t => t.id !== completedTodo.id);
+                }
+                return newGroups;
+            });
+            onUpdate();
+            toast({
+                title: "خطأ",
+                description: "فشل في استعادة المهمة.",
+                variant: "destructive",
+            });
+        }
     };
     
     const handleTogglePriority = async (todoId: string, currentPriority: boolean) => {
@@ -203,10 +290,25 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
         
         try {
             await deleteTodo(todo.id);
+            
+            // Store the deleted todo for undo with its original group
+            setLastDeletedTodo({ ...todo, originalGroupKey: groupKey || undefined });
+            
             toast({
-                title: "نجاح",
-                description: "تم حذف المهمة.",
-                variant: "destructive"
+                title: "تم حذف المهمة",
+                description: todo.text.slice(0, 50) + (todo.text.length > 50 ? "..." : ""),
+                action: (
+                    <ToastAction asChild altText="تراجع">
+                        <button
+                            onClick={() => handleUndoDelete(todo, groupKey || GENERAL_TASKS_KEY)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors"
+                        >
+                            <Undo2 className="h-4 w-4" />
+                            تراجع
+                        </button>
+                    </ToastAction>
+                ),
+                duration: 5000,
             });
         } catch (error) {
             setGroupedTodos(originalGroupedTodos);
@@ -214,6 +316,49 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
             toast({
                 title: "خطأ",
                 description: "فشل في حذف المهمة.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleUndoDelete = async (deletedTodo: Todo, originalGroupKey: string) => {
+        if (!deletedTodo) return;
+        
+        setGroupedTodos(prev => {
+            const newGroups = { ...prev };
+            if (!newGroups[originalGroupKey]) {
+                newGroups[originalGroupKey] = [];
+            }
+            newGroups[originalGroupKey] = sortTodos([deletedTodo, ...newGroups[originalGroupKey]]);
+            return newGroups;
+        });
+        onUpdate();
+        
+        try {
+            await addTodo({
+                domainId: deletedTodo.domainId,
+                text: deletedTodo.text,
+                completed: deletedTodo.completed,
+                isHighPriority: deletedTodo.isHighPriority || false,
+            });
+            setLastDeletedTodo(null);
+            toast({
+                title: "تم استعادة المهمة",
+                description: "تمت استعادة المهمة بنجاح.",
+            });
+            onUpdate();
+        } catch (error) {
+            setGroupedTodos(prev => {
+                const newGroups = { ...prev };
+                if (newGroups[originalGroupKey]) {
+                    newGroups[originalGroupKey] = newGroups[originalGroupKey].filter(t => t.id !== deletedTodo.id);
+                }
+                return newGroups;
+            });
+            onUpdate();
+            toast({
+                title: "خطأ",
+                description: "فشل في استعادة المهمة.",
                 variant: "destructive",
             });
         }
