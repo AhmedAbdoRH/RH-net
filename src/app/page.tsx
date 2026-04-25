@@ -450,7 +450,7 @@ export default function WebPage() {
       </div>
 
       {/* زر النسخ الاحتياطي في الأسفل */}
-      <div className="w-full flex justify-center py-6 mt-8">
+      <div className="w-full flex justify-center py-8 border-t border-border/40 bg-background/50">
         <Link href="/backup">
           <Button
             className="bg-black/30 hover:bg-black/50 text-white/50 hover:text-white/80 backdrop-blur-sm border border-white/5 rounded-full transition-all duration-300"
