@@ -14,7 +14,7 @@ import { getTodosForDomains, getAllTodosGroupedByDomain } from '@/services/todoS
 import { AllTodosPanel } from '@/components/all-todos-panel';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from '@/components/ui/button';
-import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Code2, User, Receipt, NotebookPen, FileText, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss, Trophy } from 'lucide-react';
+import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Code2, User, Receipt, NotebookPen, FileText, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss, Trophy, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FaultsSheet } from '@/components/faults-sheet';
 import { GeneralPaperSheet } from '@/components/general-paper-sheet';
@@ -296,6 +296,16 @@ export default function WebPage() {
       >
         <ShieldAlert className="h-5 w-5" />
       </Button>
+      <Link href="/backup">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          title="النسخ الاحتياطي والاستعادة"
+        >
+          <Database className="h-5 w-5" />
+        </Button>
+      </Link>
     </>
   );
 
@@ -437,6 +447,19 @@ export default function WebPage() {
             )}
           </main>
         </div>
+      </div>
+
+      {/* زر النسخ الاحتياطي في الأسفل */}
+      <div className="w-full flex justify-center py-6 mt-8">
+        <Link href="/backup">
+          <Button
+            className="bg-black/30 hover:bg-black/50 text-white/50 hover:text-white/80 backdrop-blur-sm border border-white/5 rounded-full transition-all duration-300"
+            size="sm"
+          >
+            <Database className="mr-1.5 h-3 w-3" />
+            <span className="text-xs">النسخ الاحتياطي</span>
+          </Button>
+        </Link>
       </div>
     </>
   );
