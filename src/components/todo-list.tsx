@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, Copy, Star } from 'lucide-react';
-import { addTodo, updateTodo, deleteTodo } from '@/services/todoService';
+import { Loader2, Plus, Trash2, Copy, Star, Edit2, Check, X, GripVertical } from 'lucide-react';
+import { addTodo, updateTodo, deleteTodo, reorderTodos } from '@/services/todoService';
 import type { Todo } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 interface TodoListProps {
   domainId: string;
@@ -25,14 +26,31 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   const [loading, setLoading] = React.useState(false);
 
   const [toggledTodos, setToggledTodos] = React.useState<string[]>([]);
+  const [editingTodoId, setEditingTodoId] = React.useState<string | null>(null);
+  const [editingTodoText, setEditingTodoText] = React.useState('');
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  // Main topics for quick task creation - loaded from localStorage or use defaults
+  const [mainTopics, setMainTopics] = React.useState<{ name: string; icon: string }[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mainTopics');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    }
+    return [];
+  });
+  const [showAddTopic, setShowAddTopic] = React.useState(false);
+  const [newTopicName, setNewTopicName] = React.useState('');
+  const [newTopicIcon, setNewTopicIcon] = React.useState('�');
   
   const sortTodos = (todos: (Todo & { isNew?: boolean })[]) => {
     return todos.sort((a, b) => {
         if (a.isHighPriority && !b.isHighPriority) return -1;
         if (!a.isHighPriority && b.isHighPriority) return 1;
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return (a.order || 0) - (b.order || 0);
     });
   };
 
@@ -55,6 +73,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
     if (!text) return;
 
     const tempId = `temp-${Date.now()}`;
+    const newOrder = todos.length;
     const optimisticTodo: Todo & { isNew?: boolean } = {
       id: tempId,
       domainId,
@@ -62,6 +81,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
       completed: false,
       createdAt: new Date().toISOString(),
       isHighPriority: false,
+      order: newOrder,
       isNew: true,
     };
 
@@ -74,8 +94,9 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
         text,
         completed: false,
         isHighPriority: false,
+        order: newOrder,
       });
-      setTodos(prevTodos => 
+      setTodos(prevTodos =>
         sortTodos(prevTodos.map(t => (t.id === tempId ? addedTodo : t)))
       );
       onUpdate();
@@ -182,10 +203,217 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
     }
   };
 
+  const handleStartEdit = (todoId: string, currentText: string) => {
+    setEditingTodoId(todoId);
+    setEditingTodoText(currentText);
+  };
+
+  const handleSaveEdit = async (todoId: string) => {
+    if (!todoId || !editingTodoText.trim()) return;
+
+    const newText = editingTodoText.trim();
+    setTodos(prev => {
+        const updatedTodos = prev.map(t =>
+            t.id === todoId ? { ...t, text: newText } : t
+        );
+        return sortTodos(updatedTodos);
+    });
+
+    try {
+        await updateTodo(todoId, { text: newText });
+        setEditingTodoId(null);
+        setEditingTodoText('');
+        onUpdate();
+    } catch (error) {
+        toast({
+            title: "خطأ",
+            description: "فشل في تحديث اسم المهمة.",
+            variant: "destructive",
+        });
+        onUpdate();
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTodoId(null);
+    setEditingTodoText('');
+  };
+
+  const handleDragEnd = async (result: any) => {
+    if (!result.destination) return;
+
+    const items = Array.from(todos);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    const updatedTodos = items.map((todo, index) => ({
+      ...todo,
+      order: index,
+    }));
+
+    setTodos(updatedTodos);
+
+    try {
+      await reorderTodos(updatedTodos);
+      onUpdate();
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث ترتيب المهام.",
+        variant: "destructive",
+      });
+      onUpdate();
+    }
+  };
+
+  const handleTopicClick = (topicName: string) => {
+    setNewTodo(`${topicName} - `);
+    inputRef.current?.focus();
+  };
+
+  const handleAddTopic = () => {
+    if (!newTopicName.trim()) return;
+
+    const newTopic = { name: newTopicName.trim(), icon: newTopicIcon };
+    const updatedTopics = [...mainTopics, newTopic];
+    setMainTopics(updatedTopics);
+    localStorage.setItem('mainTopics', JSON.stringify(updatedTopics));
+
+    setNewTopicName('');
+    setNewTopicIcon('📌');
+    setShowAddTopic(false);
+
+    toast({
+      title: "نجاح",
+      description: "تم إضافة الموضوع بنجاح.",
+    });
+  };
+
+  const handleDeleteTopic = (topicName: string) => {
+    const updatedTopics = mainTopics.filter(t => t.name !== topicName);
+    setMainTopics(updatedTopics);
+    localStorage.setItem('mainTopics', JSON.stringify(updatedTopics));
+  };
+
+  const handleTopicDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const items = Array.from(mainTopics);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setMainTopics(items);
+    localStorage.setItem('mainTopics', JSON.stringify(items));
+  };
+
   return (
     <div className="space-y-4">
+      {/* Topic buttons */}
+      <DragDropContext onDragEnd={handleTopicDragEnd}>
+        <Droppable droppableId="topics" direction="horizontal">
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="flex flex-wrap gap-2 items-center"
+            >
+              {mainTopics.map((topic, index) => (
+                <Draggable key={topic.name} draggableId={topic.name} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      className="relative group"
+                    >
+                      <Button
+                        {...provided.dragHandleProps}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleTopicClick(topic.name)}
+                        className={cn("text-xs cursor-pointer", snapshot.isDragging && "opacity-50")}
+                      >
+                        <span className="ml-1">{topic.icon}</span>
+                        {topic.name}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-3 w-3 absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-destructive text-destructive-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTopic(topic.name);
+                        }}
+                      >
+                        <X className="h-2 w-2" />
+                      </Button>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAddTopic(!showAddTopic)}
+                className="text-xs"
+              >
+                <Plus className="h-3 w-3 ml-1" />
+                إضافة
+              </Button>
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
+      {/* Add topic form */}
+      {showAddTopic && (
+        <div className="flex gap-2 items-center p-2 bg-muted/50 rounded-md">
+          <Input
+            type="text"
+            placeholder="اسم الموضوع..."
+            value={newTopicName}
+            onChange={e => setNewTopicName(e.target.value)}
+            className="h-8 text-sm"
+          />
+          <select
+            value={newTopicIcon}
+            onChange={e => setNewTopicIcon(e.target.value)}
+            className="h-8 text-sm px-2 rounded-md border bg-background"
+          >
+            <option value="📌">📌</option>
+            <option value="🎯">🎯</option>
+            <option value="🚀">🚀</option>
+            <option value="💡">💡</option>
+            <option value="⭐">⭐</option>
+            <option value="🔥">🔥</option>
+            <option value="📚">📚</option>
+            <option value="🎨">🎨</option>
+            <option value="💻">💻</option>
+            <option value="📢">📢</option>
+            <option value="📝">📝</option>
+            <option value="🎧">🎧</option>
+            <option value="💰">💰</option>
+            <option value="🔧">🔧</option>
+            <option value="📊">📊</option>
+            <option value="🎵">🎵</option>
+            <option value="🌟">🌟</option>
+            <option value="🏆">🏆</option>
+          </select>
+          <Button type="button" size="sm" onClick={handleAddTopic}>
+            <Check className="h-4 w-4" />
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={() => setShowAddTopic(false)}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
       <form onSubmit={handleAddTodo} className="flex gap-2">
         <Input
+          ref={inputRef}
           type="text"
           placeholder="مهمة جديدة..."
           value={newTodo}
@@ -202,53 +430,99 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
           <Loader2 className="h-6 w-6 animate-spin" />
         </div>
       ) : (
-        <ul className="space-y-2">
-          {todos.map((todo, index) => {
-            if (!todo.id) return null;
-            const isCompleting = toggledTodos.includes(todo.id);
-            return (
-              <li 
-                key={todo.id} 
-                className={cn(
-                  "flex items-start gap-3 p-2 rounded-md bg-background/50 hover:bg-background transition-colors group",
-                  isCompleting && "slide-out-and-fade",
-                  todo.isNew ? "slide-in-and-fade" : "staggered-fade-in",
-                  todo.isHighPriority && !todo.completed && "animate-flash-yellow"
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="todos">
+            {(provided) => (
+              <ul {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                {todos.map((todo, index) => {
+                  if (!todo.id) return null;
+                  const isCompleting = toggledTodos.includes(todo.id);
+                  const isEditing = editingTodoId === todo.id;
+                  return (
+                    <Draggable key={todo.id} draggableId={todo.id} index={index} isDragDisabled={isEditing}>
+                      {(provided, snapshot) => (
+                        <li
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className={cn(
+                            "flex items-start gap-3 p-2 rounded-md bg-background/50 hover:bg-background transition-colors group",
+                            isCompleting && "slide-out-and-fade",
+                            todo.isNew ? "slide-in-and-fade" : "staggered-fade-in",
+                            todo.isHighPriority && !todo.completed && "animate-flash-yellow",
+                            snapshot.isDragging && "shadow-lg"
+                          )}
+                          style={{
+                            ...provided.draggableProps.style,
+                            animationDelay: todo.isNew ? '0ms' : `${index * 50}ms`
+                          }}
+                        >
+                          <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing mt-1">
+                            <GripVertical className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <Checkbox
+                            id={`todo-${todo.id}`}
+                            checked={todo.completed}
+                            onCheckedChange={() => !todo.completed && handleToggleTodo(todo.id!)}
+                            aria-label={todo.text}
+                            className={cn("mt-1 completed-animation-checkbox")}
+                          />
+                          {isEditing ? (
+                              <div className="flex-1 flex items-center gap-2">
+                                  <Input
+                                      value={editingTodoText}
+                                      onChange={(e) => setEditingTodoText(e.target.value)}
+                                      onKeyDown={(e) => {
+                                          if (e.key === 'Enter') handleSaveEdit(todo.id!);
+                                          if (e.key === 'Escape') handleCancelEdit();
+                                      }}
+                                      className="h-8 text-lg"
+                                      autoFocus
+                                  />
+                                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleSaveEdit(todo.id!)}>
+                                      <Check className="h-4 w-4 text-green-500" />
+                                  </Button>
+                                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleCancelEdit}>
+                                      <X className="h-4 w-4 text-destructive" />
+                                  </Button>
+                              </div>
+                          ) : (
+                              <>
+                                  <label
+                                    htmlFor={`todo-${todo.id}`}
+                                    onClick={handleLabelClick}
+                                    className={cn("flex-1 text-lg select-all whitespace-pre-wrap relative", todo.completed && "strikethrough-label", todo.completed ? 'text-muted-foreground' : 'text-foreground' )}
+                                  >
+                                    {todo.text}
+                                  </label>
+                                  <div className="flex items-center mt-1">
+                                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => todo.id && handleTogglePriority(todo.id, todo.isHighPriority || false)}>
+                                          <Star className={cn(
+                                              "h-4 w-4 text-muted-foreground hover:text-yellow-400",
+                                              todo.isHighPriority && "text-yellow-400 fill-yellow-400/70"
+                                          )} />
+                                      </Button>
+                                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => todo.id && handleStartEdit(todo.id, todo.text)}>
+                                          <Edit2 className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                                      </Button>
+                                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => todo.id && handleDeleteTodo(todo.id)}>
+                                          <Trash2 className="h-4 w-4 text-destructive/80" />
+                                      </Button>
+                                  </div>
+                              </>
+                          )}
+                        </li>
+                      )}
+                    </Draggable>
+                  )
+                })}
+                {provided.placeholder}
+                {todos.length === 0 && (
+                  <p className="text-center text-muted-foreground py-4">لا توجد مهام حتى الآن.</p>
                 )}
-                style={{ animationDelay: todo.isNew ? '0ms' : `${index * 50}ms` }}
-              >
-                <Checkbox
-                  id={`todo-${todo.id}`}
-                  checked={todo.completed}
-                  onCheckedChange={() => !todo.completed && handleToggleTodo(todo.id!)}
-                  aria-label={todo.text}
-                  className={cn("mt-1 completed-animation-checkbox")}
-                />
-                <label 
-                  htmlFor={`todo-${todo.id}`}
-                  onClick={handleLabelClick}
-                  className={cn("flex-1 text-lg select-all whitespace-pre-wrap relative", todo.completed && "strikethrough-label", todo.completed ? 'text-muted-foreground' : 'text-foreground' )}
-                >
-                  {todo.text}
-                </label>
-                <div className="flex items-center mt-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => todo.id && handleTogglePriority(todo.id, todo.isHighPriority || false)}>
-                        <Star className={cn(
-                            "h-4 w-4 text-muted-foreground hover:text-yellow-400",
-                            todo.isHighPriority && "text-yellow-400 fill-yellow-400/70"
-                        )} />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => todo.id && handleDeleteTodo(todo.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive/80" />
-                    </Button>
-                </div>
-              </li>
-            )
-          })}
-           {todos.length === 0 && (
-             <p className="text-center text-muted-foreground py-4">لا توجد مهام حتى الآن.</p>
-           )}
-        </ul>
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
       )}
     </div>
   );

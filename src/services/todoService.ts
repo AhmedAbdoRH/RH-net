@@ -31,6 +31,7 @@ const todoFromDoc = (doc: any): Todo => {
       (data.createdAt as Timestamp)?.toDate().toISOString() ||
       new Date().toISOString(),
     isHighPriority: data.isHighPriority || false,
+    order: data.order || 0,
   };
 };
 
@@ -38,7 +39,7 @@ export const getTodos = async (domainId: string): Promise<Todo[]> => {
   const q = query(
     todosCollectionRef,
     where('domainId', '==', domainId),
-    orderBy('createdAt', 'desc')
+    orderBy('order', 'asc')
   );
   try {
     const data = await getDocs(q);
@@ -74,12 +75,9 @@ export const getTodosForDomains = async (
       }
     });
 
-    // Sort todos within each domain
+    // Sort todos within each domain by order
     Object.keys(todosByDomain).forEach((key) => {
-      todosByDomain[key].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      todosByDomain[key].sort((a, b) => (a.order || 0) - (b.order || 0));
     });
 
     return todosByDomain;
@@ -101,6 +99,7 @@ export const addTodo = (
       ...todo,
       createdAt: serverTimestamp(),
       isHighPriority: todo.isHighPriority || false,
+      order: todo.order || 0,
     };
     addDoc(todosCollectionRef, newTodoData)
       .then(async (docRef) => {
@@ -179,7 +178,7 @@ export const getAllTodosGroupedByDomain = async (): Promise<
   });
 
   // 2. Fetch all todos
-  const todosQuery = query(todosCollectionRef, orderBy('createdAt', 'desc'));
+  const todosQuery = query(todosCollectionRef, orderBy('order', 'asc'));
   const todosSnapshot = await getDocs(todosQuery).catch(serverError => {
      const permissionError = new FirestorePermissionError({
       path: todosCollectionRef.path,
@@ -216,4 +215,13 @@ export const getAllTodosGroupedByDomain = async (): Promise<
   }
 
   return groupedTodos;
+};
+
+export const reorderTodos = async (todos: Todo[]): Promise<void> => {
+  const updatePromises = todos.map((todo, index) => {
+    if (!todo.id) return Promise.resolve();
+    return updateTodo(todo.id, { order: index });
+  });
+
+  await Promise.all(updatePromises);
 };
