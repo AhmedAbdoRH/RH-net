@@ -227,7 +227,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
                 <label 
                   htmlFor={`todo-${todo.id}`}
                   onClick={handleLabelClick}
-                  className={cn("flex-1 text-sm select-all whitespace-pre-wrap relative", todo.completed && "strikethrough-label", todo.completed ? 'text-muted-foreground' : 'text-foreground' )}
+                  className={cn("flex-1 text-lg select-all whitespace-pre-wrap relative", todo.completed && "strikethrough-label", todo.completed ? 'text-muted-foreground' : 'text-foreground' )}
                 >
                   {todo.text}
                 </label>
