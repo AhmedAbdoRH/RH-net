@@ -395,13 +395,12 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
         localStorage.setItem('mainTopics', JSON.stringify(updatedTopics));
     };
 
-    const handleTopicDragEnd = (result: any) => {
-        if (!result.destination) return;
-
+    const handleMoveTopic = (index: number, direction: 'up' | 'down') => {
         const items = Array.from(mainTopics);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
+        const newIndex = direction === 'up' ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex >= items.length) return;
 
+        [items[index], items[newIndex]] = [items[newIndex], items[index]];
         setMainTopics(items);
         localStorage.setItem('mainTopics', JSON.stringify(items));
     };
@@ -502,64 +501,52 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
             <CardContent className="pt-6">
 
                 {/* Topic buttons for general tasks */}
-                <DragDropContext onDragEnd={handleTopicDragEnd}>
-                    <Droppable droppableId="topics" direction="horizontal">
-                        {(provided) => (
-                            <div
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                                className="flex flex-wrap gap-2 mb-3 items-center"
-                            >
-                                {mainTopics.map((topic, index) => (
-                                    <Draggable key={topic.name} draggableId={topic.name} index={index}>
-                                        {(provided, snapshot) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                className="relative group"
-                                            >
-                                                <Button
-                                                    {...provided.dragHandleProps}
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleTopicClick(topic.name)}
-                                                    className={cn("text-xs cursor-pointer", snapshot.isDragging && "opacity-50")}
-                                                >
-                                                    <span className="ml-1">{topic.icon}</span>
-                                                    {topic.name}
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-3 w-3 absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-destructive text-destructive-foreground"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleDeleteTopic(topic.name);
-                                                    }}
-                                                >
-                                                    <X className="h-2 w-2" />
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
+                <div className="flex flex-wrap gap-2 mb-3 items-center">
+                    {mainTopics.map((topic, index) => (
+                        <div key={topic.name} className="relative group flex items-center gap-0.5">
+                            {index > 0 && (
                                 <Button
                                     type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setShowAddTopic(!showAddTopic)}
-                                    className="text-xs"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground"
+                                    onClick={() => handleMoveTopic(index, 'up')}
                                 >
-                                    <Plus className="h-3 w-3 ml-1" />
-                                    إضافة
+                                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 2L1 5h6L4 2z" fill="currentColor"/></svg>
                                 </Button>
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>
+                            )}
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleTopicClick(topic.name)}
+                                className="text-xs cursor-pointer"
+                            >
+                                <span className="ml-1">{topic.icon}</span>
+                                {topic.name}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-3 w-3 -mt-2 -mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-destructive text-destructive-foreground"
+                                onClick={() => handleDeleteTopic(topic.name)}
+                            >
+                                <X className="h-2 w-2" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAddTopic(!showAddTopic)}
+                        className="text-xs"
+                    >
+                        <Plus className="h-3 w-3 ml-1" />
+                        إضافة
+                    </Button>
+                </div>
 
                 {/* Add topic form */}
                 {showAddTopic && (
