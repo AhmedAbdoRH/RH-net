@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "contextMessages": [
+    {
+      "id": "7ddcc7ef-3b82-420d-b556-6e83f2e27f97",
+      "role": "user",
+      "content": "اهلا",
+      "promptContext": {
+        "id": "7ddcc7ef-3b82-420d-b556-6e83f2e27f97"
+      }
+    }
+  ],
+  "contextFiles": []
+}

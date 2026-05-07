@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, ListPlus, Copy, Star } from 'lucide-react';
+import { Loader2, Plus, Trash2, Copy, Star } from 'lucide-react';
 import { addTodo, updateTodo, deleteTodo } from '@/services/todoService';
 import type { Todo } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
@@ -19,25 +19,11 @@ interface TodoListProps {
   onUpdate: () => void;
 }
 
-const defaultTodos = [
-    "شراء الدومين والميل",
-    "تسجيل سوبابيز وانشاء مشروع",
-    "نسخ بيانات المشروع",
-    " احذف بيانات سوبابيز المشروع الحالي واربط المشروع بقاعدة البيانات هذه : ",
-    "عمل حسابين للوحة التحكم",
-    "اضف الجداول والمتطلبات و  Storage Buckets.. الخاصة بلوحة التحكم والموقع عموما الى قاعدة البيانات الجيدية .. اعطني كل أوامر Sql editor المطلوبة لذلك\nاعطيها لي لأدخلها انا وايضا اوامر اضافة ال Storage Buckets",
-    "رفع جيت هب وربط نيتلفاي",
-    "الشغل على تصميم الهوية والبانرات",
-    "عدل المعلومات الموجودة في ملفات الاكواد الخاصة بمجال المتجر لتناسب نشاط : \nوليس النشاط الحالي",
-    "اختبار المستخدم",
-].reverse();
-
-
 export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   const [todos, setTodos] = React.useState<(Todo & { isNew?: boolean })[]>([]);
   const [newTodo, setNewTodo] = React.useState('');
   const [loading, setLoading] = React.useState(false);
-  const [bulkLoading, setBulkLoading] = React.useState(false);
+
   const [toggledTodos, setToggledTodos] = React.useState<string[]>([]);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
@@ -101,34 +87,6 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
         description: "فشل في إضافة المهمة.",
         variant: "destructive",
       });
-    }
-  };
-
-  const handleAddDefaultTodos = async () => {
-    setBulkLoading(true);
-    try {
-      for (const todoText of defaultTodos) {
-        await addTodo({
-          domainId,
-          text: todoText,
-          completed: false,
-          isHighPriority: false,
-        });
-      }
-      onUpdate();
-      toast({
-        title: "نجاح",
-        description: "تمت إضافة المهام الافتراضية بنجاح.",
-      });
-    } catch (error) {
-      console.error("Error adding default todos:", error);
-      toast({
-        title: "خطأ",
-        description: "فشل في إضافة المهام الافتراضية.",
-        variant: "destructive",
-      });
-    } finally {
-      setBulkLoading(false);
     }
   };
 
@@ -236,9 +194,6 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
         />
         <Button type="submit" size="icon">
           <Plus className="h-4 w-4" />
-        </Button>
-        <Button type="button" size="icon" variant="outline" onClick={handleAddDefaultTodos} disabled={bulkLoading}>
-          {bulkLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListPlus className="h-4 w-4" />}
         </Button>
       </form>
 

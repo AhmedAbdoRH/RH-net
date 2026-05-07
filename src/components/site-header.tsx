@@ -26,7 +26,7 @@ export function SiteHeader() {
   }, [])
 
   const handleCatalogClick = () => {
-    router.push('/catalog')
+    router.push('/tagr')
   }
 
   const getTimeAgo = (dateString: string) => {
@@ -83,7 +83,7 @@ export function SiteHeader() {
               <span className="text-sm">🏪</span>
             </div>
             <div>
-              <h2 className="text-lg font-bold text-foreground">تطبيق أونلاين كتالوج</h2>
+              <h2 className="text-lg font-bold text-foreground">تطبيق تاجر أونلاين</h2>
             </div>
           </div>
 

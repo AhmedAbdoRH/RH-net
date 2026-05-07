@@ -1,0 +1,21 @@
+{
+  "id": "a4c41e24-7a54-41db-9c18-493ecd158cda",
+  "baseDir": "C:\\Users\\Ahmed\\RH-net-2",
+  "name": "اهلا",
+  "archived": false,
+  "aiderTotalCost": 0,
+  "agentTotalCost": 0,
+  "mainModel": "",
+  "currentMode": "agent",
+  "contextCompactingThreshold": 0,
+  "weakModelLocked": false,
+  "parentId": null,
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-6",
+  "workingMode": "local",
+  "startedAt": "2026-05-02T06:34:55.069Z",
+  "state": "READY_FOR_REVIEW",
+  "createdAt": "2026-05-02T06:34:55.069Z",
+  "updatedAt": "2026-05-02T06:34:55.735Z",
+  "completedAt": "2026-05-02T06:34:55.735Z"
+}

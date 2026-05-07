@@ -72,7 +72,7 @@ export function UsersSheet({ inTab = false }: { inTab?: boolean }) {
               variant="ghost"
               size="icon"
               className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              title="تطبيق أونلاين كتالوج - المستخدمون"
+              title="تطبيق تاجر أونلاين - المستخدمون"
             >
               <Users className="h-5 w-5" />
             </Button>
@@ -97,7 +97,7 @@ export function UsersSheet({ inTab = false }: { inTab?: boolean }) {
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <Users className="w-6 h-6" />
-              تطبيق أونلاين كتالوج - المستخدمون المسجلون
+              تطبيق تاجر أونلاين - المستخدمون المسجلون
             </SheetTitle>
             <SheetDescription>
               عرض معلومات المستخدمين المسجلين في التطبيق

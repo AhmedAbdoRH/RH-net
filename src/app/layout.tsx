@@ -8,7 +8,7 @@ import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { LeaderboardFooter } from '@/components/leaderboard-footer';
 
 export const metadata: Metadata = {
-  title: 'لوحة تحكم النطاقات',
+  title: 'تاجر أونلاين',
   description: 'إدارة النطاقات وتتبع تواريخ التجديد والتكاليف بسهولة.',
   icons: {
     icon: '/logo.png',

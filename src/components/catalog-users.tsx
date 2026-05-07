@@ -253,8 +253,8 @@ export function CatalogUsers() {
           <Users className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold">مستخدمين تطبيق أونلاين كتالوج</h2>
-          <p className="text-muted-foreground">عرض معلومات المستخدمين المسجلين في تطبيق الأونلاين كتالوج</p>
+          <h2 className="text-2xl font-bold">مستخدمين تطبيق تاجر أونلاين</h2>
+          <p className="text-muted-foreground">عرض معلومات المستخدمين المسجلين في تطبيق تاجر أونلاين</p>
         </div>
       </div>
 
