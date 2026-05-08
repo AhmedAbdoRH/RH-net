@@ -56,7 +56,16 @@ export async function GET() {
       user_metadata: user.user_metadata
     }))
 
-    return NextResponse.json({ users })
+    return NextResponse.json(
+      { users },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        }
+      }
+    )
   } catch (error) {
     console.error('Server error:', error)
     return NextResponse.json(
