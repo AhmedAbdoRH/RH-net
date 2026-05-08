@@ -192,10 +192,25 @@ export default function WebPage() {
 
   const RHMStats = React.useMemo(() => {
     const RHMDomains = allDomains.filter(d => d.projects?.includes('RHM'));
-    const totalIncome = RHMDomains.reduce((acc, domain) => acc + (Number(domain.renewalCostClient) || 0), 0);
+    const totalIncome = RHMDomains.reduce((acc, domain) => {
+      const clientCost = Number(domain.renewalCostClient) || 0;
+      if (domain.hasInstallments && domain.installmentCount && domain.installmentsPaid) {
+        const totalInstallments = Number(domain.installmentCount);
+        const paidInstallments = domain.installmentsPaid;
+        return acc + (clientCost * (paidInstallments / totalInstallments));
+      }
+      return acc + clientCost;
+    }, 0);
     const netProfit = RHMDomains.reduce((acc, domain) => {
       const clientCost = Number(domain.renewalCostClient) || 0;
       const officeCost = Number(domain.renewalCostOffice) || 0;
+      if (domain.hasInstallments && domain.installmentCount && domain.installmentsPaid) {
+        const totalInstallments = Number(domain.installmentCount);
+        const paidInstallments = domain.installmentsPaid;
+        const paidClientCost = clientCost * (paidInstallments / totalInstallments);
+        const paidOfficeCost = officeCost * (paidInstallments / totalInstallments);
+        return acc + (paidClientCost - paidOfficeCost);
+      }
       return acc + (clientCost - officeCost);
     }, 0);
     return { totalIncome, netProfit };
