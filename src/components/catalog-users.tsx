@@ -2,9 +2,10 @@
 
 import * as React from "react"
 import { useState, useEffect } from "react"
-import { Users, Mail } from "lucide-react"
+import { Users, Mail, Trash2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 
 interface User {
   id: string
@@ -31,6 +32,31 @@ export function CatalogUsers() {
   const [traderData, setTraderData] = useState<UserProduct[]>([])
   const [traderStats, setTraderStats] = useState<any>(null)
   const [filterType, setFilterType] = useState<'الكل' | 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر' | 'برو'>('الكل')
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
+
+  const handleDeleteUser = async (userId: string) => {
+    setDeletingUserId(userId)
+    try {
+      const response = await fetch('/api/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في الحذف')
+      }
+
+      await fetchUsers()
+      await fetchTraderData()
+    } catch (err) {
+      console.error('Error deleting user:', err)
+      alert('فشل في حذف المستخدم')
+    } finally {
+      setDeletingUserId(null)
+    }
+  }
 
   useEffect(() => {
     fetchUsers()
@@ -447,7 +473,7 @@ export function CatalogUsers() {
                         </div>
                       </div>
                       
-                      {/* اليمين: الأزرار - ايميل ثم واتس ثم اتصال */}
+                      {/* اليمين: الأزرار - ايميل ثم واتس ثم اتصال ثم حذف */}
                       <div className="flex items-center gap-2">
                         <a
                           href={`mailto:${user.email}`}
@@ -475,6 +501,33 @@ export function CatalogUsers() {
                           >
                             <span className="text-sm">📞</span>
                           </a>
+                        )}
+                        {getTraderType(user.id)?.type === 'خامل' && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button
+                                disabled={deletingUserId === user.id}
+                                className="flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors px-2 py-1 rounded border border-red-600/30 hover:border-red-600/50 disabled:opacity-50"
+                                title="حذف المتجر"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  سيتم حذف المتجر <span className="font-bold">{user.store_display_name || user.store_name}</span> وجميع البيانات المرتبطة به بشكل دائم.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteUser(user.id)}>
+                                  حذف
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         )}
                       </div>
                     </div>

@@ -65,3 +65,49 @@ export async function GET() {
     )
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { userId } = await request.json()
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'معرف المستخدم مطلوب' },
+        { status: 400 }
+      )
+    }
+
+    // حذف المتجر المرتبط بالمستخدم من جدول catalogs
+    const { error: catalogDeleteError } = await supabaseAdmin
+      .from('catalogs')
+      .delete()
+      .eq('user_id', userId)
+
+    if (catalogDeleteError) {
+      console.error('Error deleting catalog:', catalogDeleteError)
+      return NextResponse.json(
+        { error: 'فشل في حذف المتجر' },
+        { status: 500 }
+      )
+    }
+
+    // حذف المستخدم من Supabase Auth
+    const { error: userDeleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+
+    if (userDeleteError) {
+      console.error('Error deleting user:', userDeleteError)
+      return NextResponse.json(
+        { error: 'فشل في حذف المستخدم' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ success: true, message: 'تم حذف المستخدم والمتجر بنجاح' })
+  } catch (error) {
+    console.error('Server error:', error)
+    return NextResponse.json(
+      { error: 'حدث خطأ في الخادم' },
+      { status: 500 }
+    )
+  }
+}
