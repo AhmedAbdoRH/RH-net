@@ -23,22 +23,6 @@ export function SiteHeader() {
 
   useEffect(() => {
     fetchStats()
-
-    // Auto-refresh every 30 seconds
-    const intervalId = setInterval(fetchStats, 30000)
-
-    // Refresh when window regains focus
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        fetchStats()
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-
-    return () => {
-      clearInterval(intervalId)
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-    }
   }, [])
 
   const handleCatalogClick = () => {

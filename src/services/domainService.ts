@@ -65,6 +65,12 @@ export const deleteDomain = (id: string): Promise<void> => {
   });
 };
 
+export const deleteDomainWithTodos = async (id: string): Promise<void> => {
+  const { deleteTodosForDomain } = await import('@/services/todoService');
+  await deleteTodosForDomain(id);
+  await deleteDomain(id);
+};
+
 export const updateDomain = (
   id: string,
   updatedDomain: Partial<Omit<Domain, 'id' | 'installmentCount'>> & {

@@ -32,7 +32,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Calendar } from './ui/calendar';
 import { Progress } from './ui/progress';
 import { Card, CardContent } from './ui/card';
-import { addDomain, deleteDomain, updateDomain } from '@/services/domainService';
+import { addDomain, deleteDomain, deleteDomainWithTodos, updateDomain } from '@/services/domainService';
 import { cn } from "@/lib/utils"
 import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
@@ -200,17 +200,17 @@ export function DomainDashboard({
     if (!domainToDelete) return;
 
     try {
-      await deleteDomain(domainId);
+      await deleteDomainWithTodos(domainId);
       toast({
-        title: "تم حذف النطاق",
-        description: `تم حذف ${domainToDelete.domainName} بنجاح.`,
+        title: "تم حذف المتجر",
+        description: `تم حذف ${domainToDelete.domainName} وجميع بياناته بنجاح.`,
         variant: "destructive"
       });
       onDomainChange();
     } catch (error) {
       toast({
         title: "خطأ",
-        description: `فشل في حذف النطاق.`,
+        description: `فشل في حذف المتجر.`,
         variant: "destructive",
       });
     }
@@ -609,34 +609,36 @@ export function DomainDashboard({
                               <Pencil className="h-4 w-4 text-blue-500" />
                             </Button>
                           )}
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                disabled={!domain.id}
-                                title="حذف"
-                                className="rounded-full w-8 h-8 bg-red-500/10 hover:bg-red-500/20 hover:scale-110 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/30 border border-red-500/20 hover:border-red-500/40 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
-                              >
-                                <Trash2 className="h-4 w-4 text-red-500" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى حذف النطاق بشكل دائم
-                                  <span className="font-bold"> {domain.domainName}</span>.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDeleteDomain(domain.id!)}>
-                                  متابعة
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                          {domain.status === 'inactive' && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  disabled={!domain.id}
+                                  title="حذف المتجر"
+                                  className="rounded-full w-8 h-8 bg-red-500/10 hover:bg-red-500/20 hover:scale-110 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/30 border border-red-500/20 hover:border-red-500/40 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى حذف المتجر
+                                    <span className="font-bold"> {domain.domainName}</span> وجميع المهام والبيانات المرتبطة به بشكل دائم.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDeleteDomain(domain.id!)}>
+                                    حذف
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
                           <Button
                             variant="ghost"
                             size="icon"
@@ -796,33 +798,35 @@ export function DomainDashboard({
                           <Pencil className="h-4 w-4 text-blue-500" />
                         </Button>
                       )}
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon" disabled={!domain.id}
-                            title="حذف"
-                            className="rounded-full w-8 h-8 bg-red-500/10 hover:bg-red-500/20 hover:scale-110 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/30 border border-red-500/20 hover:border-red-500/40 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
-                          >
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى حذف النطاق بشكل دائم
-                              <span className="font-bold"> {domain.domainName}</span>.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteDomain(domain.id!)}>
-                              متابعة
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      {domain.status === 'inactive' && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon" disabled={!domain.id}
+                              title="حذف المتجر"
+                              className="rounded-full w-8 h-8 bg-red-500/10 hover:bg-red-500/20 hover:scale-110 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/30 border border-red-500/20 hover:border-red-500/40 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى حذف المتجر
+                                <span className="font-bold"> {domain.domainName}</span> وجميع المهام والبيانات المرتبطة به بشكل دائم.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteDomain(domain.id!)}>
+                                حذف
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"

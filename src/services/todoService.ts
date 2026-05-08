@@ -156,6 +156,24 @@ export const deleteTodo = (id: string): Promise<void> => {
     });
 };
 
+export const deleteTodosForDomain = async (domainId: string): Promise<void> => {
+  try {
+    const q = query(todosCollectionRef, where('domainId', '==', domainId));
+    const querySnapshot = await getDocs(q);
+    const deletePromises = querySnapshot.docs.map(docSnapshot =>
+      deleteDoc(doc(db, 'todos', docSnapshot.id))
+    );
+    await Promise.all(deletePromises);
+  } catch (serverError: any) {
+    const permissionError = new FirestorePermissionError({
+      path: todosCollectionRef.path,
+      operation: 'delete',
+    });
+    errorEmitter.emit('permission-error', permissionError);
+    throw permissionError;
+  }
+};
+
 export const GENERAL_TASKS_KEY = 'مهام عامة';
 
 // New function to get all todos and group them by domain name
