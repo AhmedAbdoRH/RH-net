@@ -60,17 +60,22 @@ export const getContentIdeas = async (owner: string): Promise<ContentIdea[]> => 
 };
 
 export const addContentIdea = async (text: string, owner: string): Promise<ContentIdea> => {
-  const docRef = await addDoc(contentIdeasCollectionRef, {
-    text,
-    owner,
-    createdAt: serverTimestamp(),
-  });
-  return {
-    id: docRef.id,
-    text,
-    owner,
-    createdAt: new Date().toISOString(),
-  };
+  try {
+    const docRef = await addDoc(contentIdeasCollectionRef, {
+      text,
+      owner,
+      createdAt: serverTimestamp(),
+    });
+    return {
+      id: docRef.id,
+      text,
+      owner,
+      createdAt: new Date().toISOString(),
+    };
+  } catch (error: any) {
+    console.error('Error adding content idea:', error?.code, error?.message);
+    throw error;
+  }
 };
 
 export const updateContentIdea = async (id: string, updates: Partial<ContentIdea>): Promise<void> => {
