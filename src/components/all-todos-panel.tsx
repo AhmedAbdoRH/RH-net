@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from './ui/badge';
 import { Checkbox } from './ui/checkbox';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
 import { cn } from '@/lib/utils';
 
 
@@ -242,33 +242,59 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
         const text = newGeneralTodo.trim();
         if (!text) return;
 
+        const lines = text.split('\n').filter(line => line.trim());
+        if (lines.length === 0) return;
+
+        setNewGeneralTodo('');
         setAddingTodo(true);
+
         try {
-            const tempId = `temp-${Date.now()}`;
             const currentTodos = groupedTodos[GENERAL_TASKS_KEY] || [];
-            const newOrder = currentTodos.length;
-            const newTodo: Todo & { isNew?: boolean } = {
-                text,
-                completed: false,
-                id: tempId,
-                createdAt: new Date().toISOString(),
-                isHighPriority: false,
-                order: newOrder,
-                isNew: true
-            };
 
-            setGroupedTodos(prev => ({
-                ...prev,
-                [GENERAL_TASKS_KEY]: sortTodos([newTodo, ...(prev[GENERAL_TASKS_KEY] || [])])
-            }));
-            setNewGeneralTodo('');
+            if (lines.length === 1) {
+                const tempId = `temp-${Date.now()}`;
+                const newOrder = currentTodos.length;
+                const newTodo: Todo & { isNew?: boolean } = {
+                    text: lines[0],
+                    completed: false,
+                    id: tempId,
+                    createdAt: new Date().toISOString(),
+                    isHighPriority: false,
+                    order: newOrder,
+                    isNew: true
+                };
 
-            const addedTodo = await addTodo({ text, completed: false, isHighPriority: false, order: newOrder });
-            setGroupedTodos(prev => {
-                const currentTodos = prev[GENERAL_TASKS_KEY] || [];
-                const newTodos = currentTodos.map(t => t.id === tempId ? addedTodo : t);
-                return { ...prev, [GENERAL_TASKS_KEY]: sortTodos(newTodos) };
-            });
+                setGroupedTodos(prev => ({
+                    ...prev,
+                    [GENERAL_TASKS_KEY]: sortTodos([newTodo, ...(prev[GENERAL_TASKS_KEY] || [])])
+                }));
+
+                const addedTodo = await addTodo({ text: lines[0], completed: false, isHighPriority: false, order: newOrder });
+                setGroupedTodos(prev => {
+                    const currentTodos = prev[GENERAL_TASKS_KEY] || [];
+                    const newTodos = currentTodos.map(t => t.id === tempId ? addedTodo : t);
+                    return { ...prev, [GENERAL_TASKS_KEY]: sortTodos(newTodos) };
+                });
+            } else {
+                const newTodos: (Todo & { isNew?: boolean })[] = lines.map((line, index) => ({
+                    text: line,
+                    completed: false,
+                    id: `temp-${Date.now()}-${index}`,
+                    createdAt: new Date().toISOString(),
+                    isHighPriority: false,
+                    order: currentTodos.length + index,
+                    isNew: true
+                }));
+
+                setGroupedTodos(prev => ({
+                    ...prev,
+                    [GENERAL_TASKS_KEY]: sortTodos([...newTodos, ...(prev[GENERAL_TASKS_KEY] || [])])
+                }));
+
+                await Promise.all(lines.map((line, index) =>
+                    addTodo({ text: line, completed: false, isHighPriority: false, order: currentTodos.length + index })
+                ));
+            }
 
             onUpdate();
         } catch (error) {
@@ -592,13 +618,13 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
                 )}
 
                 <form onSubmit={handleAddGeneralTodo} className="flex gap-2 mb-6">
-                  <Input
+                  <Textarea
                     ref={inputRef}
-                    type="text"
                     placeholder="مهمة عامة جديدة..."
                     value={newGeneralTodo}
                     onChange={e => setNewGeneralTodo(e.target.value)}
-                    className="bg-background"
+                    className="bg-background min-h-[40px] resize-none"
+                    rows={1}
                   />
                   <Button type="submit" size="icon" disabled={addingTodo}>
                     {addingTodo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}

@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Trash2, Copy, Star, Edit2, Check, X, GripVertical } from 'lucide-react';
@@ -72,42 +72,82 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
     const text = newTodo.trim();
     if (!text) return;
 
-    const tempId = `temp-${Date.now()}`;
-    const newOrder = todos.length;
-    const optimisticTodo: Todo & { isNew?: boolean } = {
-      id: tempId,
-      domainId,
-      text,
-      completed: false,
-      createdAt: new Date().toISOString(),
-      isHighPriority: false,
-      order: newOrder,
-      isNew: true,
-    };
+    const lines = text.split('\n').filter(line => line.trim());
+    if (lines.length === 0) return;
 
-    setTodos(prevTodos => sortTodos([optimisticTodo, ...prevTodos]));
     setNewTodo('');
 
-    try {
-      const addedTodo = await addTodo({
+    if (lines.length === 1) {
+      const tempId = `temp-${Date.now()}`;
+      const newOrder = todos.length;
+      const optimisticTodo: Todo & { isNew?: boolean } = {
+        id: tempId,
         domainId,
-        text,
+        text: lines[0],
         completed: false,
+        createdAt: new Date().toISOString(),
         isHighPriority: false,
         order: newOrder,
-      });
-      setTodos(prevTodos =>
-        sortTodos(prevTodos.map(t => (t.id === tempId ? addedTodo : t)))
-      );
-      onUpdate();
-    } catch (error) {
-      setTodos(prevTodos => prevTodos.filter(t => t.id !== tempId));
-      console.error("Error adding todo:", error);
-      toast({
-        title: "خطأ",
-        description: "فشل في إضافة المهمة.",
-        variant: "destructive",
-      });
+        isNew: true,
+      };
+
+      setTodos(prevTodos => sortTodos([optimisticTodo, ...prevTodos]));
+
+      try {
+        const addedTodo = await addTodo({
+          domainId,
+          text: lines[0],
+          completed: false,
+          isHighPriority: false,
+          order: newOrder,
+        });
+        setTodos(prevTodos =>
+          sortTodos(prevTodos.map(t => (t.id === tempId ? addedTodo : t)))
+        );
+        onUpdate();
+      } catch (error) {
+        setTodos(prevTodos => prevTodos.filter(t => t.id !== tempId));
+        console.error("Error adding todo:", error);
+        toast({
+          title: "خطأ",
+          description: "فشل في إضافة المهمة.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      const newTodos: (Todo & { isNew?: boolean })[] = lines.map((line, index) => ({
+        id: `temp-${Date.now()}-${index}`,
+        domainId,
+        text: line,
+        completed: false,
+        createdAt: new Date().toISOString(),
+        isHighPriority: false,
+        order: todos.length + index,
+        isNew: true,
+      }));
+
+      setTodos(prevTodos => sortTodos([...newTodos, ...prevTodos]));
+
+      try {
+        await Promise.all(lines.map((line, index) =>
+          addTodo({
+            domainId,
+            text: line,
+            completed: false,
+            isHighPriority: false,
+            order: todos.length + index,
+          })
+        ));
+        onUpdate();
+      } catch (error) {
+        setTodos(prevTodos => prevTodos.filter(t => !t.id?.startsWith('temp-')));
+        console.error("Error adding todos:", error);
+        toast({
+          title: "خطأ",
+          description: "فشل في إضافة المهام.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -399,13 +439,13 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
       )}
 
       <form onSubmit={handleAddTodo} className="flex gap-2">
-        <Input
+        <Textarea
           ref={inputRef}
-          type="text"
           placeholder="مهمة جديدة..."
           value={newTodo}
           onChange={e => setNewTodo(e.target.value)}
-          className="bg-background"
+          className="bg-background min-h-[40px] resize-none"
+          rows={1}
         />
         <Button type="submit" size="icon">
           <Plus className="h-4 w-4" />
