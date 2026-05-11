@@ -33,12 +33,13 @@ const ideaFromDoc = (doc: any): ContentIdea => {
 export const getContentIdeas = async (owner: string): Promise<ContentIdea[]> => {
   const q = query(
     contentIdeasCollectionRef,
-    where('owner', '==', owner),
-    orderBy('createdAt', 'desc')
+    where('owner', '==', owner)
   );
   try {
     const data = await getDocs(q);
-    return data.docs.map(ideaFromDoc);
+    return data.docs.map(ideaFromDoc).sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   } catch (serverError: any) {
     const errorMessage = serverError?.message || '';
     const isPermissionError =
