@@ -20,6 +20,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 const todosCollectionRef = collection(db, 'todos');
 const domainsCollectionRef = collection(db, 'domains');
+const topicsCollectionRef = collection(db, 'topics');
 
 // Helper to convert Firestore timestamp to ISO string
 const todoFromDoc = (doc: any): Todo => {
@@ -242,4 +243,40 @@ export const reorderTodos = async (todos: Todo[]): Promise<void> => {
   });
 
   await Promise.all(updatePromises);
+};
+
+export interface Topic {
+  name: string;
+  icon: string;
+}
+
+export const getTopics = async (): Promise<Topic[]> => {
+  try {
+    const q = query(topicsCollectionRef, orderBy('createdAt', 'desc'));
+    const data = await getDocs(q);
+    return data.docs.map(doc => doc.data() as Topic);
+  } catch (serverError: any) {
+    console.error('Error fetching topics:', serverError);
+    return [];
+  }
+};
+
+export const saveTopics = async (topics: Topic[]): Promise<void> => {
+  try {
+    // Clear existing topics first
+    const existingSnapshot = await getDocs(topicsCollectionRef);
+    const deletePromises = existingSnapshot.docs.map(docSnapshot =>
+      deleteDoc(doc(db, 'topics', docSnapshot.id))
+    );
+    await Promise.all(deletePromises);
+
+    // Add all topics
+    const addPromises = topics.map(topic =>
+      addDoc(topicsCollectionRef, { ...topic, createdAt: serverTimestamp() })
+    );
+    await Promise.all(addPromises);
+  } catch (serverError: any) {
+    console.error('Error saving topics:', serverError);
+    throw serverError;
+  }
 };
