@@ -125,7 +125,7 @@ export function ContentIdeasWallet({ title, owner, icon = "💡" }: ContentIdeas
               rows={1}
             />
             <Button type="submit" size="sm" variant="outline" className="h-auto min-h-[40px] font-bold whitespace-nowrap" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Plus className="h-4 w-4 ml-1 shrink-0" /> إضافة موضوعات</>}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             </Button>
           </form>
 
