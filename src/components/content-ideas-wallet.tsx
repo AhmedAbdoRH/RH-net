@@ -5,41 +5,39 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Trash2, Copy, Edit2, Check, X, ChevronDown, ChevronUp, Lightbulb } from 'lucide-react';
+import { getContentIdeas, addContentIdea, updateContentIdea, deleteContentIdea } from '@/services/contentIdeasService';
+import type { ContentIdea } from '@/lib/types';
 import { cn } from '@/lib/utils';
-
-interface Idea {
-  id: string;
-  text: string;
-  createdAt: string;
-}
 
 interface ContentIdeasWalletProps {
   title: string;
-  storageKey: string;
+  owner: string; // 'ahmed-abu-ezz' or 'ahmed-abdo'
   icon?: string;
 }
 
-export function ContentIdeasWallet({ title, storageKey, icon = "💡" }: ContentIdeasWalletProps) {
-  const [ideas, setIdeas] = React.useState<Idea[]>([]);
+export function ContentIdeasWallet({ title, owner, icon = "💡" }: ContentIdeasWalletProps) {
+  const [ideas, setIdeas] = React.useState<ContentIdea[]>([]);
   const [newIdea, setNewIdea] = React.useState('');
   const [isOpen, setIsOpen] = React.useState(false);
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editingText, setEditingText] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
   const { toast } = useToast();
 
-  React.useEffect(() => {
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      setIdeas(JSON.parse(saved));
+  const refreshIdeas = React.useCallback(async () => {
+    try {
+      const data = await getContentIdeas(owner);
+      setIdeas(data);
+    } catch (error) {
+      console.error("Error fetching ideas:", error);
     }
-  }, [storageKey]);
+  }, [owner]);
 
-  const saveIdeas = (newIdeas: Idea[]) => {
-    setIdeas(newIdeas);
-    localStorage.setItem(storageKey, JSON.stringify(newIdeas));
-  };
+  React.useEffect(() => {
+    refreshIdeas();
+  }, [refreshIdeas]);
 
-  const handleAddIdea = (e: React.FormEvent) => {
+  const handleAddIdea = async (e: React.FormEvent) => {
     e.preventDefault();
     const text = newIdea.trim();
     if (!text) return;
@@ -47,20 +45,35 @@ export function ContentIdeasWallet({ title, storageKey, icon = "💡" }: Content
     const lines = text.split('\n').filter(line => line.trim());
     if (lines.length === 0) return;
 
-    const newIdeas: Idea[] = lines.map((line, index) => ({
-      id: `temp-${Date.now()}-${index}`,
-      text: line,
-      createdAt: new Date().toISOString(),
-    }));
-
-    saveIdeas([...newIdeas, ...ideas]);
+    setLoading(true);
     setNewIdea('');
-    toast({ title: "نجاح", description: `تمت إضافة ${lines.length} فكرة.` });
+
+    try {
+      if (lines.length === 1) {
+        const newIdeaObj = await addContentIdea(lines[0], owner);
+        setIdeas(prev => [newIdeaObj, ...prev]);
+      } else {
+        await Promise.all(lines.map(line => addContentIdea(line, owner)));
+        await refreshIdeas();
+      }
+      toast({ title: "نجاح", description: `تمت إضافة ${lines.length} فكرة.` });
+    } catch (error) {
+      console.error("Error adding idea:", error);
+      toast({ title: "خطأ", description: "فشل في إضافة الفكرة.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteIdea = (id: string) => {
-    saveIdeas(ideas.filter(i => i.id !== id));
-    toast({ title: "نجاح", description: "تم حذف الفكرة." });
+  const handleDeleteIdea = async (id: string) => {
+    try {
+      await deleteContentIdea(id);
+      setIdeas(prev => prev.filter(i => i.id !== id));
+      toast({ title: "نجاح", description: "تم حذف الفكرة." });
+    } catch (error) {
+      console.error("Error deleting idea:", error);
+      toast({ title: "خطأ", description: "فشل في حذف الفكرة.", variant: "destructive" });
+    }
   };
 
   const handleStartEdit = (id: string, text: string) => {
@@ -68,11 +81,18 @@ export function ContentIdeasWallet({ title, storageKey, icon = "💡" }: Content
     setEditingText(text);
   };
 
-  const handleSaveEdit = (id: string) => {
+  const handleSaveEdit = async (id: string) => {
     if (!editingText.trim()) return;
-    saveIdeas(ideas.map(i => i.id === id ? { ...i, text: editingText.trim() } : i));
-    setEditingId(null);
-    setEditingText('');
+    try {
+      await updateContentIdea(id, { text: editingText.trim() });
+      setIdeas(prev => prev.map(i => i.id === id ? { ...i, text: editingText.trim() } : i));
+      setEditingId(null);
+      setEditingText('');
+      toast({ title: "نجاح", description: "تم تحديث الفكرة." });
+    } catch (error) {
+      console.error("Error updating idea:", error);
+      toast({ title: "خطأ", description: "فشل في تحديث الفكرة.", variant: "destructive" });
+    }
   };
 
   const handleCopyIdea = (text: string) => {
@@ -104,8 +124,8 @@ export function ContentIdeasWallet({ title, storageKey, icon = "💡" }: Content
               className="bg-background min-h-[40px] resize-none text-sm"
               rows={1}
             />
-            <Button type="submit" size="icon" variant="outline" className="h-auto min-h-[40px]">
-              <Plus className="h-4 w-4" />
+            <Button type="submit" size="icon" variant="outline" className="h-auto min-h-[40px]" disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             </Button>
           </form>
 
@@ -127,7 +147,7 @@ export function ContentIdeasWallet({ title, storageKey, icon = "💡" }: Content
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
-                            handleSaveEdit(idea.id);
+                            handleSaveEdit(idea.id!);
                           }
                           if (e.key === 'Escape') {
                             setEditingId(null);
@@ -135,7 +155,7 @@ export function ContentIdeasWallet({ title, storageKey, icon = "💡" }: Content
                           }
                         }}
                       />
-                      <Button size="icon" variant="ghost" className="h-8 w-8 flex-shrink-0" onClick={() => handleSaveEdit(idea.id)}>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 flex-shrink-0" onClick={() => handleSaveEdit(idea.id!)}>
                         <Check className="h-4 w-4 text-green-500" />
                       </Button>
                       <Button size="icon" variant="ghost" className="h-8 w-8 flex-shrink-0" onClick={() => { setEditingId(null); setEditingText(''); }}>
@@ -149,10 +169,10 @@ export function ContentIdeasWallet({ title, storageKey, icon = "💡" }: Content
                         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopyIdea(idea.text)}>
                           <Copy className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleStartEdit(idea.id, idea.text)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleStartEdit(idea.id!, idea.text)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleDeleteIdea(idea.id)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleDeleteIdea(idea.id!)}>
                           <Trash2 className="h-3 w-3 text-destructive/80" />
                         </Button>
                       </div>

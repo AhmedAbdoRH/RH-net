@@ -41,3 +41,10 @@ export type Fault = {
   text: string;
   createdAt: string; // ISO 8601 string
 };
+
+export type ContentIdea = {
+  id?: string;
+  text: string;
+  createdAt: string;
+  owner: string; // 'ahmed-abu-ezz' or 'ahmed-abdo'
+};

@@ -42,7 +42,7 @@ export default function CatalogPage() {
           <div className="space-y-4">
             <ContentIdeasWallet 
               title="محفظة أفكار المحتوى"
-              storageKey="content-ideas-ahmed-abu-ezz"
+              owner="ahmed-abu-ezz"
               icon="📝"
             />
             <Card className="card-base">
@@ -63,7 +63,7 @@ export default function CatalogPage() {
           <div className="space-y-4">
             <ContentIdeasWallet 
               title="محفظة أفكار تطوير التطبيق"
-              storageKey="content-ideas-ahmed-abdo"
+              owner="ahmed-abdo"
               icon="💻"
             />
             <Card className="card-base">
