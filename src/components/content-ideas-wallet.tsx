@@ -57,9 +57,9 @@ export function ContentIdeasWallet({ title, owner, icon = "💡" }: ContentIdeas
         await refreshIdeas();
       }
       toast({ title: "نجاح", description: `تمت إضافة ${lines.length} فكرة.` });
-    } catch (error) {
-      console.error("Error adding idea:", error);
-      toast({ title: "خطأ", description: "فشل في إضافة الفكرة.", variant: "destructive" });
+    } catch (error: any) {
+      console.error("Error adding idea:", error?.code, error?.message);
+      toast({ title: "خطأ", description: error?.message || "فشل في إضافة الفكرة. تأكد من صلاحيات Firestore.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -124,8 +124,8 @@ export function ContentIdeasWallet({ title, owner, icon = "💡" }: ContentIdeas
               className="bg-background min-h-[40px] resize-none text-sm"
               rows={1}
             />
-            <Button type="submit" size="icon" variant="outline" className="h-auto min-h-[40px]" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            <Button type="submit" size="sm" variant="outline" className="h-auto min-h-[40px] font-bold whitespace-nowrap" disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Plus className="h-4 w-4 ml-1 shrink-0" /> إضافة موضوعات</>}
             </Button>
           </form>
 
