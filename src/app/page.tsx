@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { DomainDashboard } from '@/components/domain-dashboard';
-import { StatusPanel } from '@/components/status-panel';
 import { Icons } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDomains } from '@/services/domainService';
@@ -216,10 +215,6 @@ export default function WebPage() {
     return { totalIncome, netProfit };
   }, [allDomains]);
 
-  const filteredDomainsForStatusPanel = React.useMemo(() => {
-    return allDomains.filter(d => d.projects?.includes('RHM') || d.projects?.includes('other'));
-  }, [allDomains]);
-
   const actionButtons = (
     <>
       <span className="h-6 w-px bg-border/60"></span>
@@ -373,27 +368,22 @@ export default function WebPage() {
             open={isTodosPanelOpen}
             onOpenChange={setTodosPanelOpen}
           >
-            <StatusPanel
-              domains={filteredDomainsForStatusPanel}
-              domainStatuses={domainStatuses}
-              domainTodos={hasTodosMap}
-              apiKeyStatuses={apiKeyStatuses}
-              showGeneralStatus={true}
-            />
-            <CollapsibleTrigger asChild>
-              <div className="w-full h-4 bg-card hover:bg-muted/80 border-x border-b border-border/60 rounded-b-lg flex items-center justify-center cursor-pointer">
-                <ChevronDown className="h-4 w-4 text-muted-foreground opacity-50 transition-transform data-[state=open]:rotate-180" />
-              </div>
-            </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="mt-2">
                 <AllTodosPanel
                   onUpdate={refreshTodos}
                   initialGroupedTodos={allGroupedTodos}
                   loading={loading}
+                  allDomains={allDomains}
+                  domainStatuses={domainStatuses}
                 />
               </div>
             </CollapsibleContent>
+            <CollapsibleTrigger asChild>
+              <div className="w-full h-4 bg-card hover:bg-muted/80 border-x border-b border-border/60 rounded-b-lg flex items-center justify-center cursor-pointer">
+                <ChevronDown className="h-4 w-4 text-muted-foreground opacity-50 transition-transform data-[state=open]:rotate-180" />
+              </div>
+            </CollapsibleTrigger>
           </Collapsible>
 
 

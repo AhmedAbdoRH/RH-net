@@ -6,12 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Trash2, Plus, Star, Edit2, Check, X, GripVertical } from 'lucide-react';
 import { getAllTodosGroupedByDomain, deleteTodo, GENERAL_TASKS_KEY, addTodo, updateTodo, reorderTodos } from '@/services/todoService';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import type { Todo } from '@/lib/types';
+import type { Todo, Domain } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from './ui/badge';
 import { Checkbox } from './ui/checkbox';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
+import { Input } from './ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from './ui/dialog';
 import { cn } from '@/lib/utils';
 
 
@@ -23,9 +25,11 @@ interface AllTodosPanelProps {
     onUpdate: () => void;
     initialGroupedTodos: GroupedTodos;
     loading: boolean;
+    allDomains?: Domain[];
+    domainStatuses?: Record<string, 'checking' | 'online' | 'offline'>;
 }
 
-export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTodosPanelProps) {
+export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomains, domainStatuses }: AllTodosPanelProps) {
     const [groupedTodos, setGroupedTodos] = React.useState<GroupedTodos>(initialGroupedTodos);
     const [newGeneralTodo, setNewGeneralTodo] = React.useState('');
     const [addingTodo, setAddingTodo] = React.useState(false);
@@ -34,14 +38,21 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
     const [editingTodoText, setEditingTodoText] = React.useState('');
     const audioRef = React.useRef<HTMLAudioElement | null>(null);
     const { toast } = useToast();
-    const inputRef = React.useRef<HTMLInputElement>(null);
+    const inputRef = React.useRef<HTMLTextAreaElement>(null);
+    const [newTodoIsHighPriority, setNewTodoIsHighPriority] = React.useState(false);
+    const [isDataSheetOpen, setDataSheetOpen] = React.useState(false);
+    const [dataSheetContent, setDataSheetContent] = React.useState({ title: '', content: '' });
+    const [editingDataSheetDomain, setEditingDataSheetDomain] = React.useState<Domain | null>(null);
 
     // Main topics for quick task creation - loaded from localStorage or use defaults
-    const [mainTopics, setMainTopics] = React.useState<{ name: string; icon: string }[]>(() => {
+    const [mainTopics, setMainTopics] = React.useState<{ name: string; icon: string; isRHM?: boolean; renewalDate?: string }[]>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('mainTopics');
             if (saved) {
-                return JSON.parse(saved);
+                const parsed = JSON.parse(saved);
+                // Clear old topics and start fresh with domains only
+                localStorage.removeItem('mainTopics');
+                return [];
             }
         }
         return [];
@@ -49,6 +60,37 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
     const [showAddTopic, setShowAddTopic] = React.useState(false);
     const [newTopicName, setNewTopicName] = React.useState('');
     const [newTopicIcon, setNewTopicIcon] = React.useState('📌');
+
+    // Add domains as topics on mount
+    React.useEffect(() => {
+        if (allDomains && allDomains.length > 0) {
+            const domainTopics = allDomains
+                .map(domain => {
+                    const domainName = domain.domainName.slice(0, -4); // Remove last 4 characters (.com, .net, etc.)
+                    const fullDomain = domain.domainName;
+                    const isRHM = domain.projects?.includes('RHM') || false;
+                    return {
+                        name: domainName,
+                        icon: `https://www.google.com/s2/favicons?domain=${fullDomain}&sz=32`,
+                        renewalDate: domain.renewalDate,
+                        isRHM: isRHM
+                    };
+                })
+                .sort((a, b) => {
+                    // First sort by isRHM (RHM first)
+                    if (a.isRHM && !b.isRHM) return -1;
+                    if (!a.isRHM && b.isRHM) return 1;
+                    // Then sort by renewal date (latest first)
+                    if (a.renewalDate && b.renewalDate) {
+                        return new Date(b.renewalDate).getTime() - new Date(a.renewalDate).getTime();
+                    }
+                    return 0;
+                });
+
+            setMainTopics(domainTopics);
+            localStorage.setItem('mainTopics', JSON.stringify(domainTopics));
+        }
+    }, [allDomains]);
 
     const sortTodos = (todos: (Todo & { isNew?: boolean })[]) => {
         return todos.sort((a, b) => {
@@ -397,6 +439,107 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
         inputRef.current?.focus();
     };
 
+    const openDataSheetDialog = (topicName: string) => {
+        const domain = allDomains?.find(d => d.domainName.slice(0, -4) === topicName);
+        if (domain) {
+            setDataSheetContent({ title: `شيت بيانات: ${domain.domainName}`, content: domain.dataSheet || '' });
+            setEditingDataSheetDomain(domain);
+            setDataSheetOpen(true);
+        }
+    };
+
+    const handleDataSheetChange = (content: string) => {
+        setDataSheetContent(prev => ({ ...prev, content }));
+        if (editingDataSheetDomain) {
+            setEditingDataSheetDomain(prev => prev ? { ...prev, dataSheet: content } : null);
+        }
+    };
+
+    const handleSaveDataSheet = async () => {
+        if (!editingDataSheetDomain || !editingDataSheetDomain.id) return;
+
+        try {
+            const { updateDomain } = await import('@/services/domainService');
+            await updateDomain(editingDataSheetDomain.id, { dataSheet: editingDataSheetDomain.dataSheet });
+            toast({
+                title: "تم حفظ شيت البيانات",
+                description: `تم تحديث شيت بيانات ${editingDataSheetDomain.domainName}.`,
+            });
+            setDataSheetOpen(false);
+            setEditingDataSheetDomain(null);
+            onUpdate();
+        } catch (error) {
+            console.error("Error saving data sheet:", error);
+            toast({
+                title: "خطأ",
+                description: "فشل في حفظ شيت البيانات.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleLongPress = (topicName: string) => {
+        openDataSheetDialog(topicName);
+    };
+
+    const LongPressButton = ({ topicName, children }: { topicName: string; children: React.ReactNode }) => {
+        const [pressTimer, setPressTimer] = React.useState<NodeJS.Timeout | null>(null);
+
+        const handleMouseDown = () => {
+            const timer = setTimeout(() => {
+                handleLongPress(topicName);
+            }, 1000); // 1 second
+            setPressTimer(timer);
+        };
+
+        const handleMouseUp = () => {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                setPressTimer(null);
+            }
+        };
+
+        const handleMouseLeave = () => {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                setPressTimer(null);
+            }
+        };
+
+        return (
+            <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleTopicClick(topicName)}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
+                className="text-xs cursor-pointer h-7 px-1 py-0"
+            >
+                {children}
+            </Button>
+        );
+    };
+
+    const renderStatusDot = (topicName: string) => {
+        if (!domainStatuses || !allDomains) return null;
+        const domain = allDomains.find(d => d.domainName.slice(0, -4) === topicName);
+        if (!domain || !domain.id) return null;
+        const status = domainStatuses[domain.id];
+
+        if (status === 'checking') {
+          return <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse ml-1" title="يتم التحقق..."></div>;
+        }
+        if (status === 'offline') {
+          return <div className="h-2 w-2 rounded-full bg-red-500 ml-1" title="غير متصل"></div>;
+        }
+        if (status === 'online') {
+          return <div className="h-2 w-2 rounded-full bg-green-500 ml-1" title="متصل"></div>;
+        }
+        return null;
+    };
+
     const handleAddTopic = () => {
         if (!newTopicName.trim()) return;
 
@@ -523,113 +666,77 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
     }
 
     return (
-        <Card className="bg-card/80 backdrop-blur-sm">
-            <CardContent className="pt-6">
-
-                {/* Topic buttons for general tasks */}
-                <div className="flex flex-wrap gap-2 mb-3 items-center">
-                    {mainTopics.map((topic, index) => (
-                        <div key={topic.name} className="relative group flex items-center gap-0.5">
-                            {index > 0 && (
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground"
-                                    onClick={() => handleMoveTopic(index, 'up')}
-                                >
-                                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 2L1 5h6L4 2z" fill="currentColor"/></svg>
-                                </Button>
-                            )}
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleTopicClick(topic.name)}
-                                className="text-xs cursor-pointer"
-                            >
-                                <span className="ml-1">{topic.icon}</span>
+        <>
+            {/* Topic buttons for general tasks - separate from todo list */}
+            <Card className="bg-card/80 backdrop-blur-sm mb-2">
+                <CardContent className="pt-6">
+                    {/* RHM domains */}
+                    <div className="flex flex-wrap gap-0 items-center mb-2 justify-center">
+                        {mainTopics.filter(t => t.isRHM).map((topic) => (
+                            <LongPressButton key={topic.name} topicName={topic.name}>
+                                {topic.icon.startsWith('http') ? (
+                                    <img src={topic.icon} alt="" className="w-4 h-4 ml-0" />
+                                ) : (
+                                    <span className="ml-0">{topic.icon}</span>
+                                )}
                                 {topic.name}
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-3 w-3 -mt-2 -mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-destructive text-destructive-foreground"
-                                onClick={() => handleDeleteTopic(topic.name)}
-                            >
-                                <X className="h-2 w-2" />
-                            </Button>
-                        </div>
-                    ))}
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowAddTopic(!showAddTopic)}
-                        className="text-xs"
-                    >
-                        <Plus className="h-3 w-3 ml-1" />
-                        إضافة
-                    </Button>
-                </div>
-
-                {/* Add topic form */}
-                {showAddTopic && (
-                    <div className="flex gap-2 items-center p-2 bg-muted/50 rounded-md mb-3">
-                        <Input
-                            type="text"
-                            placeholder="اسم الموضوع..."
-                            value={newTopicName}
-                            onChange={e => setNewTopicName(e.target.value)}
-                            className="h-8 text-sm"
-                        />
-                        <select
-                            value={newTopicIcon}
-                            onChange={e => setNewTopicIcon(e.target.value)}
-                            className="h-8 text-sm px-2 rounded-md border bg-background"
-                        >
-                            <option value="📌">📌</option>
-                            <option value="🎯">🎯</option>
-                            <option value="🚀">🚀</option>
-                            <option value="💡">💡</option>
-                            <option value="⭐">⭐</option>
-                            <option value="🔥">🔥</option>
-                            <option value="📚">📚</option>
-                            <option value="🎨">🎨</option>
-                            <option value="💻">💻</option>
-                            <option value="📢">📢</option>
-                            <option value="📝">📝</option>
-                            <option value="🎧">🎧</option>
-                            <option value="💰">💰</option>
-                            <option value="🔧">🔧</option>
-                            <option value="📊">📊</option>
-                            <option value="🎵">🎵</option>
-                            <option value="🌟">🌟</option>
-                            <option value="🏆">🏆</option>
-                        </select>
-                        <Button type="button" size="sm" onClick={handleAddTopic}>
-                            <Check className="h-4 w-4" />
-                        </Button>
-                        <Button type="button" variant="ghost" size="sm" onClick={() => setShowAddTopic(false)}>
-                            <X className="h-4 w-4" />
-                        </Button>
+                                {renderStatusDot(topic.name)}
+                            </LongPressButton>
+                        ))}
                     </div>
-                )}
+                    {/* Separator between RHM and other projects */}
+                    {mainTopics.some(t => t.isRHM) && mainTopics.some(t => !t.isRHM) && (
+                        <div className="w-full h-px bg-border my-2"></div>
+                    )}
+                    {/* Other projects domains */}
+                    <div className="flex flex-wrap gap-0 items-center justify-center">
+                        {mainTopics.filter(t => !t.isRHM).map((topic) => (
+                            <LongPressButton key={topic.name} topicName={topic.name}>
+                                {topic.icon.startsWith('http') ? (
+                                    <img src={topic.icon} alt="" className="w-4 h-4 ml-0" />
+                                ) : (
+                                    <span className="ml-0">{topic.icon}</span>
+                                )}
+                                {topic.name}
+                                {renderStatusDot(topic.name)}
+                            </LongPressButton>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
 
-                <form onSubmit={handleAddGeneralTodo} className="flex gap-2 mb-6">
-                  <Textarea
-                    ref={inputRef}
-                    placeholder="مهمة عامة جديدة..."
-                    value={newGeneralTodo}
-                    onChange={e => setNewGeneralTodo(e.target.value)}
-                    className="bg-background min-h-[40px] resize-none"
-                    rows={1}
-                  />
-                  <Button type="submit" size="icon" disabled={addingTodo}>
-                    {addingTodo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                  </Button>
-                </form>
+            {/* Todo list */}
+            <Card className="bg-card/80 backdrop-blur-sm">
+                <CardContent className="pt-6">
+                    <form onSubmit={handleAddGeneralTodo} className="flex gap-2 mb-6 items-center">
+                        <button
+                            type="button"
+                            onClick={() => setNewTodoIsHighPriority(!newTodoIsHighPriority)}
+                            className="cursor-pointer"
+                        >
+                            <Star className={cn(
+                                "h-5 w-5",
+                                newTodoIsHighPriority ? "text-yellow-400 fill-yellow-400/70" : "text-muted-foreground"
+                            )} />
+                        </button>
+                        <Textarea
+                            ref={inputRef}
+                            placeholder="مهمة عامة جديدة..."
+                            value={newGeneralTodo}
+                            onChange={e => setNewGeneralTodo(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleAddGeneralTodo(e);
+                                }
+                            }}
+                            className="bg-background min-h-[40px] resize-none"
+                            rows={1}
+                        />
+                        <Button type="submit" size="icon" disabled={addingTodo}>
+                            {addingTodo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                        </Button>
+                    </form>
 
                 {sortedGroups.length === 0 && !addingTodo ? (
                     <p className="text-center text-muted-foreground py-4">لا توجد أي مهام في جميع المشاريع.</p>
@@ -657,5 +764,39 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading }: AllTod
                 )}
             </CardContent>
         </Card>
+
+        {/* Data Sheet Dialog */}
+        <Dialog open={isDataSheetOpen} onOpenChange={setDataSheetOpen}>
+            <DialogContent className="max-w-[90vw] md:max-w-2xl lg:max-w-4xl h-[80vh] flex flex-col">
+                <DialogHeader className="flex-row justify-between items-center">
+                    <DialogTitle className="text-lg">
+                        شيت بيانات:{' '}
+                        {editingDataSheetDomain && (
+                            <a
+                                href={editingDataSheetDomain.domainName.startsWith('http') ? editingDataSheetDomain.domainName : `https://${editingDataSheetDomain.domainName}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                            >
+                                {editingDataSheetDomain.domainName}
+                            </a>
+                        )}
+                    </DialogTitle>
+                    <div className="flex items-center gap-2">
+                        <Button onClick={handleSaveDataSheet}>حفظ</Button>
+                        <DialogClose asChild><Button variant="ghost">إغلاق</Button></DialogClose>
+                    </div>
+                </DialogHeader>
+                <div className="flex-grow flex flex-col py-4">
+                    <Textarea
+                        value={dataSheetContent.content}
+                        onChange={e => handleDataSheetChange(e.target.value)}
+                        className="w-full flex-grow font-mono text-sm"
+                        rows={25}
+                    />
+                </div>
+            </DialogContent>
+        </Dialog>
+        </>
     );
 }

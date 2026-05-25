@@ -50,10 +50,12 @@ export default function CatalogPage() {
                 <CardTitle className="text-xl bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 text-transparent bg-clip-text">مهام أحمد أبو العزم</CardTitle>
               </CardHeader>
               <CardContent>
-                <TodoList 
+                <TodoList
                   domainId="ahmed-abu-ezz"
                   initialTodos={todosAhmedAbuEzz}
                   onUpdate={refreshTodos}
+                  showMainTopics={true}
+                  topicsKey="topics-ahmed-abu-ezz"
                 />
               </CardContent>
             </Card>
@@ -71,10 +73,11 @@ export default function CatalogPage() {
                 <CardTitle className="text-xl bg-gradient-to-r from-sky-400 via-blue-400 to-cyan-400 text-transparent bg-clip-text">مهام أحمد عبده</CardTitle>
               </CardHeader>
               <CardContent>
-                <TodoList 
+                <TodoList
                   domainId="ahmed-abdo"
                   initialTodos={todosAhmedAbdo}
                   onUpdate={refreshTodos}
+                  showMainTopics={false}
                 />
               </CardContent>
             </Card>

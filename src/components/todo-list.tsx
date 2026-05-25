@@ -19,9 +19,11 @@ interface TodoListProps {
   domainId: string;
   initialTodos: Todo[];
   onUpdate: () => void;
+  showMainTopics?: boolean;
+  topicsKey?: string;
 }
 
-export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
+export function TodoList({ domainId, initialTodos, onUpdate, showMainTopics = true, topicsKey = 'mainTopics' }: TodoListProps) {
   const [todos, setTodos] = React.useState<(Todo & { isNew?: boolean })[]>([]);
   const [newTodo, setNewTodo] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -36,12 +38,15 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   // Main topics for quick task creation - loaded from Firestore
   const [mainTopics, setMainTopics] = React.useState<Topic[]>([]);
 
-  // Load topics from Firestore on mount
+  // Load topics from localStorage on mount
   React.useEffect(() => {
-    getTopics().then(topics => {
-      setMainTopics(topics);
-    }).catch(err => console.error('Error loading topics:', err));
-  }, []);
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(topicsKey);
+      if (saved) {
+        setMainTopics(JSON.parse(saved));
+      }
+    }
+  }, [topicsKey]);
   const [showAddTopic, setShowAddTopic] = React.useState(false);
   const [newTopicName, setNewTopicName] = React.useState('');
   const [newTopicIcon, setNewTopicIcon] = React.useState(String.fromCodePoint(0x1F4CC));
@@ -317,14 +322,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
     const newTopic = { name: newTopicName.trim(), icon: newTopicIcon };
     const updatedTopics = [...mainTopics, newTopic];
     setMainTopics(updatedTopics);
-
-    try {
-      await saveTopics(updatedTopics);
-      toast({ title: "نجاح", description: "تم إضافة الموضوع بنجاح." });
-    } catch (error) {
-      console.error('Error saving topic:', error);
-      toast({ title: "خطأ", description: "فشل في حفظ الموضوع.", variant: "destructive" });
-    }
+    localStorage.setItem(topicsKey, JSON.stringify(updatedTopics));
 
     setNewTopicName('');
     setNewTopicIcon('📌');
@@ -334,11 +332,7 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
   const handleDeleteTopic = async (topicName: string) => {
     const updatedTopics = mainTopics.filter(t => t.name !== topicName);
     setMainTopics(updatedTopics);
-    try {
-      await saveTopics(updatedTopics);
-    } catch (error) {
-      console.error('Error deleting topic:', error);
-    }
+    localStorage.setItem(topicsKey, JSON.stringify(updatedTopics));
   };
 
   const handleMoveTopic = async (index: number, direction: 'up' | 'down') => {
@@ -348,18 +342,16 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
 
     [items[index], items[newIndex]] = [items[newIndex], items[index]];
     setMainTopics(items);
-    try {
-      await saveTopics(items);
-    } catch (error) {
-      console.error('Error reordering topics:', error);
-    }
+    localStorage.setItem(topicsKey, JSON.stringify(items));
   };
 
   return (
     <div className="space-y-4">
       {/* Topic buttons */}
-      <div className="flex flex-wrap gap-2 items-center">
-        {mainTopics.map((topic, index) => (
+      {showMainTopics && (
+        <>
+          <div className="flex flex-wrap gap-2 items-center">
+            {mainTopics.map((topic, index) => (
           <div key={topic.name} className="relative group flex items-center gap-0.5">
             {index > 0 && (
               <Button
@@ -446,6 +438,8 @@ export function TodoList({ domainId, initialTodos, onUpdate }: TodoListProps) {
             <X className="h-4 w-4" />
           </Button>
         </div>
+      )}
+        </>
       )}
 
       <form onSubmit={handleAddTodo} className="flex gap-2">
