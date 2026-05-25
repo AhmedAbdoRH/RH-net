@@ -77,7 +77,8 @@ export default function CatalogPage() {
                   domainId="ahmed-abdo"
                   initialTodos={todosAhmedAbdo}
                   onUpdate={refreshTodos}
-                  showMainTopics={false}
+                  showMainTopics={true}
+                  topicsKey="topics-ahmed-abdo"
                 />
               </CardContent>
             </Card>

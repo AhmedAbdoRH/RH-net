@@ -9,7 +9,7 @@ import { checkDomainStatus } from '@/ai/flows/checkDomainStatus';
 import { checkApiKeyStatus } from '@/ai/flows/checkApiKeyStatus';
 import type { Domain, Todo, ApiKeyStatus, Project } from '@/lib/types';
 import Link from 'next/link';
-import { getTodosForDomains, getAllTodosGroupedByDomain } from '@/services/todoService';
+import { getAllTodosGroupedByDomain } from '@/services/todoService';
 import { AllTodosPanel } from '@/components/all-todos-panel';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from '@/components/ui/button';
@@ -46,7 +46,6 @@ export default function WebPage() {
   const [allDomains, setAllDomains] = React.useState<Domain[]>([]);
   const [domainStatuses, setDomainStatuses] = React.useState<Record<string, 'checking' | 'online' | 'offline'>>({});
   const [apiKeyStatuses, setApiKeyStatuses] = React.useState<ApiKeyStatus[]>([]);
-  const [domainTodos, setDomainTodos] = React.useState<Record<string, Todo[]>>({});
   const [allGroupedTodos, setAllGroupedTodos] = React.useState<Record<string, Todo[]>>({});
   const [loading, setLoading] = React.useState(true);
   const [isFaultsSheetOpen, setFaultsSheetOpen] = React.useState(false);
@@ -104,12 +103,7 @@ export default function WebPage() {
       const domainsFromDb = await getDomains();
       const domainIds = domainsFromDb.map(d => d.id).filter((id): id is string => !!id);
 
-      const [todosByDomain, allGrouped] = await Promise.all([
-        domainIds.length > 0 ? getTodosForDomains(domainIds) : Promise.resolve({}),
-        getAllTodosGroupedByDomain()
-      ]);
-
-      setDomainTodos(todosByDomain);
+      const allGrouped = await getAllTodosGroupedByDomain();
       setAllGroupedTodos(allGrouped);
 
     } catch (error) {
@@ -180,14 +174,6 @@ export default function WebPage() {
   React.useEffect(() => {
     refreshAllStatuses();
   }, [refreshAllStatuses]);
-
-  const hasTodosMap = React.useMemo(() => {
-    const hasTodos: Record<string, boolean> = {};
-    Object.keys(domainTodos).forEach(domainId => {
-      hasTodos[domainId] = domainTodos[domainId].some(todo => !todo.completed);
-    });
-    return hasTodos;
-  }, [domainTodos]);
 
   const RHMStats = React.useMemo(() => {
     const RHMDomains = allDomains.filter(d => d.projects?.includes('RHM'));
@@ -404,11 +390,9 @@ export default function WebPage() {
                         <DomainDashboard
                           project="RHM"
                           allDomains={allDomains}
-                          allTodos={domainTodos}
                           domainStatuses={domainStatuses}
                           loading={loading}
                           onDomainChange={refreshAllStatuses}
-                          onTodoChange={refreshTodos}
                         />
                       </div>
                       <div className="p-4 border-t border-border mt-4">
@@ -433,11 +417,9 @@ export default function WebPage() {
                         <DomainDashboard
                           project="other"
                           allDomains={allDomains}
-                          allTodos={domainTodos}
                           domainStatuses={domainStatuses}
                           loading={loading}
                           onDomainChange={refreshAllStatuses}
-                          onTodoChange={refreshTodos}
                         />
                       </div>
                     </TabsContent>

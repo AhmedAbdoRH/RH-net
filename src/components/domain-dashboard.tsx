@@ -37,7 +37,6 @@ import { cn } from "@/lib/utils"
 import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { TodoList } from './todo-list';
 
 const USD_TO_EGP_RATE_OFFICE = 47.5; // سعر الصرف لمصاريف المكتب
 const USD_TO_EGP_RATE_CLIENT = 50; // سعر الصرف لتحصيل العميل
@@ -56,21 +55,17 @@ const projectOptions: Project[] = ['RHM', 'pova', 'firefly', 'other'];
 interface DomainDashboardProps {
   project: Project;
   allDomains: Domain[];
-  allTodos: Record<string, Todo[]>;
   domainStatuses: Record<string, DomainStatus>;
   loading: boolean;
   onDomainChange: () => void;
-  onTodoChange: () => void;
 }
 
 export function DomainDashboard({
   project,
   allDomains,
-  allTodos,
   domainStatuses,
   loading,
-  onDomainChange,
-  onTodoChange
+  onDomainChange
 }: DomainDashboardProps) {
   const [isAddDomainOpen, setAddDomainOpen] = React.useState(false);
   const [isEditDomainOpen, setEditDomainOpen] = React.useState(false);
@@ -420,12 +415,7 @@ export function DomainDashboard({
 
   const renderStatusDot = (domainId: string) => {
     const status = domainStatuses[domainId];
-    const todosForDomain = allTodos[domainId] || [];
-    const hasTodos = todosForDomain.some(t => !t.completed);
 
-    if (hasTodos) {
-      return <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_2px] shadow-blue-500/60 animate-pulse" title="يحتوي على مهام"></div>;
-    }
     if (status === 'checking') {
       return <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" title="يتم التحقق..."></div>;
     }
@@ -452,7 +442,7 @@ export function DomainDashboard({
     });
 
     setSortedDomains(sorted);
-  }, [allDomains, project, allTodos]);
+  }, [allDomains, project]);
 
   if (loading) {
     return (
@@ -656,19 +646,6 @@ export function DomainDashboard({
                       </div>
                     </TableCell>
                   </TableRow>
-                  <CollapsibleContent asChild>
-                    <TableRow>
-                      <TableCell colSpan={colSpan} className="p-0">
-                        <div className="p-4 bg-muted/50">
-                          <TodoList
-                            domainId={domain.id!}
-                            initialTodos={allTodos[domain.id!] || []}
-                            onUpdate={onTodoChange}
-                          />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  </CollapsibleContent>
                 </TableBody>
               </Collapsible>
             )
@@ -834,15 +811,6 @@ export function DomainDashboard({
                       </Button>
                     </div>
                   </div>
-                  <CollapsibleContent>
-                    <div className="p-4 border-t bg-muted/20">
-                      <TodoList
-                        domainId={domain.id!}
-                        initialTodos={allTodos[domain.id!] || []}
-                        onUpdate={onTodoChange}
-                      />
-                    </div>
-                  </CollapsibleContent>
                 </div>
               </Collapsible>
             </Card>

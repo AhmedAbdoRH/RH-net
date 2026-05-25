@@ -66,7 +66,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
         if (allDomains && allDomains.length > 0) {
             const domainTopics = allDomains
                 .map(domain => {
-                    const domainName = domain.domainName.slice(0, -4); // Remove last 4 characters (.com, .net, etc.)
+                    const domainName = domain.domainName.slice(0, -4).replace(/-/g, ' '); // Replace hyphens with spaces
                     const fullDomain = domain.domainName;
                     const isRHM = domain.projects?.includes('RHM') || false;
                     return {
@@ -440,7 +440,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
     };
 
     const openDataSheetDialog = (topicName: string) => {
-        const domain = allDomains?.find(d => d.domainName.slice(0, -4) === topicName);
+        const domain = allDomains?.find(d => d.domainName.slice(0, -4).replace(/-/g, ' ') === topicName);
         if (domain) {
             setDataSheetContent({ title: `شيت بيانات: ${domain.domainName}`, content: domain.dataSheet || '' });
             setEditingDataSheetDomain(domain);
@@ -524,7 +524,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
 
     const renderStatusDot = (topicName: string) => {
         if (!domainStatuses || !allDomains) return null;
-        const domain = allDomains.find(d => d.domainName.slice(0, -4) === topicName);
+        const domain = allDomains.find(d => d.domainName.slice(0, -4).replace(/-/g, ' ') === topicName);
         if (!domain || !domain.id) return null;
         const status = domainStatuses[domain.id];
 
