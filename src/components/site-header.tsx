@@ -71,52 +71,52 @@ export function SiteHeader() {
 
   return (
     <div 
-      className="w-full bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-b border-primary/10 py-2 px-4 backdrop-blur-sm cursor-pointer hover:bg-primary/10 transition-colors duration-200"
+      className="w-full bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-b border-primary/10 py-1 px-4 backdrop-blur-sm cursor-pointer hover:bg-primary/10 transition-colors duration-200"
       onClick={handleCatalogClick}
       title="انقر لعرض تفاصيل المستخدمين الكاملة"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between gap-6">
+        <div className="flex items-center justify-between gap-4">
           {/* عنوان التطبيق */}
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
-              <span className="text-sm">🏪</span>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center">
+              <span className="text-xs">🏪</span>
             </div>
             <div>
-              <h2 className="text-lg font-bold text-foreground">تاجر أونلاين</h2>
+              <h2 className="text-sm font-bold text-foreground">تاجر أونلاين</h2>
             </div>
           </div>
 
           {/* المعلومات الأساسية - على اليمين */}
-          <div className="flex items-center gap-6 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
             {/* إجمالي المستخدمين */}
-            <div className="flex items-center gap-2 bg-green-500/5 px-3 py-1 rounded-lg border border-green-500/20">
-              <div className="w-6 h-6 bg-green-500/10 rounded-full flex items-center justify-center">
-                <Users className="w-3 h-3 text-green-600" />
+            <div className="flex items-center gap-1.5 bg-green-500/5 px-2 py-0.5 rounded-lg border border-green-500/20">
+              <div className="w-5 h-5 bg-green-500/10 rounded-full flex items-center justify-center">
+                <Users className="w-2.5 h-2.5 text-green-600" />
               </div>
-              <div className="text-xs">
-                <div className="font-bold text-lg text-green-600">{stats.totalUsers} <span className="text-sm text-muted-foreground">مستخدم</span></div>
-                <div className="text-[10px] text-muted-foreground">
+              <div className="text-[10px]">
+                <div className="font-bold text-sm text-green-600">{stats.totalUsers} <span className="text-[10px] text-muted-foreground">مستخدم</span></div>
+                <div className="text-[9px] text-muted-foreground">
                   آخر تسجيل منذ: {stats.lastUserDate}
                 </div>
               </div>
             </div>
 
             {/* مستخدمين البرو */}
-            <div className="flex items-center gap-2 bg-amber-500/5 px-3 py-1 rounded-lg border border-amber-500/20">
-              <div className="w-6 h-6 bg-amber-500/10 rounded-full flex items-center justify-center">
-                <Crown className="w-3 h-3 text-amber-600" />
+            <div className="flex items-center gap-1.5 bg-amber-500/5 px-2 py-0.5 rounded-lg border border-amber-500/20">
+              <div className="w-5 h-5 bg-amber-500/10 rounded-full flex items-center justify-center">
+                <Crown className="w-2.5 h-2.5 text-amber-600" />
               </div>
-              <div className="text-xs">
-                <div className="font-bold text-lg text-amber-700">{stats.proUsers}</div>
-                <div className="text-[10px] text-muted-foreground">برو</div>
+              <div className="text-[10px]">
+                <div className="font-bold text-sm text-amber-700">{stats.proUsers}</div>
+                <div className="text-[9px] text-muted-foreground">برو</div>
               </div>
             </div>
 
             {/* حالة التحميل */}
             {loading && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md">
-                <div className="w-3 h-3 border border-primary/30 border-t-primary rounded-full animate-spin"></div>
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-md">
+                <div className="w-2.5 h-2.5 border border-primary/30 border-t-primary rounded-full animate-spin"></div>
                 <span>جاري التحميل...</span>
               </div>
             )}
