@@ -1,19 +1,23 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
-
-const supabaseUrl = 'https://ikelmblsikapgbxbpebz.supabase.co'
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrZWxtYmxzaWthcGdieGJwZWJ6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzMzNDg4MiwiZXhwIjoyMDc4OTEwODgyfQ.0zTJzPRsBvYzwNQeP6ZgpwVkzvG11yz1tD6upX35zSQ'
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+import { createSupabaseAdminClient } from '@/lib/supabase-admin'
 
 interface TraderData {
   userId: string
   productCount: number
   type: 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر'
+  productActivityDays: ProductActivityDay[]
+  firstProductAt: string | null
+  latestProductAt: string | null
+}
+
+interface ProductActivityDay {
+  date: string
+  count: number
 }
 
 export async function GET() {
   try {
+    const supabaseAdmin = createSupabaseAdminClient()
     // جلب جميع المستخدمين
     const { data: usersData, error: usersError } = await supabaseAdmin.auth.admin.listUsers()
 
@@ -46,7 +50,7 @@ export async function GET() {
     // 2. جلب جميع المنتجات (menu_items) مع catalog_id
     const { data: menuItemsData, error: menuItemsError } = await supabaseAdmin
       .from('menu_items')
-      .select('id, catalog_id')
+      .select('id, catalog_id, created_at')
     
     if (menuItemsError) {
       console.error('❌ Error fetching menu_items:', menuItemsError.message)
@@ -67,10 +71,37 @@ export async function GET() {
     
     // عد عدد المنتجات لكل مستخدم
     const productCounts: { [userId: string]: number } = {}
+    const createdAtByUserId: { [userId: string]: number } = {}
+    usersData.users.forEach(user => {
+      const createdAtMs = Date.parse(user.created_at)
+      if (!Number.isNaN(createdAtMs)) createdAtByUserId[user.id] = createdAtMs
+    })
+
+    const activityByUserId: { [userId: string]: Map<string, number> } = {}
+    const firstProductAtByUserId: { [userId: string]: string } = {}
+    const latestProductAtByUserId: { [userId: string]: string } = {}
+
     menuItemsData?.forEach(item => {
       const userId = catalogToUser[item.catalog_id]
       if (userId) {
         productCounts[userId] = (productCounts[userId] || 0) + 1
+
+        const accountCreatedAtMs = createdAtByUserId[userId]
+        const itemCreatedAtMs = item.created_at ? Date.parse(item.created_at) : NaN
+        if (!Number.isNaN(accountCreatedAtMs) && !Number.isNaN(itemCreatedAtMs)) {
+          if (itemCreatedAtMs >= accountCreatedAtMs) {
+            const dayKey = new Date(itemCreatedAtMs).toISOString().slice(0, 10)
+            activityByUserId[userId] ||= new Map<string, number>()
+            activityByUserId[userId].set(dayKey, (activityByUserId[userId].get(dayKey) || 0) + 1)
+
+            if (!firstProductAtByUserId[userId] || item.created_at < firstProductAtByUserId[userId]) {
+              firstProductAtByUserId[userId] = item.created_at
+            }
+            if (!latestProductAtByUserId[userId] || item.created_at > latestProductAtByUserId[userId]) {
+              latestProductAtByUserId[userId] = item.created_at
+            }
+          }
+        }
       }
     })
     
@@ -83,6 +114,9 @@ export async function GET() {
     
     usersData.users.forEach(user => {
       const count = productCounts[user.id] || 0
+      const productActivityDays = Array.from(activityByUserId[user.id]?.entries() || [])
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, dayCount]) => ({ date, count: dayCount }))
       let type: 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر'
       
       if (count === 0) {
@@ -98,7 +132,10 @@ export async function GET() {
       traders.push({
         userId: user.id,
         productCount: count,
-        type
+        type,
+        productActivityDays,
+        firstProductAt: firstProductAtByUserId[user.id] || null,
+        latestProductAt: latestProductAtByUserId[user.id] || null
       })
     })
 

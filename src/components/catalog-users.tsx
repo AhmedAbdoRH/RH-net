@@ -22,7 +22,15 @@ interface User {
 interface UserProduct {
   userId: string
   productCount: number
+  productActivityDays?: ProductActivityDay[]
+  firstProductAt?: string | null
+  latestProductAt?: string | null
   type: 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر'
+}
+
+interface ProductActivityDay {
+  date: string
+  count: number
 }
 
 export function CatalogUsers() {
@@ -156,6 +164,55 @@ export function CatalogUsers() {
 
   const getTraderType = (userId: string) => {
     return traderData.find(t => t.userId === userId)
+  }
+
+  const ProductActivityTimeline = ({
+    accountCreatedAt,
+    activityDays = []
+  }: {
+    accountCreatedAt: string
+    activityDays?: ProductActivityDay[]
+  }) => {
+    const start = new Date(accountCreatedAt).getTime()
+    const end = Date.now()
+    const duration = Math.max(end - start, 1)
+    const totalProducts = activityDays.reduce((sum, day) => sum + day.count, 0)
+
+    const formatShortDate = (dateString: string) =>
+      new Date(dateString).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' })
+
+    return (
+      <div className="mt-3 border-t border-border/20 pt-3" dir="rtl">
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-2">
+          <span>الآن</span>
+          <span>{totalProducts > 0 ? `${totalProducts} منتج على خط الزمن` : 'لا توجد إضافات منتجات'}</span>
+          <span>بداية الاستخدام</span>
+        </div>
+        <div className="relative h-8">
+          <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-border" />
+          <div className="absolute right-0 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-muted-foreground/50" />
+          <div className="absolute left-0 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-muted-foreground/50" />
+          {activityDays.map((day) => {
+            const dayTime = new Date(`${day.date}T12:00:00`).getTime()
+            const progress = Math.min(Math.max((dayTime - start) / duration, 0), 1)
+            const dotSize = Math.min(18, 8 + day.count * 2)
+
+            return (
+              <div
+                key={day.date}
+                className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[4px] border border-emerald-300 bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]"
+                style={{
+                  left: `${progress * 100}%`,
+                  width: dotSize,
+                  height: dotSize
+                }}
+                title={`${formatShortDate(day.date)}: ${day.count} منتج`}
+              />
+            )
+          })}
+        </div>
+      </div>
+    )
   }
 
   const getTraderTypeColor = (type: string) => {
@@ -385,11 +442,13 @@ export function CatalogUsers() {
                   const traderType = getTraderType(user.id)?.type
                   return traderType === filterType
                 })
-                .map((user, index) => (
-                <div
-                  key={user.id}
-                  className="group relative bg-gradient-to-r from-card to-card/70 border border-border/60 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200 hover:border-primary/40 backdrop-blur-md"
-                >
+                .map((user, index) => {
+                  const trader = getTraderType(user.id)
+                  return (
+                    <div
+                      key={user.id}
+                      className="group relative bg-gradient-to-r from-card to-card/70 border border-border/60 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200 hover:border-primary/40 backdrop-blur-md"
+                    >
                   {/* محتوى البطاقة */}
                   <div className="relative z-10">
                     {/* الصف الأول: اسم المتجر والمعلومات الأساسية */}
@@ -531,9 +590,14 @@ export function CatalogUsers() {
                         )}
                       </div>
                     </div>
+                    <ProductActivityTimeline
+                      accountCreatedAt={user.created_at}
+                      activityDays={trader?.productActivityDays}
+                    />
                   </div>
-                </div>
-              ))}
+                    </div>
+                  )
+                })}
             </div>
           )}
 

@@ -1,13 +1,9 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
-
-const supabaseUrl = 'https://ikelmblsikapgbxbpebz.supabase.co'
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrZWxtYmxzaWthcGdieGJwZWJ6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzMzNDg4MiwiZXhwIjoyMDc4OTEwODgyfQ.0zTJzPRsBvYzwNQeP6ZgpwVkzvG11yz1tD6upX35zSQ'
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+import { createSupabaseAdminClient } from '@/lib/supabase-admin'
 
 export async function GET() {
   try {
+    const supabaseAdmin = createSupabaseAdminClient()
     // استخدام service role key للوصول إلى بيانات المستخدمين
     const { data, error } = await supabaseAdmin.auth.admin.listUsers()
 
@@ -68,6 +64,7 @@ export async function GET() {
 
 export async function DELETE(request: Request) {
   try {
+    const supabaseAdmin = createSupabaseAdminClient()
     const { userId } = await request.json()
 
     if (!userId) {

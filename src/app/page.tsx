@@ -334,7 +334,7 @@ export default function WebPage() {
                 <img
                   src="https://rhm-digital.com/favicon.ico"
                   alt="RHM Digital"
-                  className="h-12 w-12 rounded-lg"
+                  className="h-10 w-10 rounded-lg"
                 />
               </div>
               <div>

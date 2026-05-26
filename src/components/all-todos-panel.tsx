@@ -515,7 +515,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
-                className="text-xs cursor-pointer h-7 px-1 py-0"
+                className="text-sm cursor-pointer h-9 px-2 py-1"
             >
                 {children}
             </Button>
@@ -675,7 +675,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                         {mainTopics.filter(t => t.isRHM).map((topic) => (
                             <LongPressButton key={topic.name} topicName={topic.name}>
                                 {topic.icon.startsWith('http') ? (
-                                    <img src={topic.icon} alt="" className="w-4 h-4 ml-0" />
+                                    <img src={topic.icon} alt="" className="w-5 h-5 ml-0" />
                                 ) : (
                                     <span className="ml-0">{topic.icon}</span>
                                 )}
@@ -693,7 +693,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                         {mainTopics.filter(t => !t.isRHM).map((topic) => (
                             <LongPressButton key={topic.name} topicName={topic.name}>
                                 {topic.icon.startsWith('http') ? (
-                                    <img src={topic.icon} alt="" className="w-4 h-4 ml-0" />
+                                    <img src={topic.icon} alt="" className="w-5 h-5 ml-0" />
                                 ) : (
                                     <span className="ml-0">{topic.icon}</span>
                                 )}
