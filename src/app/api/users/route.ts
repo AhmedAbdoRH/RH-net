@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseAdminClient } from '@/lib/supabase-admin'
+import { listAllAuthUsersResponse } from '@/lib/supabase-auth-users'
 
 export async function GET() {
   try {
     const supabaseAdmin = createSupabaseAdminClient()
     // استخدام service role key للوصول إلى بيانات المستخدمين
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers()
+    const { data, error } = await listAllAuthUsersResponse(supabaseAdmin)
 
     if (error) {
       console.error('Error fetching users:', error)
@@ -52,7 +53,7 @@ export async function GET() {
       user_metadata: user.user_metadata
     }))
 
-    return NextResponse.json({ users })
+    return NextResponse.json({ users, totalUsers: users.length })
   } catch (error) {
     console.error('Server error:', error)
     return NextResponse.json(

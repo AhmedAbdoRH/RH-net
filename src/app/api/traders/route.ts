@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseAdminClient } from '@/lib/supabase-admin'
+import { listAllAuthUsersResponse } from '@/lib/supabase-auth-users'
 
 interface TraderData {
   userId: string
@@ -19,7 +20,7 @@ export async function GET() {
   try {
     const supabaseAdmin = createSupabaseAdminClient()
     // جلب جميع المستخدمين
-    const { data: usersData, error: usersError } = await supabaseAdmin.auth.admin.listUsers()
+    const { data: usersData, error: usersError } = await listAllAuthUsersResponse(supabaseAdmin)
 
     if (usersError || !usersData.users) {
       console.error('Error fetching users:', usersError)

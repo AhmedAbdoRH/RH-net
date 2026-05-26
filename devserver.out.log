@@ -8,206 +8,33 @@
 - Environments: .env.local
 
 ✓ Starting...
-✓ Ready in 1079ms
- GET /tagr 200 in 2.4s (compile: 1900ms, render: 473ms)
+✓ Ready in 1749ms
 🔍 Fetching catalogs and menu_items...
- GET /api/arena 200 in 1590ms (compile: 1040ms, render: 550ms)
- GET /api/users 200 in 1787ms (compile: 901ms, render: 887ms)
-✅ Found 50 catalogs
- GET /api/arena 200 in 243ms (compile: 3ms, render: 241ms)
+ GET /api/users 200 in 1426ms (compile: 792ms, render: 634ms)
+✅ Found 48 catalogs
+ GET /tagr 200 in 2.1s (compile: 1647ms, render: 420ms)
 ✅ Found 136 menu items
 
-📊 Summary: 50 catalogs, 136 menu items
+📊 Summary: 48 catalogs, 136 menu items
 Users with products: 24
 ✅ Total products counted: 136
 Traders stats: {
-  totalTraders: 50,
-  stats: { 'خامل': 28, 'مبتدئ': 14, 'نشط': 7, 'سوبر': 1 },
-  percentages: { 'خامل': 56, 'مبتدئ': 28, 'نشط': 14, 'سوبر': 2 }
+  totalTraders: 51,
+  stats: { 'خامل': 27, 'مبتدئ': 16, 'نشط': 7, 'سوبر': 1 },
+  percentages: { 'خامل': 53, 'مبتدئ': 31, 'نشط': 14, 'سوبر': 2 }
 }
- GET /api/traders 200 in 1913ms (compile: 839ms, render: 1074ms)
- GET /api/users 200 in 257ms (compile: 3ms, render: 253ms)
- GET / 200 in 92ms (compile: 10ms, render: 83ms)
- GET / 200 in 592ms (compile: 287ms, render: 305ms)
- GET /api/arena 200 in 363ms (compile: 4ms, render: 359ms)
- GET /api/arena 200 in 199ms (compile: 3ms, render: 196ms)
- GET /api/users 200 in 623ms (compile: 5ms, render: 618ms)
- GET /tagr 200 in 59ms (compile: 8ms, render: 51ms)
- POST / 200 in 855ms (compile: 4ms, render: 851ms)
- GET /api/users 200 in 299ms (compile: 3ms, render: 296ms)
+ GET /api/traders 200 in 2.1s (compile: 719ms, render: 1374ms)
 🔍 Fetching catalogs and menu_items...
-✅ Found 50 catalogs
- GET /api/users 200 in 281ms (compile: 11ms, render: 270ms)
+✅ Found 48 catalogs
+ GET /api/users 200 in 650ms (compile: 64ms, render: 587ms)
 ✅ Found 136 menu items
 
-📊 Summary: 50 catalogs, 136 menu items
+📊 Summary: 48 catalogs, 136 menu items
 Users with products: 24
 ✅ Total products counted: 136
 Traders stats: {
-  totalTraders: 50,
-  stats: { 'خامل': 28, 'مبتدئ': 14, 'نشط': 7, 'سوبر': 1 },
-  percentages: { 'خامل': 56, 'مبتدئ': 28, 'نشط': 14, 'سوبر': 2 }
+  totalTraders: 51,
+  stats: { 'خامل': 27, 'مبتدئ': 16, 'نشط': 7, 'سوبر': 1 },
+  percentages: { 'خامل': 53, 'مبتدئ': 31, 'نشط': 14, 'سوبر': 2 }
 }
- GET /api/traders 200 in 662ms (compile: 3ms, render: 659ms)
- POST / 200 in 799ms (compile: 8ms, render: 791ms)
- POST /tagr 200 in 820ms (compile: 5ms, render: 814ms)
-🔍 Fetching catalogs and menu_items...
- GET /api/users 200 in 273ms (compile: 3ms, render: 270ms)
-✅ Found 50 catalogs
-✅ Found 136 menu items
-
-📊 Summary: 50 catalogs, 136 menu items
-Users with products: 24
-✅ Total products counted: 136
-Traders stats: {
-  totalTraders: 50,
-  stats: { 'خامل': 28, 'مبتدئ': 14, 'نشط': 7, 'سوبر': 1 },
-  percentages: { 'خامل': 56, 'مبتدئ': 28, 'نشط': 14, 'سوبر': 2 }
-}
- GET /api/traders 200 in 385ms (compile: 2ms, render: 382ms)
- POST / 200 in 802ms (compile: 4ms, render: 797ms)
- POST /tagr 200 in 821ms (compile: 4ms, render: 817ms)
- GET /api/users 200 in 333ms (compile: 2ms, render: 331ms)
- POST / 200 in 464ms (compile: 4ms, render: 460ms)
- POST /tagr 200 in 476ms (compile: 3ms, render: 473ms)
- POST / 200 in 481ms (compile: 4ms, render: 477ms)
- POST /tagr 200 in 503ms (compile: 4ms, render: 499ms)
- POST / 200 in 504ms (compile: 6ms, render: 498ms)
- POST /tagr 200 in 518ms (compile: 4ms, render: 514ms)
- POST / 200 in 488ms (compile: 3ms, render: 485ms)
- POST /tagr 200 in 515ms (compile: 3ms, render: 512ms)
- POST / 200 in 446ms (compile: 4ms, render: 443ms)
- POST /tagr 200 in 458ms (compile: 2ms, render: 456ms)
- POST / 200 in 673ms (compile: 3ms, render: 670ms)
- POST /tagr 200 in 687ms (compile: 3ms, render: 684ms)
- POST / 200 in 446ms (compile: 4ms, render: 442ms)
- POST /tagr 200 in 457ms (compile: 3ms, render: 454ms)
- POST / 200 in 714ms (compile: 4ms, render: 710ms)
- POST /tagr 200 in 725ms (compile: 2ms, render: 723ms)
- POST / 200 in 759ms (compile: 4ms, render: 755ms)
- POST /tagr 200 in 770ms (compile: 3ms, render: 767ms)
- POST / 200 in 912ms (compile: 5ms, render: 907ms)
- POST /tagr 200 in 928ms (compile: 5ms, render: 923ms)
- POST / 200 in 908ms (compile: 5ms, render: 903ms)
- POST /tagr 200 in 920ms (compile: 4ms, render: 917ms)
- POST / 200 in 1081ms (compile: 3ms, render: 1078ms)
- POST /tagr 200 in 1095ms (compile: 3ms, render: 1092ms)
- POST / 200 in 1536ms (compile: 6ms, render: 1529ms)
- POST /tagr 200 in 1550ms (compile: 4ms, render: 1546ms)
-API Key validation failed for key ending with ...qjy4: {
-  status: 429,
-  statusText: 'Too Many Requests',
-  error: {
-    code: 429,
-    message: "Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateContent request limit per minute for a region' of service 'generativelanguage.googleapis.com' for consumer 'project_number:569837515809'.",
-    status: 'RESOURCE_EXHAUSTED',
-    details: [ [Object], [Object] ]
-  }
-}
- POST / 200 in 352ms (compile: 3ms, render: 348ms)
- POST /tagr 200 in 363ms (compile: 3ms, render: 360ms)
- POST / 200 in 587ms (compile: 4ms, render: 583ms)
- POST /tagr 200 in 598ms (compile: 3ms, render: 594ms)
-API Key validation failed for key ending with ...qZH0: {
-  status: 403,
-  statusText: 'Forbidden',
-  error: {
-    code: 403,
-    message: "Permission denied: Consumer 'api_key:AIzaSyADRxtILZAQ7EeJA9fKju7tj_YkMErqZH0' has been suspended.",
-    status: 'PERMISSION_DENIED',
-    details: [ [Object], [Object] ]
-  }
-}
- POST / 200 in 124ms (compile: 5ms, render: 120ms)
- POST /tagr 200 in 136ms (compile: 4ms, render: 133ms)
-API Key validation failed for key ending with ...IVDs: {
-  status: 429,
-  statusText: 'Too Many Requests',
-  error: {
-    code: 429,
-    message: "Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateContent request limit per minute for a region' of service 'generativelanguage.googleapis.com' for consumer 'project_number:545954279321'.",
-    status: 'RESOURCE_EXHAUSTED',
-    details: [ [Object], [Object] ]
-  }
-}
- POST / 200 in 336ms (compile: 4ms, render: 333ms)
- POST /tagr 200 in 346ms (compile: 3ms, render: 343ms)
-API Key validation failed for key ending with ..._lO4: {
-  status: 403,
-  statusText: 'Forbidden',
-  error: {
-    code: 403,
-    message: 'Your API key was reported as leaked. Please use another API key.',
-    status: 'PERMISSION_DENIED'
-  }
-}
- POST / 200 in 270ms (compile: 4ms, render: 267ms)
- POST /tagr 200 in 281ms (compile: 4ms, render: 277ms)
-✓ Compiled in 220ms
-✓ Compiled in 273ms
-✓ Compiled in 166ms
-✓ Compiled in 165ms
-✓ Compiled in 188ms
-🔍 Fetching catalogs and menu_items...
-✅ Found 50 catalogs
-✅ Found 136 menu items
-
-📊 Summary: 50 catalogs, 136 menu items
-Users with products: 24
-✅ Total products counted: 136
-Traders stats: {
-  totalTraders: 50,
-  stats: { 'خامل': 28, 'مبتدئ': 14, 'نشط': 7, 'سوبر': 1 },
-  percentages: { 'خامل': 56, 'مبتدئ': 28, 'نشط': 14, 'سوبر': 2 }
-}
- GET /api/traders 200 in 808ms (compile: 112ms, render: 696ms)
-🔍 Fetching catalogs and menu_items...
-✅ Found 50 catalogs
-✅ Found 136 menu items
-
-📊 Summary: 50 catalogs, 136 menu items
-Users with products: 24
-✅ Total products counted: 136
-Traders stats: {
-  totalTraders: 50,
-  stats: { 'خامل': 28, 'مبتدئ': 14, 'نشط': 7, 'سوبر': 1 },
-  percentages: { 'خامل': 56, 'مبتدئ': 28, 'نشط': 14, 'سوبر': 2 }
-}
- GET /api/traders 200 in 670ms (compile: 4ms, render: 665ms)
-✓ Compiled in 221ms
- GET /tagr 200 in 448ms (compile: 110ms, render: 338ms)
-🔍 Fetching catalogs and menu_items...
-✅ Found 50 catalogs
-✅ Found 136 menu items
-
-📊 Summary: 50 catalogs, 136 menu items
-Users with products: 24
-✅ Total products counted: 136
-Traders stats: {
-  totalTraders: 50,
-  stats: { 'خامل': 28, 'مبتدئ': 14, 'نشط': 7, 'سوبر': 1 },
-  percentages: { 'خامل': 56, 'مبتدئ': 28, 'نشط': 14, 'سوبر': 2 }
-}
- GET /api/traders 200 in 616ms (compile: 8ms, render: 608ms)
- GET /tagr 200 in 66ms (compile: 3ms, render: 62ms)
- GET /api/arena 200 in 257ms (compile: 2ms, render: 255ms)
-🔍 Fetching catalogs and menu_items...
-✅ Found 50 catalogs
- GET /api/users 200 in 451ms (compile: 4ms, render: 447ms)
- GET /api/arena 200 in 254ms (compile: 3ms, render: 252ms)
-✅ Found 136 menu items
-
-📊 Summary: 50 catalogs, 136 menu items
-Users with products: 24
-✅ Total products counted: 136
-Traders stats: {
-  totalTraders: 50,
-  stats: { 'خامل': 28, 'مبتدئ': 14, 'نشط': 7, 'سوبر': 1 },
-  percentages: { 'خامل': 56, 'مبتدئ': 28, 'نشط': 14, 'سوبر': 2 }
-}
- GET /api/traders 200 in 548ms (compile: 3ms, render: 545ms)
- GET /api/users 200 in 251ms (compile: 2ms, render: 249ms)
-✓ Compiled in 186ms
- GET /tagr 200 in 443ms (compile: 103ms, render: 340ms)
-✓ Compiled in 219ms
- GET /tagr 200 in 458ms (compile: 102ms, render: 356ms)
+ GET /api/traders 200 in 754ms (compile: 117ms, render: 636ms)
