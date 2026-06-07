@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createSupabaseAdminClient } from '@/lib/supabase-admin'
+import { createSupabaseAdminClient, handleSupabaseError, isSupabaseConfigured } from '@/lib/supabase-admin'
 import { listAllAuthUsersResponse } from '@/lib/supabase-auth-users'
 
 interface TraderData {
@@ -17,6 +17,17 @@ interface ProductActivityDay {
 }
 
 export async function GET() {
+  // لو Supabase مش متظبط، نرجع بيانات فارغة بدل ما نرمي exception
+  if (!isSupabaseConfigured()) {
+    console.warn('⚠️ Supabase غير مهيأ - سيتم إرجاع بيانات فارغة لـ /api/traders')
+    return NextResponse.json({
+      traders: [],
+      stats: { خامل: 0, 'مبتدئ': 0, نشط: 0, سوبر: 0 },
+      percentages: { خامل: 0, 'مبتدئ': 0, نشط: 0, سوبر: 0 },
+      warning: 'خدمة قاعدة البيانات غير مهيأة',
+    })
+  }
+
   try {
     const supabaseAdmin = createSupabaseAdminClient()
     // جلب جميع المستخدمين

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
-import { createSupabaseAdminClient } from '@/lib/supabase-admin'
+import { createSupabaseAdminClient, handleSupabaseError } from '@/lib/supabase-admin'
 import { listAllAuthUsersResponse } from '@/lib/supabase-auth-users'
+import { sendEmail, isEmailServiceConfigured } from '@/lib/email'
+import { buildUpgradeToProEmail } from '@/lib/email-templates/upgrade-to-pro'
 
 export async function GET() {
   try {
@@ -54,12 +56,10 @@ export async function GET() {
     }))
 
     return NextResponse.json({ users, totalUsers: users.length })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Server error:', error)
-    return NextResponse.json(
-      { error: 'حدث خطأ في الخادم' },
-      { status: 500 }
-    )
+    const { status, body } = handleSupabaseError(error)
+    return NextResponse.json(body, { status })
   }
 }
 
@@ -71,6 +71,15 @@ export async function PATCH(request: Request) {
     if (!userId || !plan) {
       return NextResponse.json(
         { error: 'معرف المستخدم والخطة مطلوبان' },
+        { status: 400 }
+      )
+    }
+
+    // التحقق من أن الخطة الجديدة من القيم المسموح بها
+    const allowedPlans = ['free', 'basic', 'pro']
+    if (!allowedPlans.includes(plan)) {
+      return NextResponse.json(
+        { error: 'قيمة الخطة غير صحيحة' },
         { status: 400 }
       )
     }
@@ -89,7 +98,90 @@ export async function PATCH(request: Request) {
       )
     }
 
-    return NextResponse.json({ success: true, message: 'تم تحديث الخطة بنجاح' })
+    // ✅ إذا تمت الترقية إلى Pro، قم بإرسال إيميل ترحيبي تلقائي
+    let emailResult: { sent: boolean; error?: string; id?: string } | null = null
+    if (plan === 'pro') {
+      try {
+        // جلب بيانات المستخدم والمتجر من Supabase
+        const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
+
+        if (userError || !userData?.user) {
+          console.error('❌ تعذر جلب بيانات المستخدم لإرسال الإيميل:', userError)
+          emailResult = { sent: false, error: 'لم يتم العثور على المستخدم' }
+        } else {
+          const user = userData.user
+          const userEmail = user.email
+
+          if (!userEmail) {
+            console.warn('⚠️ المستخدم ليس لديه إيميل مسجل:', userId)
+            emailResult = { sent: false, error: 'لا يوجد إيميل للمستخدم' }
+          } else {
+            // جلب اسم المتجر
+            const { data: catalog } = await supabaseAdmin
+              .from('catalogs')
+              .select('name, display_name')
+              .eq('user_id', userId)
+              .single()
+
+            const traderName =
+              user.user_metadata?.display_name ||
+              user.user_metadata?.full_name ||
+              userEmail.split('@')[0]
+
+            const storeName = catalog?.display_name || catalog?.name || 'متجرك'
+
+            // بناء قالب الإيميل
+            const emailContent = buildUpgradeToProEmail({
+              traderName,
+              storeName,
+            })
+
+            // التحقق من تهيئة خدمة الإيميل
+            if (!isEmailServiceConfigured()) {
+              console.warn('⚠️ خدمة الإيميل غير مهيأة (RESEND_API_KEY مفقود)')
+              emailResult = {
+                sent: false,
+                error: 'خدمة الإيميل غير مهيأة - تم تنفيذ الترقية بدون إرسال إيميل',
+              }
+            } else {
+              // إرسال الإيميل
+              const sendResult = await sendEmail({
+                to: userEmail,
+                subject: emailContent.subject,
+                html: emailContent.html,
+                text: emailContent.text,
+                replyTo: process.env.RESEND_REPLY_TO || undefined,
+              })
+
+              emailResult = {
+                sent: sendResult.success,
+                error: sendResult.error,
+                id: sendResult.id,
+              }
+
+              if (sendResult.success) {
+                console.log(`✅ تم إرسال إيميل ترقية Pro إلى: ${userEmail}`)
+              } else {
+                console.error(`❌ فشل إرسال إيميل ترقية Pro إلى: ${userEmail}`, sendResult.error)
+              }
+            }
+          }
+        }
+      } catch (emailErr: any) {
+        // لا نُفشل العملية كلها إذا فشل الإيميل — الترقية تمت بنجاح
+        console.error('❌ استثناء أثناء محاولة إرسال إيميل الترقية:', emailErr)
+        emailResult = {
+          sent: false,
+          error: emailErr?.message || 'استثناء غير متوقع',
+        }
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'تم تحديث الخطة بنجاح',
+      email: emailResult,
+    })
   } catch (error) {
     console.error('Server error:', error)
     return NextResponse.json(
