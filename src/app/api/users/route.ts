@@ -63,6 +63,42 @@ export async function GET() {
   }
 }
 
+export async function PATCH(request: Request) {
+  try {
+    const supabaseAdmin = createSupabaseAdminClient()
+    const { userId, plan } = await request.json()
+
+    if (!userId || !plan) {
+      return NextResponse.json(
+        { error: 'معرف المستخدم والخطة مطلوبان' },
+        { status: 400 }
+      )
+    }
+
+    // تحديث الخطة في جدول catalogs
+    const { error: updateError } = await supabaseAdmin
+      .from('catalogs')
+      .update({ plan })
+      .eq('user_id', userId)
+
+    if (updateError) {
+      console.error('Error updating plan:', updateError)
+      return NextResponse.json(
+        { error: 'فشل في تحديث الخطة' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ success: true, message: 'تم تحديث الخطة بنجاح' })
+  } catch (error) {
+    console.error('Server error:', error)
+    return NextResponse.json(
+      { error: 'حدث خطأ في الخادم' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function DELETE(request: Request) {
   try {
     const supabaseAdmin = createSupabaseAdminClient()

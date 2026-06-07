@@ -41,6 +41,7 @@ export function CatalogUsers() {
   const [traderStats, setTraderStats] = useState<any>(null)
   const [filterType, setFilterType] = useState<'الكل' | 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر' | 'برو'>('الكل')
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
+  const [upgradingUserId, setUpgradingUserId] = useState<string | null>(null)
 
   const handleDeleteUser = async (userId: string) => {
     setDeletingUserId(userId)
@@ -63,6 +64,31 @@ export function CatalogUsers() {
       alert('فشل في حذف المستخدم')
     } finally {
       setDeletingUserId(null)
+    }
+  }
+
+  const handleUpgradeToPro = async (userId: string) => {
+    setUpgradingUserId(userId)
+    try {
+      const response = await fetch('/api/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, plan: 'pro' })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في الترقية')
+      }
+
+      await fetchUsers()
+      await fetchTraderData()
+      alert('تم ترقية المستخدم إلى Pro بنجاح')
+    } catch (err) {
+      console.error('Error upgrading user:', err)
+      alert('فشل في ترقية المستخدم')
+    } finally {
+      setUpgradingUserId(null)
     }
   }
 
@@ -532,7 +558,7 @@ export function CatalogUsers() {
                         </div>
                       </div>
                       
-                      {/* اليمين: الأزرار - ايميل ثم واتس ثم اتصال ثم حذف */}
+                      {/* اليمين: الأزرار - ايميل ثم واتس ثم اتصال ثم ترقية ثم حذف */}
                       <div className="flex items-center gap-2">
                         <a
                           href={`mailto:${user.email}`}
@@ -560,6 +586,16 @@ export function CatalogUsers() {
                           >
                             <span className="text-sm">📞</span>
                           </a>
+                        )}
+                        {user.plan !== 'pro' && (
+                          <button
+                            onClick={() => handleUpgradeToPro(user.id)}
+                            disabled={upgradingUserId === user.id}
+                            className="flex items-center gap-1 text-amber-600 hover:text-amber-700 transition-colors px-2 py-1 rounded border border-amber-600/30 hover:border-amber-600/50 disabled:opacity-50"
+                            title="ترقية إلى Pro"
+                          >
+                            <span className="text-sm">👑</span>
+                          </button>
                         )}
                         {getTraderType(user.id)?.type === 'خامل' && (
                           <AlertDialog>

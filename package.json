@@ -60,6 +60,7 @@
     "react-hook-form": "^7.54.2",
     "recharts": "^2.15.1",
     "shimmer": "^1.2.1",
+    "source-map-js": "^1.2.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "tiny-emitter": "^2.1.0",
