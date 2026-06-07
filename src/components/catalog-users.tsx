@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState, useEffect } from "react"
-import { Users, Mail, Trash2 } from "lucide-react"
+import { Users, Mail, Trash2, Copy, Check, ExternalLink } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
@@ -42,6 +42,17 @@ export function CatalogUsers() {
   const [filterType, setFilterType] = useState<'الكل' | 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر' | 'برو'>('الكل')
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
   const [upgradingUserId, setUpgradingUserId] = useState<string | null>(null)
+  const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null)
+
+  const handleCopyLink = (userId: string, storeName: string) => {
+    const url = getStoreUrl(storeName)
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        setCopiedStoreId(userId)
+        setTimeout(() => setCopiedStoreId(null), 2000)
+      })
+      .catch((err) => console.error("Could not copy link:", err))
+  }
 
   const handleDeleteUser = async (userId: string) => {
     setDeletingUserId(userId)
@@ -162,7 +173,7 @@ export function CatalogUsers() {
       .replace(/\s+/g, '-') // استبدال المسافات بشرطات
       .replace(/-+/g, '-') // إزالة الشرطات المكررة
       .trim()
-    return `https://online-catalog.net/${slug}`
+    return `https://tagr-online.com/${slug}`
   }
 
   const formatDate = (dateString: string) => {
@@ -473,88 +484,104 @@ export function CatalogUsers() {
                   return (
                     <div
                       key={user.id}
-                      className="group relative bg-gradient-to-r from-card to-card/70 border border-border/60 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200 hover:border-primary/40 backdrop-blur-md"
+                      className="group relative bg-gradient-to-r from-card to-card/70 border border-border/60 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:border-primary/40 backdrop-blur-md overflow-hidden"
                     >
-                  {/* محتوى البطاقة */}
-                  <div className="relative z-10">
-                    {/* الصف الأول: اسم المتجر والمعلومات الأساسية */}
-                    <div className="flex items-center justify-between mb-3">
-                      {/* اسم المتجر الرئيسي */}
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      {/* هيدر الكارت المنفصل: اسم المتجر ونوع الاشتراك */}
+                      <div className="bg-muted/40 border-b border-border/50 px-4 py-2.5 flex items-center justify-between">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
                           <span className="text-lg">🏪</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
                           {user.store_name !== 'لا يوجد متجر' ? (
-                            <a
-                              href={getStoreUrl(user.store_name)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block group/link"
-                            >
-                              <h3 className="text-lg font-bold text-foreground group-hover/link:text-primary transition-colors duration-200 truncate">
-                                {user.store_display_name || user.store_name}
-                              </h3>
-                              <div className="flex items-center gap-2 text-xs text-primary font-medium">
-                                <span>زيارة المتجر</span>
-                                <span className="text-sm group-hover/link:translate-x-1 transition-transform duration-200">→</span>
-                              </div>
-                            </a>
-                          ) : (
-                            <div>
-                              <h3 className="text-lg font-bold text-muted-foreground truncate">
-                                {user.store_display_name || user.store_name}
-                              </h3>
-                              <div className="text-xs text-muted-foreground">
-                                متجر غير متوفر
-                              </div>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <a
+                                href={getStoreUrl(user.store_name)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group/link flex items-center gap-1.5 min-w-0"
+                              >
+                                <h3 className="text-sm md:text-base font-bold text-foreground group-hover/link:text-primary transition-colors duration-200 truncate">
+                                  {user.store_display_name || user.store_name}
+                                </h3>
+                              </a>
+                              <button
+                                onClick={() => handleCopyLink(user.id, user.store_name)}
+                                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-muted/80 shrink-0"
+                                title="نسخ رابط المتجر"
+                              >
+                                {copiedStoreId === user.id ? (
+                                  <span className="text-emerald-500 text-xs font-semibold flex items-center gap-0.5">
+                                    <Check className="h-3.5 w-3.5" />
+                                    تم النسخ
+                                  </span>
+                                ) : (
+                                  <Copy className="h-3.5 w-3.5" />
+                                )}
+                              </button>
+                              <a
+                                href={getStoreUrl(user.store_name)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-muted/80 shrink-0"
+                                title="فتح المتجر في صفحة جديدة"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </a>
                             </div>
+                          ) : (
+                            <h3 className="text-sm md:text-base font-bold text-muted-foreground truncate">
+                              {user.store_display_name || user.store_name}
+                            </h3>
                           )}
                         </div>
-                      </div>
-
-                      {/* معلومات إضافية */}
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        {/* نوع التاجر */}
-                        {getTraderType(user.id) && (() => {
-                          const trader = getTraderType(user.id)!
-                          const typeColor = getTraderTypeColor(trader.type)
-                          return (
-                            <div className={cn(
-                              "px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1 whitespace-nowrap",
-                              typeColor.bg,
-                              typeColor.text,
-                              typeColor.border
-                            )}>
-                              <span>{typeColor.icon}</span>
-                              <span>{trader.type === 'خامل' ? 'غير نشط' : trader.type}</span>
-                              <span className="text-xs">({trader.productCount})</span>
-                            </div>
-                          )
-                        })()}
-                        
-                        {/* نوع الخطة */}
+                        {/* نوع الخطة في الهيدر */}
                         <div className={cn(
-                          "px-2 py-1 rounded-full text-xs font-bold border",
+                          "px-2 py-0.5 rounded-full text-[10px] font-bold border shrink-0 mr-2",
                           user.plan === 'pro' 
                             ? "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-700 border-amber-500/30" 
                             : "bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-700 border-blue-500/30"
                         )}>
-                          {user.plan === 'pro' ? '👑' : '💎'}
+                          {user.plan === 'pro' ? '👑 برو' : '💎 بيزيك'}
                         </div>
                       </div>
-                    </div>
 
-                    {/* الصف الثاني: معلومات المالك والأزرار */}
+                      {/* محتوى البطاقة */}
+                      <div className="p-4 relative z-10">
+                        {/* الصف الأول: معلومات التاجر وحالته */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                          <div className="flex items-center gap-1.5 text-sm">
+                            <span className="text-xs">👤</span>
+                            <span className="text-xs font-semibold text-muted-foreground">التاجر:</span>
+                            <span className="font-semibold text-foreground/90">{user.display_name}</span>
+                          </div>
+
+                          {/* معلومات إضافية */}
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            {/* نوع التاجر */}
+                            {getTraderType(user.id) && (() => {
+                              const trader = getTraderType(user.id)!
+                              const typeColor = getTraderTypeColor(trader.type)
+                              return (
+                                <div className={cn(
+                                  "px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1 whitespace-nowrap",
+                                  typeColor.bg,
+                                  typeColor.text,
+                                  typeColor.border
+                                )}>
+                                  <span>{typeColor.icon}</span>
+                                  <span>{trader.type === 'خامل' ? 'غير نشط' : trader.type}</span>
+                                  <span className="text-xs">({trader.productCount})</span>
+                                </div>
+                              )
+                            })()}
+                          </div>
+                        </div>
+
+                    {/* الصف الثالث: معلومات التسجيل والأزرار */}
                     <div className="flex items-center justify-between text-xs text-muted-foreground border-t border-border/20 pt-2">
                       {/* اليسار: معلومات المستخدم */}
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1">
-                          <span className="text-xs">👤</span>
-                          <span>{user.display_name}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs">(مسجل منذ: {getTimeAgo(user.created_at)})</span>
+                          <span className="text-xs">📅</span>
+                          <span>مسجل منذ: {getTimeAgo(user.created_at)}</span>
                         </div>
                       </div>
                       
