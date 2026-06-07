@@ -18,7 +18,7 @@ export function buildUpgradeToProEmail(params: UpgradeToProEmailParams): {
   const traderName = params.traderName || DEFAULT_TRADER_NAME
   const storeName = params.storeName || DEFAULT_STORE_NAME
 
-  const subject = 'أهلاً بيك في عائلة Pro — تاجر أونلاين 👑'
+  const subject = `تم تفعيل اشتراك Pro لمتجرك ${storeName} — تاجر أونلاين`
 
   const html = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -256,6 +256,10 @@ export function buildUpgradeToProEmail(params: UpgradeToProEmailParams): {
       <p>
         <a href="https://tagr-online.com" style="color:#043832; text-decoration:none;">tagr-online.com</a>
       </p>
+      <p style="font-size:12px; color:#999; margin-top:15px;">
+        تم إرسال هذا الإيميل لأنك مشترك في تاجر أونلاين. <br>
+        <a href="https://tagr-online.com/unsubscribe" style="color:#999; text-decoration:underline;">إلغاء الاشتراك</a>
+      </p>
     </div>
 
   </div>
@@ -294,6 +298,9 @@ https://api.whatsapp.com/send/?phone=201008116452
 — أحمد عبده
 تاجر أونلاين
 tagr-online.com
+
+تم إرسال هذا الإيميل لأنك مشترك في تاجر أونلاين.
+إلغاء الاشتراك: https://tagr-online.com/unsubscribe
   `.trim()
 
   return { subject, html, text }
