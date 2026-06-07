@@ -1,38 +1,137 @@
 {
   "source": "https://arena.ai/ar/leaderboard/code",
-  "updatedAt": "2026-03-29T08:45:14.336Z",
-  "total": 57,
+  "updatedAt": "2026-06-07T06:20:38.866Z",
+  "total": 85,
   "leaderboard": [
     {
       "rank": "1",
-      "rankSpread": "1-2",
+      "rankSpread": "1-4",
       "organization": "Anthropic",
-      "model": "claude-opus-4-6",
+      "model": "claude-opus-4-7-thinking",
       "license": "Anthropic · Proprietary",
-      "score": "1549",
-      "confidence": "+11/-11"
-    },
-    {
-      "rank": "2",
-      "rankSpread": "1-2",
-      "organization": "Anthropic",
-      "model": "claude-opus-4-6-thinking",
-      "license": "Anthropic · Proprietary",
-      "score": "1545",
-      "confidence": "+12/-12"
-    },
-    {
-      "rank": "3",
-      "rankSpread": "3-3",
-      "organization": "Anthropic",
-      "model": "claude-sonnet-4-6",
-      "license": "Anthropic · Proprietary",
-      "score": "1523",
+      "score": "1567",
       "confidence": "+9/-9"
     },
     {
+      "rank": "2",
+      "rankSpread": "1-6",
+      "organization": "Anthropic",
+      "model": "claude-opus-4-7",
+      "license": "Anthropic · Proprietary",
+      "score": "1557",
+      "confidence": "+9/-9"
+    },
+    {
+      "rank": "3",
+      "rankSpread": "1-9",
+      "organization": "Anthropic",
+      "model": "claude-opus-4-8-thinking",
+      "license": "Anthropic · Proprietary",
+      "score": "1552",
+      "confidence": "+16/-16"
+    },
+    {
       "rank": "4",
-      "rankSpread": "4-4",
+      "rankSpread": "1-9",
+      "organization": "Anthropic",
+      "model": "claude-opus-4-8",
+      "license": "Anthropic · Proprietary",
+      "score": "1545",
+      "confidence": "+14/-14"
+    },
+    {
+      "rank": "5",
+      "rankSpread": "2-9",
+      "organization": "Anthropic",
+      "model": "claude-opus-4-6-thinking",
+      "license": "Anthropic · Proprietary",
+      "score": "1543",
+      "confidence": "+7/-7"
+    },
+    {
+      "rank": "6",
+      "rankSpread": "3-9",
+      "organization": "Anthropic",
+      "model": "claude-opus-4-6",
+      "license": "Anthropic · Proprietary",
+      "score": "1538",
+      "confidence": "+7/-7"
+    },
+    {
+      "rank": "7",
+      "rankSpread": "2-11",
+      "organization": "Unknown",
+      "model": "qwen3.7-max-20260517",
+      "license": "Alibaba · Proprietary",
+      "score": "1537",
+      "confidence": "+13/-13"
+    },
+    {
+      "rank": "8",
+      "rankSpread": "3-12",
+      "organization": "Unknown",
+      "model": "glm-5.1",
+      "license": "Z.ai · MIT",
+      "score": "1532",
+      "confidence": "+11/-11"
+    },
+    {
+      "rank": "9",
+      "rankSpread": "3-13",
+      "organization": "Unknown",
+      "model": "minimax-m3",
+      "license": "MiniMax · Proprietary",
+      "score": "1528",
+      "confidence": "+16/-16"
+    },
+    {
+      "rank": "10",
+      "rankSpread": "7-13",
+      "organization": "Anthropic",
+      "model": "claude-sonnet-4-6",
+      "license": "Anthropic · Proprietary",
+      "score": "1522",
+      "confidence": "+7/-7"
+    },
+    {
+      "rank": "11",
+      "rankSpread": "7-14",
+      "organization": "Unknown",
+      "model": "kimi-k2.6",
+      "license": "Moonshot · Modified MIT",
+      "score": "1516",
+      "confidence": "+9/-9"
+    },
+    {
+      "rank": "12",
+      "rankSpread": "8-16",
+      "organization": "Meta",
+      "model": "muse-spark",
+      "license": "Meta · Proprietary",
+      "score": "1508",
+      "confidence": "+16/-16"
+    },
+    {
+      "rank": "13",
+      "rankSpread": "9-16",
+      "organization": "Unknown",
+      "model": "gemini-3.5-flash",
+      "license": "Google · Proprietary",
+      "score": "1506",
+      "confidence": "+13/-13"
+    },
+    {
+      "rank": "14",
+      "rankSpread": "11-16",
+      "organization": "Unknown",
+      "model": "gpt-5.5-xhigh (codex-harness)",
+      "license": "OpenAI · Proprietary",
+      "score": "1502",
+      "confidence": "+9/-9"
+    },
+    {
+      "rank": "15",
+      "rankSpread": "12-17",
       "organization": "Anthropic",
       "model": "claude-opus-4-5-20251101-thinking-32k",
       "license": "Anthropic · Proprietary",
@@ -40,17 +139,62 @@
       "confidence": "+7/-7"
     },
     {
-      "rank": "5",
-      "rankSpread": "5-7",
+      "rank": "16",
+      "rankSpread": "12-20",
+      "organization": "Unknown",
+      "model": "qwen3.6-max-preview",
+      "license": "Alibaba · Proprietary",
+      "score": "1484",
+      "confidence": "+12/-12"
+    },
+    {
+      "rank": "17",
+      "rankSpread": "15-20",
+      "organization": "Unknown",
+      "model": "gpt-5.5-high (codex-harness)",
+      "license": "OpenAI · Proprietary",
+      "score": "1482",
+      "confidence": "+9/-9"
+    },
+    {
+      "rank": "18",
+      "rankSpread": "16-22",
       "organization": "Anthropic",
       "model": "claude-opus-4-5-20251101",
       "license": "Anthropic · Proprietary",
-      "score": "1465",
-      "confidence": "+7/-7"
+      "score": "1467",
+      "confidence": "+6/-6"
     },
     {
-      "rank": "6",
-      "rankSpread": "5-14",
+      "rank": "19",
+      "rankSpread": "16-22",
+      "organization": "Unknown",
+      "model": "mimo-v2.5-pro",
+      "license": "Xiaomi · MIT",
+      "score": "1466",
+      "confidence": "+9/-9"
+    },
+    {
+      "rank": "20",
+      "rankSpread": "18-23",
+      "organization": "Unknown",
+      "model": "qwen3.6-plus",
+      "license": "Alibaba · Proprietary",
+      "score": "1463",
+      "confidence": "+8/-8"
+    },
+    {
+      "rank": "21",
+      "rankSpread": "18-25",
+      "organization": "Unknown",
+      "model": "deepseek-v4-pro-thinking",
+      "license": "DeepSeek · MIT",
+      "score": "1461",
+      "confidence": "+9/-9"
+    },
+    {
+      "rank": "22",
+      "rankSpread": "16-31",
       "organization": "Unknown",
       "model": "gpt-5.4-high (codex-harness)",
       "license": "OpenAI · Proprietary",
@@ -58,53 +202,53 @@
       "confidence": "+17/-17"
     },
     {
-      "rank": "7",
-      "rankSpread": "5-11",
+      "rank": "23",
+      "rankSpread": "20-31",
+      "organization": "Unknown",
+      "model": "gpt-5.5 (codex-harness)",
+      "license": "OpenAI · Proprietary",
+      "score": "1448",
+      "confidence": "+9/-9"
+    },
+    {
+      "rank": "24",
+      "rankSpread": "21-30",
       "organization": "Unknown",
       "model": "gemini-3.1-pro-preview",
       "license": "Google · Proprietary",
-      "score": "1455",
-      "confidence": "+10/-10"
+      "score": "1447",
+      "confidence": "+6/-6"
     },
     {
-      "rank": "8",
-      "rankSpread": "6-15",
-      "organization": "Unknown",
-      "model": "glm-5",
-      "license": "Z.ai · MIT",
-      "score": "1445",
-      "confidence": "+10/-10"
-    },
-    {
-      "rank": "9",
-      "rankSpread": "6-15",
+      "rank": "25",
+      "rankSpread": "22-32",
       "organization": "Unknown",
       "model": "glm-4.7",
       "license": "Z.ai · MIT",
-      "score": "1439",
+      "score": "1440",
       "confidence": "+10/-10"
     },
     {
-      "rank": "10",
-      "rankSpread": "7-15",
+      "rank": "26",
+      "rankSpread": "22-32",
       "organization": "Unknown",
       "model": "gemini-3-pro",
       "license": "Google · Proprietary",
-      "score": "1438",
+      "score": "1439",
       "confidence": "+7/-7"
     },
     {
-      "rank": "11",
-      "rankSpread": "6-15",
+      "rank": "27",
+      "rankSpread": "21-34",
       "organization": "Unknown",
-      "model": "mimo-v2-pro",
-      "license": "Xiaomi · Proprietary",
+      "model": "gpt-5.4-medium (codex-harness)",
+      "license": "OpenAI · Proprietary",
       "score": "1437",
-      "confidence": "+13/-13"
+      "confidence": "+16/-16"
     },
     {
-      "rank": "12",
-      "rankSpread": "7-15",
+      "rank": "28",
+      "rankSpread": "22-32",
       "organization": "Unknown",
       "model": "gemini-3-flash",
       "license": "Google · Proprietary",
@@ -112,44 +256,53 @@
       "confidence": "+7/-7"
     },
     {
-      "rank": "13",
-      "rankSpread": "6-15",
-      "organization": "Minimax",
-      "model": "minimax-m2.7",
-      "license": "MiniMax · Proprietary",
-      "score": "1435",
-      "confidence": "+14/-14"
+      "rank": "29",
+      "rankSpread": "22-32",
+      "organization": "Unknown",
+      "model": "mimo-v2.5",
+      "license": "Xiaomi · MIT",
+      "score": "1436",
+      "confidence": "+9/-9"
     },
     {
-      "rank": "14",
-      "rankSpread": "8-15",
-      "organization": "MoonshotAI",
-      "model": "kimi-k2.5-thinking",
-      "license": "Moonshot · Modified MIT",
-      "score": "1430",
+      "rank": "30",
+      "rankSpread": "22-32",
+      "organization": "Unknown",
+      "model": "glm-5",
+      "license": "Z.ai · MIT",
+      "score": "1435",
       "confidence": "+8/-8"
     },
     {
-      "rank": "15",
-      "rankSpread": "7-18",
+      "rank": "31",
+      "rankSpread": "23-33",
       "organization": "Unknown",
-      "model": "gpt-5.4-medium (codex-harness)",
-      "license": "OpenAI · Proprietary",
-      "score": "1428",
-      "confidence": "+16/-16"
+      "model": "mimo-v2-pro",
+      "license": "Xiaomi · Proprietary",
+      "score": "1433",
+      "confidence": "+8/-8"
     },
     {
-      "rank": "16",
-      "rankSpread": "15-23",
-      "organization": "MoonshotAI",
+      "rank": "32",
+      "rankSpread": "25-33",
+      "organization": "Unknown",
+      "model": "kimi-k2.5-thinking",
+      "license": "Moonshot · Modified MIT",
+      "score": "1431",
+      "confidence": "+6/-6"
+    },
+    {
+      "rank": "33",
+      "rankSpread": "33-43",
+      "organization": "Unknown",
       "model": "kimi-k2.5-instant",
       "license": "Moonshot · Modified MIT",
       "score": "1408",
       "confidence": "+11/-11"
     },
     {
-      "rank": "17",
-      "rankSpread": "15-24",
+      "rank": "34",
+      "rankSpread": "33-45",
       "organization": "Unknown",
       "model": "gpt-5.3-codex (codex-harness)",
       "license": "OpenAI · Proprietary",
@@ -157,80 +310,116 @@
       "confidence": "+12/-12"
     },
     {
-      "rank": "18",
-      "rankSpread": "16-25",
-      "organization": "Minimax",
-      "model": "minimax-m2.5",
-      "license": "MiniMax · Modified MIT",
-      "score": "1403",
-      "confidence": "+9/-9"
-    },
-    {
-      "rank": "19",
-      "rankSpread": "15-28",
+      "rank": "35",
+      "rankSpread": "32-48",
       "organization": "Unknown",
       "model": "gpt-5.2",
       "license": "OpenAI · Proprietary",
-      "score": "1403",
-      "confidence": "+16/-16"
+      "score": "1405",
+      "confidence": "+17/-17"
     },
     {
-      "rank": "20",
-      "rankSpread": "16-28",
+      "rank": "36",
+      "rankSpread": "33-47",
+      "organization": "Unknown",
+      "model": "gpt-5.4-mini-high",
+      "license": "OpenAI · Proprietary",
+      "score": "1398",
+      "confidence": "+8/-8"
+    },
+    {
+      "rank": "37",
+      "rankSpread": "33-49",
+      "organization": "Unknown",
+      "model": "minimax-m2.7",
+      "license": "MiniMax · Modified MIT",
+      "score": "1395",
+      "confidence": "+8/-8"
+    },
+    {
+      "rank": "38",
+      "rankSpread": "33-50",
       "organization": "Unknown",
       "model": "gpt-5-medium",
       "license": "OpenAI · Proprietary",
-      "score": "1392",
+      "score": "1394",
       "confidence": "+13/-13"
     },
     {
-      "rank": "21",
-      "rankSpread": "16-28",
-      "organization": "Minimax",
+      "rank": "39",
+      "rankSpread": "33-49",
+      "organization": "Unknown",
+      "model": "qwen3.5-397b-a17b",
+      "license": "Alibaba · Apache 2.0",
+      "score": "1394",
+      "confidence": "+7/-7"
+    },
+    {
+      "rank": "40",
+      "rankSpread": "33-49",
+      "organization": "Unknown",
+      "model": "grok-4.20-beta-0309-reasoning",
+      "license": "xAI · Proprietary",
+      "score": "1393",
+      "confidence": "+7/-7"
+    },
+    {
+      "rank": "41",
+      "rankSpread": "33-49",
+      "organization": "Unknown",
       "model": "minimax-m2.1-preview",
       "license": "MiniMax · MIT",
       "score": "1392",
       "confidence": "+8/-8"
     },
     {
-      "rank": "22",
-      "rankSpread": "16-28",
-      "organization": "Unknown",
-      "model": "gemini-3-flash (thinking-minimal)",
-      "license": "Google · Proprietary",
-      "score": "1392",
-      "confidence": "+7/-7"
-    },
-    {
-      "rank": "23",
-      "rankSpread": "16-28",
+      "rank": "42",
+      "rankSpread": "33-50",
       "organization": "Unknown",
       "model": "gpt-5.1-medium",
       "license": "OpenAI · Proprietary",
-      "score": "1390",
+      "score": "1391",
       "confidence": "+9/-9"
     },
     {
-      "rank": "24",
-      "rankSpread": "18-28",
+      "rank": "43",
+      "rankSpread": "30-57",
+      "organization": "Unknown",
+      "model": "gpt-5.4",
+      "license": "OpenAI · Proprietary",
+      "score": "1391",
+      "confidence": "+35/-35"
+    },
+    {
+      "rank": "44",
+      "rankSpread": "34-50",
       "organization": "Anthropic",
       "model": "claude-sonnet-4-5-20250929-thinking-32k",
       "license": "Anthropic · Proprietary",
-      "score": "1389",
+      "score": "1388",
+      "confidence": "+7/-7"
+    },
+    {
+      "rank": "45",
+      "rankSpread": "35-50",
+      "organization": "Unknown",
+      "model": "gemini-3-flash (thinking-minimal)",
+      "license": "Google · Proprietary",
+      "score": "1388",
       "confidence": "+6/-6"
     },
     {
-      "rank": "25",
-      "rankSpread": "17-28",
-      "organization": "Unknown",
-      "model": "qwen3.5-397b-a17b",
-      "license": "Alibaba · Apache 2.0",
-      "score": "1387",
+      "rank": "46",
+      "rankSpread": "34-52",
+      "organization": "Anthropic",
+      "model": "claude-opus-4-1-20250805",
+      "license": "Anthropic · Proprietary",
+      "score": "1386",
       "confidence": "+9/-9"
     },
     {
-      "rank": "26",
-      "rankSpread": "19-28",
+      "rank": "47",
+      "rankSpread": "35-52",
       "organization": "Anthropic",
       "model": "claude-sonnet-4-5-20250929",
       "license": "Anthropic · Proprietary",
@@ -238,71 +427,107 @@
       "confidence": "+6/-6"
     },
     {
-      "rank": "27",
-      "rankSpread": "19-29",
-      "organization": "Anthropic",
-      "model": "claude-opus-4-1-20250805",
-      "license": "Anthropic · Proprietary",
-      "score": "1384",
-      "confidence": "+9/-9"
-    },
-    {
-      "rank": "28",
-      "rankSpread": "19-30",
+      "rank": "48",
+      "rankSpread": "36-54",
       "organization": "Unknown",
-      "model": "grok-4.20-beta-0309-reasoning",
-      "license": "xAI · Proprietary",
-      "score": "1378",
-      "confidence": "+13/-13"
-    },
-    {
-      "rank": "29",
-      "rankSpread": "27-31",
-      "organization": "Unknown",
-      "model": "deepseek-v3.2-thinking",
-      "license": "DeepSeek · MIT",
-      "score": "1369",
+      "model": "minimax-m2.5",
+      "license": "MiniMax · Modified MIT",
+      "score": "1382",
       "confidence": "+8/-8"
     },
     {
-      "rank": "30",
-      "rankSpread": "28-32",
+      "rank": "49",
+      "rankSpread": "37-55",
       "organization": "Unknown",
-      "model": "qwen3.5-122b-a10b",
-      "license": "Alibaba · Apache 2.0",
-      "score": "1364",
+      "model": "gemma-4-31b",
+      "license": "Google · Apache 2.0",
+      "score": "1377",
       "confidence": "+10/-10"
     },
     {
-      "rank": "31",
-      "rankSpread": "29-34",
+      "rank": "50",
+      "rankSpread": "41-57",
       "organization": "Unknown",
-      "model": "glm-4.6",
-      "license": "Z.ai · MIT",
-      "score": "1353",
-      "confidence": "+9/-9"
-    },
-    {
-      "rank": "32",
-      "rankSpread": "30-36",
-      "organization": "Unknown",
-      "model": "qwen3.5-27b",
-      "license": "Alibaba · Apache 2.0",
-      "score": "1346",
+      "model": "gpt-5.3-codex (codex-harness)",
+      "license": "OpenAI · Proprietary",
+      "score": "1373",
       "confidence": "+11/-11"
     },
     {
-      "rank": "33",
-      "rankSpread": "31-38",
+      "rank": "51",
+      "rankSpread": "45-57",
       "organization": "Unknown",
-      "model": "gpt-5.1",
-      "license": "OpenAI · Proprietary",
-      "score": "1339",
+      "model": "grok-4.3",
+      "license": "xAI · Proprietary",
+      "score": "1371",
+      "confidence": "+10/-10"
+    },
+    {
+      "rank": "52",
+      "rankSpread": "47-57",
+      "organization": "Unknown",
+      "model": "deepseek-v3.2-thinking",
+      "license": "DeepSeek · MIT",
+      "score": "1368",
+      "confidence": "+8/-8"
+    },
+    {
+      "rank": "53",
+      "rankSpread": "48-57",
+      "organization": "Unknown",
+      "model": "qwen3.5-122b-a10b",
+      "license": "Alibaba · Apache 2.0",
+      "score": "1365",
       "confidence": "+7/-7"
     },
     {
-      "rank": "34",
-      "rankSpread": "31-38",
+      "rank": "54",
+      "rankSpread": "45-58",
+      "organization": "Tencent",
+      "model": "hunyuan-hy3-preview",
+      "license": "Tencent · tencent-hunyuan-community",
+      "score": "1364",
+      "confidence": "+17/-17"
+    },
+    {
+      "rank": "55",
+      "rankSpread": "47-59",
+      "organization": "Unknown",
+      "model": "gemma-4-26b-a4b",
+      "license": "Google · Apache 2.0",
+      "score": "1360",
+      "confidence": "+16/-16"
+    },
+    {
+      "rank": "56",
+      "rankSpread": "49-57",
+      "organization": "Unknown",
+      "model": "qwen3.5-27b",
+      "license": "Alibaba · Apache 2.0",
+      "score": "1357",
+      "confidence": "+8/-8"
+    },
+    {
+      "rank": "57",
+      "rankSpread": "49-58",
+      "organization": "Unknown",
+      "model": "glm-4.6",
+      "license": "Z.ai · MIT",
+      "score": "1355",
+      "confidence": "+9/-9"
+    },
+    {
+      "rank": "58",
+      "rankSpread": "55-63",
+      "organization": "Unknown",
+      "model": "gpt-5.1",
+      "license": "OpenAI · Proprietary",
+      "score": "1340",
+      "confidence": "+7/-7"
+    },
+    {
+      "rank": "59",
+      "rankSpread": "57-64",
       "organization": "Unknown",
       "model": "mimo-v2-flash (non-thinking)",
       "license": "Xiaomi · MIT",
@@ -310,210 +535,237 @@
       "confidence": "+8/-8"
     },
     {
-      "rank": "35",
-      "rankSpread": "32-38",
+      "rank": "60",
+      "rankSpread": "58-64",
       "organization": "Unknown",
       "model": "gpt-5.2-codex",
       "license": "OpenAI · Proprietary",
-      "score": "1336",
+      "score": "1335",
       "confidence": "+8/-8"
     },
     {
-      "rank": "36",
-      "rankSpread": "33-38",
-      "organization": "MoonshotAI",
-      "model": "kimi-k2-thinking-turbo",
-      "license": "Moonshot · Modified MIT",
-      "score": "1328",
-      "confidence": "+6/-6"
-    },
-    {
-      "rank": "37",
-      "rankSpread": "32-38",
-      "organization": "Unknown",
-      "model": "gpt-5.1-codex",
-      "license": "OpenAI · Proprietary",
-      "score": "1328",
-      "confidence": "+9/-9"
-    },
-    {
-      "rank": "38",
-      "rankSpread": "33-38",
+      "rank": "61",
+      "rankSpread": "58-64",
       "organization": "Unknown",
       "model": "deepseek-v3.2",
       "license": "DeepSeek · MIT",
-      "score": "1325",
-      "confidence": "+8/-8"
+      "score": "1332",
+      "confidence": "+7/-7"
     },
     {
-      "rank": "39",
-      "rankSpread": "39-41",
-      "organization": "Anthropic",
-      "model": "claude-haiku-4-5-20251001",
-      "license": "Anthropic · Proprietary",
-      "score": "1309",
-      "confidence": "+6/-6"
-    },
-    {
-      "rank": "40",
-      "rankSpread": "39-42",
-      "organization": "Minimax",
-      "model": "minimax-m2",
-      "license": "MiniMax · Apache 2.0",
-      "score": "1303",
-      "confidence": "+9/-9"
-    },
-    {
-      "rank": "41",
-      "rankSpread": "39-43",
+      "rank": "62",
+      "rankSpread": "58-64",
       "organization": "Unknown",
-      "model": "mimo-v2-flash (thinking)",
-      "license": "Xiaomi · MIT",
-      "score": "1300",
-      "confidence": "+14/-14"
-    },
-    {
-      "rank": "42",
-      "rankSpread": "40-43",
-      "organization": "Unknown",
-      "model": "deepseek-v3.2-exp",
-      "license": "DeepSeek · MIT",
-      "score": "1285",
-      "confidence": "+11/-11"
-    },
-    {
-      "rank": "43",
-      "rankSpread": "41-43",
-      "organization": "Unknown",
-      "model": "qwen3-coder-480b-a35b-instruct",
-      "license": "Alibaba · Apache 2.0",
-      "score": "1280",
-      "confidence": "+6/-6"
-    },
-    {
-      "rank": "44",
-      "rankSpread": "44-49",
-      "organization": "Kwai",
-      "model": "KAT-Coder-Pro-V1",
-      "license": "KwaiKAT · Proprietary",
-      "score": "1257",
-      "confidence": "+15/-15"
-    },
-    {
-      "rank": "45",
-      "rankSpread": "44-50",
-      "organization": "Unknown",
-      "model": "qwen3.5-35b-a3b",
-      "license": "Alibaba · Apache 2.0",
-      "score": "1248",
-      "confidence": "+16/-16"
-    },
-    {
-      "rank": "46",
-      "rankSpread": "44-50",
-      "organization": "Unknown",
-      "model": "gemini-3.1-flash-lite-preview",
-      "license": "Google · Proprietary",
-      "score": "1242",
+      "model": "gpt-5.1-codex",
+      "license": "OpenAI · Proprietary",
+      "score": "1330",
       "confidence": "+10/-10"
     },
     {
-      "rank": "47",
-      "rankSpread": "44-51",
+      "rank": "63",
+      "rankSpread": "58-64",
+      "organization": "Unknown",
+      "model": "kimi-k2-thinking-turbo",
+      "license": "Moonshot · Modified MIT",
+      "score": "1330",
+      "confidence": "+6/-6"
+    },
+    {
+      "rank": "64",
+      "rankSpread": "59-64",
+      "organization": "Anthropic",
+      "model": "claude-haiku-4-5-20251001",
+      "license": "Anthropic · Proprietary",
+      "score": "1324",
+      "confidence": "+5/-5"
+    },
+    {
+      "rank": "65",
+      "rankSpread": "65-67",
+      "organization": "Unknown",
+      "model": "minimax-m2",
+      "license": "MiniMax · Apache 2.0",
+      "score": "1305",
+      "confidence": "+9/-9"
+    },
+    {
+      "rank": "66",
+      "rankSpread": "65-69",
+      "organization": "Unknown",
+      "model": "mimo-v2-flash (thinking)",
+      "license": "Xiaomi · MIT",
+      "score": "1301",
+      "confidence": "+14/-14"
+    },
+    {
+      "rank": "67",
+      "rankSpread": "65-69",
+      "organization": "Unknown",
+      "model": "deepseek-v3.2-exp",
+      "license": "DeepSeek · MIT",
+      "score": "1287",
+      "confidence": "+11/-11"
+    },
+    {
+      "rank": "68",
+      "rankSpread": "66-69",
+      "organization": "Unknown",
+      "model": "qwen3-coder-480b-a35b-instruct",
+      "license": "Alibaba · Apache 2.0",
+      "score": "1282",
+      "confidence": "+7/-7"
+    },
+    {
+      "rank": "69",
+      "rankSpread": "66-75",
+      "organization": "Unknown",
+      "model": "mistral-medium-3.5",
+      "license": "Mistral · Modified MIT",
+      "score": "1269",
+      "confidence": "+19/-19"
+    },
+    {
+      "rank": "70",
+      "rankSpread": "69-76",
+      "organization": "Kwai",
+      "model": "KAT-Coder-Pro-V1",
+      "license": "KwaiKAT · Proprietary",
+      "score": "1259",
+      "confidence": "+16/-16"
+    },
+    {
+      "rank": "71",
+      "rankSpread": "69-77",
+      "organization": "Unknown",
+      "model": "qwen3.5-35b-a3b",
+      "license": "Alibaba · Apache 2.0",
+      "score": "1250",
+      "confidence": "+16/-16"
+    },
+    {
+      "rank": "72",
+      "rankSpread": "69-77",
+      "organization": "Unknown",
+      "model": "gemini-3.1-flash-lite-preview",
+      "license": "Google · Proprietary",
+      "score": "1249",
+      "confidence": "+7/-7"
+    },
+    {
+      "rank": "73",
+      "rankSpread": "69-78",
+      "organization": "Unknown",
+      "model": "trinity-large-thinking",
+      "license": "Arcee AI · Apache 2.0",
+      "score": "1245",
+      "confidence": "+19/-19"
+    },
+    {
+      "rank": "74",
+      "rankSpread": "69-78",
       "organization": "Unknown",
       "model": "gpt-5.1-codex-mini",
       "license": "OpenAI · Proprietary",
+      "score": "1240",
+      "confidence": "+17/-17"
+    },
+    {
+      "rank": "75",
+      "rankSpread": "69-78",
+      "organization": "Unknown",
+      "model": "qwen3.5-flash",
+      "license": "Alibaba · Proprietary",
       "score": "1238",
       "confidence": "+17/-17"
     },
     {
-      "rank": "48",
-      "rankSpread": "44-51",
-      "organization": "Unknown",
-      "model": "qwen3.5-flash",
-      "license": "Alibaba · Proprietary",
-      "score": "1237",
-      "confidence": "+17/-17"
-    },
-    {
-      "rank": "49",
-      "rankSpread": "44-51",
+      "rank": "76",
+      "rankSpread": "70-78",
       "organization": "Unknown",
       "model": "grok-4-1-fast-reasoning",
       "license": "xAI · Proprietary",
-      "score": "1233",
+      "score": "1234",
       "confidence": "+9/-9"
     },
     {
-      "rank": "50",
-      "rankSpread": "45-54",
+      "rank": "77",
+      "rankSpread": "71-81",
       "organization": "Unknown",
       "model": "mistral-large-3",
       "license": "Mistral · Apache 2.0",
-      "score": "1220",
+      "score": "1223",
       "confidence": "+20/-20"
     },
     {
-      "rank": "51",
-      "rankSpread": "47-54",
+      "rank": "78",
+      "rankSpread": "73-81",
       "organization": "Unknown",
       "model": "grok-4.1-thinking",
       "license": "xAI · Proprietary",
-      "score": "1206",
+      "score": "1209",
       "confidence": "+20/-20"
     },
     {
-      "rank": "52",
-      "rankSpread": "50-54",
+      "rank": "79",
+      "rankSpread": "77-81",
       "organization": "Unknown",
       "model": "gemini-2.5-pro",
       "license": "Google · Proprietary",
-      "score": "1202",
+      "score": "1204",
       "confidence": "+13/-13"
     },
     {
-      "rank": "53",
-      "rankSpread": "50-54",
+      "rank": "80",
+      "rankSpread": "77-82",
+      "organization": "Unknown",
+      "model": "granite-4.1-8b",
+      "license": "IBM · Apache 2.0",
+      "score": "1201",
+      "confidence": "+18/-18"
+    },
+    {
+      "rank": "81",
+      "rankSpread": "77-82",
       "organization": "Unknown",
       "model": "devstral-2",
       "license": "Mistral · Modified MIT",
-      "score": "1198",
+      "score": "1199",
       "confidence": "+17/-17"
     },
     {
-      "rank": "54",
-      "rankSpread": "50-55",
+      "rank": "82",
+      "rankSpread": "80-84",
       "organization": "Unknown",
       "model": "mercury-2",
       "license": "Inception AI · Proprietary",
-      "score": "1183",
-      "confidence": "+21/-21"
-    },
-    {
-      "rank": "55",
-      "rankSpread": "54-56",
-      "organization": "Unknown",
-      "model": "grok-4-fast-reasoning",
-      "license": "xAI · Proprietary",
-      "score": "1147",
+      "score": "1165",
       "confidence": "+23/-23"
     },
     {
-      "rank": "56",
-      "rankSpread": "55-56",
+      "rank": "83",
+      "rankSpread": "82-84",
+      "organization": "Unknown",
+      "model": "grok-4-fast-reasoning",
+      "license": "xAI · Proprietary",
+      "score": "1150",
+      "confidence": "+23/-23"
+    },
+    {
+      "rank": "84",
+      "rankSpread": "82-84",
       "organization": "Unknown",
       "model": "grok-code-fast-1",
       "license": "xAI · Proprietary",
-      "score": "1138",
+      "score": "1140",
       "confidence": "+22/-22"
     },
     {
-      "rank": "57",
-      "rankSpread": "57-57",
+      "rank": "85",
+      "rankSpread": "85-85",
       "organization": "Unknown",
       "model": "devstral-medium-2507",
       "license": "Mistral · Proprietary",
-      "score": "1090",
+      "score": "1092",
       "confidence": "+23/-23"
     }
   ]

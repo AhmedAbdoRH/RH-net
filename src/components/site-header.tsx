@@ -88,7 +88,7 @@ export function SiteHeader() {
           </div>
 
           {/* المعلومات الأساسية - على اليمين */}
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="grid grid-cols-2 md:flex md:flex-row md:items-center gap-2 md:gap-3">
             {/* إجمالي المستخدمين */}
             <div className="flex items-center gap-1.5 bg-green-500/5 px-2 py-0.5 rounded-lg border border-green-500/20">
               <div className="w-5 h-5 bg-green-500/10 rounded-full flex items-center justify-center">
@@ -115,7 +115,7 @@ export function SiteHeader() {
 
             {/* حالة التحميل */}
             {loading && (
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-md">
+              <div className="col-span-2 md:col-span-auto flex items-center gap-1.5 text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-md">
                 <div className="w-2.5 h-2.5 border border-primary/30 border-t-primary rounded-full animate-spin"></div>
                 <span>جاري التحميل...</span>
               </div>

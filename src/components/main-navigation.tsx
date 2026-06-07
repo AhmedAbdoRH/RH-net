@@ -95,22 +95,22 @@ export function MainNavigation() {
             </Link>
           </div>
           
-          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+          <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-2 items-center">
             <Button asChild variant="ghost" className="flex items-center text-gray-800 hover:bg-white/50 hover:backdrop-blur-sm">
               <Link href="/main-office-invoices">
                 <FileText className="h-4 w-4 ml-1" />
                 <span>تحصيل فواتير المكتب الرئيسي</span>
               </Link>
             </Button>
-            
+
             <Button asChild variant="ghost" className="flex items-center text-gray-800 hover:bg-white/50 hover:backdrop-blur-sm">
               <Link href="/online-finance">
                 <DollarSign className="h-4 w-4 ml-1" />
                 <span>ماليات الأونلاين كاتلوج</span>
               </Link>
             </Button>
-            
-            <Button asChild variant="ghost" className="flex items-center text-gray-800 hover:bg-white/50 hover:backdrop-blur-sm">
+
+            <Button asChild variant="ghost" className="flex items-center text-gray-800 hover:bg-white/50 hover:backdrop-blur-sm col-span-2 sm:col-span-auto">
               <Link href="/international-transactions">
                 <Globe className="h-4 w-4 ml-1" />
                 <span>المعاملات الدولية</span>
