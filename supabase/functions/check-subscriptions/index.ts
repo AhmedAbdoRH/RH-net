@@ -253,15 +253,15 @@ function buildSubscriptionWarningEmail(params: { traderName: string; storeName: 
       <p>حابين نذكرك إن اشتراكك الحالي في باقة <strong>Pro</strong> لمتجرك <strong>${escapeHtml(storeName)}</strong> قد انتهى.</p>
       <div class="countdown"><p class="countdown-number">${remainingDays}</p><p class="countdown-text">أيام متبقية في فترة السماح للتجديد</p></div>
       <p>متجرك حالياً يعمل بكامل كفاءته خلال فترة السماح.</p>
-      <div class="features-summary"><strong style="color: #043832;">📌 أبرز المميزات التي يتوجب الحفاظ عليها:</strong><ul><li>إضافة منتجات وتصنيفات لا نهائية لمتجرك.</li><li>رابط مخصص واحترافي يحمل اسم علامتك التجارية.</li><li>أدوات الذكاء الاصطناعي المتقدمة وتخصيص المظهر بالكامل.</li><li>إخفاء حقوق المنصة ليبقى براندك هو الظاهر فقط للعملاء.</li></ul></div>
-      <div class="btn-group"><a href="https://api.whatsapp.com/send/?phone=201008116452&text=أريد%20تجديد%20اشتراك%20Pro" class="btn btn-renew">جدد اشتراكك دلوقتي (عبر واتساب) 🚀</a><a href="https://api.whatsapp.com/send/?phone=201008116452&text=مرحباً،%20أريد%20الاستفسار%20عن%20تجديد%20باقة%20Pro" class="btn btn-contact">تواصل معنا للاستفسار 💬</a><a href="https://play.google.com/store/apps/details?id=com.nextcatalog.app" class="btn btn-app">افتح التطبيق مباشرة من هنا 📱</a></div>
+      <div class="features-summary"><strong style="color: #043832;">📌 أبرز المميزات التي يتوجب الحفاظ عليها:</strong><ul><li>إضافة منتجات وتصنيفات لا نهائية لمتجرك.</li><li>أدوات الذكاء الاصطناعي المتقدمة وتخصيص المظهر بالكامل.</li><li>إخفاء حقوق المنصة ليبقى براندك هو الظاهر فقط للعملاء.</li><li>الوصول الكامل إلى بيانات عملائك.</li></ul></div>
+      <div class="btn-group"><a href="https://play.google.com/store/apps/details?id=com.nextcatalog.app" class="btn btn-renew">جدد اشتراكك من خلال التطبيق �</a><a href="https://api.whatsapp.com/send/?phone=201008116452&text=أريد%20تجديد%20اشتراك%20Pro" class="btn btn-contact">جدد اشتراكك من خلال WhatsApp �</a></div>
       <div class="signature">نتطلع لاستمرار رحلة نجاحك معنا 🤝<br><br>— أحمد عبده<br><span style="color:#666; font-weight:400;">تاجر أونلاين</span></div>
     </div>
     <div class="footer"><p>تاجر أونلاين | منظومة تمكين التاجر المحلي</p><p><a href="https://tagr-online.com" style="color:#043832; text-decoration:none;">tagr-online.com</a></p></div>
   </div>
 </body>
 </html>`.trim()
-  const text = `جدد اشتراكك الآن في باقة Pro لتجنب فقدان المميزات ⚠️\n\nأهلاً ${traderName} 👋\n\nحابين نذكرك إن اشتراكك الحالي في باقة Pro لمتجرك ${storeName} قد انتهى.\n\n⏰ ${remainingDays} أيام متبقية في فترة السماح للتجديد\n\nجدد اشتراكك دلوقتي: https://api.whatsapp.com/send/?phone=201008116452&text=أريد%20تجديد%20اشتراك%20Pro\n\n— أحمد عبده\ntagr-online.com`.trim()
+  const text = `جدد اشتراكك الآن في باقة Pro لتجنب فقدان المميزات ⚠️\n\nأهلاً ${traderName} 👋\n\nحابين نذكرك إن اشتراكك الحالي في باقة Pro لمتجرك ${storeName} قد انتهى.\n\n⏰ ${remainingDays} أيام متبقية في فترة السماح للتجديد\n\n📌 أبرز المميزات التي يتوجب الحفاظ عليها:\n- إضافة منتجات وتصنيفات لا نهائية لمتجرك\n- أدوات الذكاء الاصطناعي المتقدمة وتخصيص المظهر بالكامل\n- إخفاء حقوق المنصة ليبقى براندك هو الظاهر فقط للعملاء\n- الوصول الكامل إلى بيانات عملائك\n\nجدد اشتراكك من خلال التطبيق:\nhttps://play.google.com/store/apps/details?id=com.nextcatalog.app\n\nجدد اشتراكك من خلال WhatsApp:\nhttps://api.whatsapp.com/send/?phone=201008116452&text=أريد%20تجديد%20اشتراك%20Pro\n\n— أحمد عبده\ntagr-online.com`.trim()
   return { subject, html, text }
 }
 

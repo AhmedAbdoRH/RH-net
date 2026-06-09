@@ -130,12 +130,6 @@ export function buildSubscriptionWarningEmail(params: SubscriptionWarningEmailPa
     background: #043832;
     color: #ffffff;
   }
-  .btn-app {
-    background: #f0fdfa;
-    color: #043832;
-    border: 2px solid #55F9E6;
-    box-sizing: border-box;
-  }
   .footer {
     background: #f5f5f5;
     padding: 25px 30px;
@@ -174,9 +168,9 @@ export function buildSubscriptionWarningEmail(params: SubscriptionWarningEmailPa
         <strong style="color: #043832;">📌 أبرز المميزات التي يتوجب الحفاظ عليها:</strong>
         <ul>
           <li>إضافة منتجات وتصنيفات لا نهائية لمتجرك.</li>
-          <li>رابط مخصص واحترافي يحمل اسم علامتك التجارية.</li>
           <li>أدوات الذكاء الاصطناعي المتقدمة وتخصيص المظهر بالكامل.</li>
           <li>إخفاء حقوق المنصة ليبقى براندك هو الظاهر فقط للعملاء.</li>
+          <li>الوصول الكامل إلى بيانات عملائك.</li>
         </ul>
       </div>
 
@@ -184,11 +178,10 @@ export function buildSubscriptionWarningEmail(params: SubscriptionWarningEmailPa
 
       <hr class="divider">
 
-      <!-- أزرار الإجراءات والتواصل الثلاثية -->
+      <!-- أزرار الإجراءات والتواصل -->
       <div class="btn-group">
-        <a href="https://api.whatsapp.com/send/?phone=201008116452&text=أريد%20تجديد%20اشتراك%20Pro" class="btn btn-renew">جدد اشتراكك دلوقتي (عبر واتساب) 🚀</a>
-        <a href="https://api.whatsapp.com/send/?phone=201008116452&text=مرحباً،%20أريد%20الاستفسار%20عن%20تجديد%20باقة%20Pro" class="btn btn-contact">تواصل معنا للاستفسار 💬</a>
-        <a href="https://play.google.com/store/apps/details?id=com.nextcatalog.app" class="btn btn-app">افتح التطبيق مباشرة من هنا �</a>
+        <a href="https://play.google.com/store/apps/details?id=com.nextcatalog.app" class="btn btn-renew">جدد اشتراكك من خلال التطبيق 📱</a>
+        <a href="https://api.whatsapp.com/send/?phone=201008116452&text=أريد%20تجديد%20اشتراك%20Pro" class="btn btn-contact">جدد اشتراكك من خلال WhatsApp 💬</a>
       </div>
 
       <hr class="divider">
@@ -224,20 +217,17 @@ export function buildSubscriptionWarningEmail(params: SubscriptionWarningEmailPa
 
 📌 أبرز المميزات التي يتوجب الحفاظ عليها:
 - إضافة منتجات وتصنيفات لا نهائية لمتجرك
-- رابط مخصص واحترافي يحمل اسم علامتك التجارية
 - أدوات الذكاء الاصطناعي المتقدمة وتخصيص المظهر بالكامل
 - إخفاء حقوق المنصة ليبقى براندك هو الظاهر فقط للعملاء
+- الوصول الكامل إلى بيانات عملائك
 
 ⚠️ يرجى العلم أنه بعد انتهاء فترة السماح، ستعود خصائص المتجر تلقائياً إلى الباقة الأساسية المحدودة.
 
-جدد اشتراكك دلوقتي (عبر واتساب):
-https://api.whatsapp.com/send/?phone=201008116452&text=أريد%20تجديد%20اشتراك%20Pro
-
-تواصل معنا للاستفسار:
-https://api.whatsapp.com/send/?phone=201008116452&text=مرحباً،%20أريد%20الاستفسار%20عن%20تجديد%20باقة%20Pro
-
-افتح التطبيق مباشرة:
+جدد اشتراكك من خلال التطبيق:
 https://play.google.com/store/apps/details?id=com.nextcatalog.app
+
+جدد اشتراكك من خلال WhatsApp:
+https://api.whatsapp.com/send/?phone=201008116452&text=أريد%20تجديد%20اشتراك%20Pro
 
 نتطلع لاستمرار رحلة نجاحك معنا 🤝
 
