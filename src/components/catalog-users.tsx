@@ -769,20 +769,20 @@ export function CatalogUsers() {
                         {user.plan === 'pro' && (
                           <>
                             <button
-                              onClick={() => handleRenewSubscription(user.id)}
-                              disabled={renewingUserId === user.id}
-                              className="flex items-center gap-1 text-green-600 hover:text-green-700 transition-colors px-2 py-1 rounded border border-green-600/30 hover:border-green-600/50 disabled:opacity-50"
-                              title="تجديد الاشتراك"
-                            >
-                              <span className="text-sm">🔄</span>
-                            </button>
-                            <button
                               onClick={() => handleCancelSubscription(user.id)}
                               disabled={cancelingUserId === user.id}
                               className="flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors px-2 py-1 rounded border border-red-600/30 hover:border-red-600/50 disabled:opacity-50"
                               title="إيقاف الاشتراك"
                             >
-                              <span className="text-sm">🛑</span>
+                              <span className="text-sm">�</span>
+                            </button>
+                            <button
+                              onClick={() => handleRenewSubscription(user.id)}
+                              disabled={renewingUserId === user.id}
+                              className="flex items-center gap-1 text-green-600 hover:text-green-700 transition-colors px-2 py-1 rounded border border-green-600/30 hover:border-green-600/50 disabled:opacity-50"
+                              title="تجديد الاشتراك"
+                            >
+                              <span className="text-sm">�</span>
                             </button>
                             <button
                               onClick={() => handleSendWarning(user.id)}
