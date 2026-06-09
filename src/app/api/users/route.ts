@@ -3,6 +3,8 @@ import { createSupabaseAdminClient, handleSupabaseError } from '@/lib/supabase-a
 import { listAllAuthUsersResponse } from '@/lib/supabase-auth-users'
 import { sendEmail, isEmailServiceConfigured } from '@/lib/email'
 import { buildUpgradeToProEmail } from '@/lib/email-templates/upgrade-to-pro'
+import { buildSubscriptionCancelledEmail } from '@/lib/email-templates/subscription-cancelled'
+import { buildSubscriptionWarningEmail } from '@/lib/email-templates/subscription-warning'
 
 export async function GET() {
   try {
@@ -236,6 +238,164 @@ export async function DELETE(request: Request) {
     }
 
     return NextResponse.json({ success: true, message: 'تم حذف المستخدم والمتجر بنجاح' })
+  } catch (error) {
+    console.error('Server error:', error)
+    return NextResponse.json(
+      { error: 'حدث خطأ في الخادم' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const supabaseAdmin = createSupabaseAdminClient()
+    const { userId, action } = await request.json()
+
+    if (!userId || !action) {
+      return NextResponse.json(
+        { error: 'معرف المستخدم والإجراء مطلوبان' },
+        { status: 400 }
+      )
+    }
+
+    // جلب بيانات المستخدم والمتجر
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
+
+    if (userError || !userData?.user) {
+      console.error('❌ تعذر جلب بيانات المستخدم:', userError)
+      return NextResponse.json(
+        { error: 'لم يتم العثور على المستخدم' },
+        { status: 404 }
+      )
+    }
+
+    const user = userData.user
+    const userEmail = user.email
+
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: 'المستخدم ليس لديه إيميل' },
+        { status: 400 }
+      )
+    }
+
+    // جلب اسم المتجر
+    const { data: catalog } = await supabaseAdmin
+      .from('catalogs')
+      .select('name, display_name, plan, pro_activated_at')
+      .eq('user_id', userId)
+      .single()
+
+    const traderName =
+      user.user_metadata?.display_name ||
+      user.user_metadata?.full_name ||
+      userEmail.split('@')[0]
+
+    const storeName = catalog?.display_name || catalog?.name || 'متجرك'
+
+    let emailResult: { sent: boolean; error?: string; id?: string } | null = null
+
+    if (action === 'cancel_subscription') {
+      // إيقاف الاشتراك
+      const { error: updateError } = await supabaseAdmin
+        .from('catalogs')
+        .update({ plan: 'basic', pro_activated_at: null })
+        .eq('user_id', userId)
+
+      if (updateError) {
+        console.error('Error cancelling subscription:', updateError)
+        return NextResponse.json(
+          { error: 'فشل في إيقاف الاشتراك' },
+          { status: 500 }
+        )
+      }
+
+      // إرسال إيميل إيقاف الاشتراك
+      if (isEmailServiceConfigured()) {
+        const emailContent = buildSubscriptionCancelledEmail({
+          traderName,
+          storeName,
+        })
+
+        const sendResult = await sendEmail({
+          to: userEmail,
+          subject: emailContent.subject,
+          html: emailContent.html,
+          text: emailContent.text,
+          replyTo: process.env.RESEND_REPLY_TO || undefined,
+        })
+
+        emailResult = {
+          sent: sendResult.success,
+          error: sendResult.error,
+          id: sendResult.id,
+        }
+
+        if (sendResult.success) {
+          console.log(`✅ تم إرسال إيميل إيقاف الاشتراك إلى: ${userEmail}`)
+        } else {
+          console.error(`❌ فشل إرسال إيميل إيقاف الاشتراك:`, sendResult.error)
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'تم إيقاف الاشتراك بنجاح',
+        email: emailResult,
+      })
+    } else if (action === 'send_warning') {
+      // إرسال تنبيه فقط
+      // حساب الأيام المتبقية
+      const proActivatedAt = catalog?.pro_activated_at
+      let remainingDays = 0
+
+      if (proActivatedAt) {
+        const activatedDate = new Date(proActivatedAt)
+        const now = new Date()
+        const daysSinceActivation = Math.floor((now.getTime() - activatedDate.getTime()) / (1000 * 60 * 60 * 24))
+        remainingDays = Math.max(0, 30 - daysSinceActivation)
+      }
+
+      if (isEmailServiceConfigured()) {
+        const emailContent = buildSubscriptionWarningEmail({
+          traderName,
+          storeName,
+          remainingDays,
+        })
+
+        const sendResult = await sendEmail({
+          to: userEmail,
+          subject: emailContent.subject,
+          html: emailContent.html,
+          text: emailContent.text,
+          replyTo: process.env.RESEND_REPLY_TO || undefined,
+        })
+
+        emailResult = {
+          sent: sendResult.success,
+          error: sendResult.error,
+          id: sendResult.id,
+        }
+
+        if (sendResult.success) {
+          console.log(`✅ تم إرسال إيميل التنبيه إلى: ${userEmail}`)
+        } else {
+          console.error(`❌ فشل إرسال إيميل التنبيه:`, sendResult.error)
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'تم إرسال التنبيه بنجاح',
+        email: emailResult,
+      })
+    } else {
+      return NextResponse.json(
+        { error: 'إجراء غير صالح' },
+        { status: 400 }
+      )
+    }
   } catch (error) {
     console.error('Server error:', error)
     return NextResponse.json(

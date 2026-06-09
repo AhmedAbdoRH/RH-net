@@ -43,6 +43,8 @@ export function CatalogUsers() {
   const [filterType, setFilterType] = useState<'الكل' | 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر' | 'برو'>('الكل')
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
   const [upgradingUserId, setUpgradingUserId] = useState<string | null>(null)
+  const [cancelingUserId, setCancelingUserId] = useState<string | null>(null)
+  const [sendingWarningUserId, setSendingWarningUserId] = useState<string | null>(null)
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null)
 
   const handleCopyLink = (userId: string, storeName: string) => {
@@ -101,6 +103,56 @@ export function CatalogUsers() {
       alert('فشل في ترقية المستخدم')
     } finally {
       setUpgradingUserId(null)
+    }
+  }
+
+  const handleCancelSubscription = async (userId: string) => {
+    if (!confirm('هل أنت متأكد من إيقاف اشتراك هذا التاجر؟')) return
+
+    setCancelingUserId(userId)
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'cancel_subscription' })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في إيقاف الاشتراك')
+      }
+
+      await fetchUsers()
+      await fetchTraderData()
+      alert('تم إيقاف الاشتراك بنجاح')
+    } catch (err) {
+      console.error('Error canceling subscription:', err)
+      alert('فشل في إيقاف الاشتراك')
+    } finally {
+      setCancelingUserId(null)
+    }
+  }
+
+  const handleSendWarning = async (userId: string) => {
+    setSendingWarningUserId(userId)
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'send_warning' })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في إرسال التنبيه')
+      }
+
+      alert('تم إرسال التنبيه بنجاح')
+    } catch (err) {
+      console.error('Error sending warning:', err)
+      alert('فشل في إرسال التنبيه')
+    } finally {
+      setSendingWarningUserId(null)
     }
   }
 
@@ -215,52 +267,49 @@ export function CatalogUsers() {
     const gracePeriodDays = 10 // فترة السماح
     const totalDays = subscriptionDays + gracePeriodDays
 
-    const remainingSubscriptionDays = Math.max(0, subscriptionDays - daysSinceActivation)
-    const remainingGracePeriodDays = Math.max(0, gracePeriodDays - Math.max(0, daysSinceActivation - subscriptionDays))
+    // حساب نسبة المتبقي (ينقص من 100% إلى 0%)
+    const remainingDays = Math.max(0, totalDays - daysSinceActivation)
+    const remainingPercentage = (remainingDays / totalDays) * 100
 
-    const subscriptionProgress = Math.min(100, Math.max(0, (daysSinceActivation / subscriptionDays) * 100))
-    const gracePeriodProgress = daysSinceActivation > subscriptionDays
-      ? Math.min(100, Math.max(0, ((daysSinceActivation - subscriptionDays) / gracePeriodDays) * 100))
-      : 0
+    // حساب نسبة كل جزء
+    const subscriptionPercentage = (subscriptionDays / totalDays) * 100
+    const gracePeriodPercentage = (gracePeriodDays / totalDays) * 100
 
-    const isExpired = daysSinceActivation > totalDays
-    const isInGracePeriod = daysSinceActivation > subscriptionDays && daysSinceActivation <= totalDays
+    // حساب عرض كل شريط بناءً على المتبقي
+    let subscriptionBarWidth = 0
+    let gracePeriodBarWidth = 0
+
+    if (daysSinceActivation < subscriptionDays) {
+      // في فترة الاشتراك: الشريط الذهبي ينقص
+      subscriptionBarWidth = subscriptionPercentage - (daysSinceActivation / totalDays) * 100
+      gracePeriodBarWidth = gracePeriodPercentage
+    } else if (daysSinceActivation < totalDays) {
+      // في فترة السماح: الشريط الذهبي = 0، الشريط الغامق ينقص
+      subscriptionBarWidth = 0
+      const daysInGracePeriod = daysSinceActivation - subscriptionDays
+      gracePeriodBarWidth = gracePeriodPercentage - (daysInGracePeriod / totalDays) * 100
+    } else {
+      // انتهى: كلاهما = 0
+      subscriptionBarWidth = 0
+      gracePeriodBarWidth = 0
+    }
 
     return (
       <div className="mt-3 border-t border-border/20 pt-3">
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-2">
-          <span>التفعيل</span>
-          <span>
-            {isExpired ? (
-              <span className="text-red-600 font-semibold">منتهي</span>
-            ) : isInGracePeriod ? (
-              <span className="text-orange-600 font-semibold">فترة سماح</span>
-            ) : (
-              <span className="text-amber-600 font-semibold">نشط</span>
-            )}
-          </span>
-          <span>
-            {isExpired ? 'انتهى' : isInGracePeriod ? `${remainingGracePeriodDays} يوم متبقي` : `${remainingSubscriptionDays} يوم متبقي`}
-          </span>
-        </div>
         <div className="relative h-3 bg-muted rounded-full overflow-hidden">
-          {/* الشريط الذهبي - فترة الاشتراك */}
+          {/* الشريط الذهبي - فترة الاشتراك (30 يوم) */}
           <div
             className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-400 to-amber-500 transition-all duration-300"
-            style={{ width: `${subscriptionProgress}%` }}
+            style={{ width: `${Math.max(0, subscriptionBarWidth)}%` }}
           />
-          {/* الشريط الذهبي الغامق - فترة السماح */}
-          {gracePeriodProgress > 0 && (
-            <div
-              className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-700 to-amber-800 transition-all duration-300"
-              style={{ width: `${gracePeriodProgress}%` }}
-            />
-          )}
-        </div>
-        <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1">
-          <span>0 يوم</span>
-          <span>30 يوم</span>
-          <span>40 يوم</span>
+          {/* الشريط الذهبي الغامق - فترة السماح (10 أيام) ملتصق بالشريط الذهبي */}
+          <div
+            className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-700 to-amber-800 transition-all duration-300"
+            style={{
+              width: `${Math.max(0, gracePeriodBarWidth)}%`,
+              right: `${Math.max(0, subscriptionBarWidth)}%`
+            }}
+          />
         </div>
       </div>
     )
@@ -686,6 +735,26 @@ export function CatalogUsers() {
                           >
                             <span className="text-sm">👑</span>
                           </button>
+                        )}
+                        {user.plan === 'pro' && (
+                          <>
+                            <button
+                              onClick={() => handleCancelSubscription(user.id)}
+                              disabled={cancelingUserId === user.id}
+                              className="flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors px-2 py-1 rounded border border-red-600/30 hover:border-red-600/50 disabled:opacity-50"
+                              title="إيقاف الاشتراك"
+                            >
+                              <span className="text-sm">🛑</span>
+                            </button>
+                            <button
+                              onClick={() => handleSendWarning(user.id)}
+                              disabled={sendingWarningUserId === user.id}
+                              className="flex items-center gap-1 text-orange-600 hover:text-orange-700 transition-colors px-2 py-1 rounded border border-orange-600/30 hover:border-orange-600/50 disabled:opacity-50"
+                              title="إرسال تنبيه"
+                            >
+                              <span className="text-sm">⚠️</span>
+                            </button>
+                          </>
                         )}
                         {getTraderType(user.id)?.type === 'خامل' && (
                           <AlertDialog>
