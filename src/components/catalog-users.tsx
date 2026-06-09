@@ -325,22 +325,20 @@ export function CatalogUsers() {
     }
 
     return (
-      <div className="mt-3 border-t border-border/20 pt-3">
-        <div className="relative h-3 bg-muted rounded-full overflow-hidden">
-          {/* الشريط الذهبي - فترة الاشتراك (30 يوم) */}
-          <div
-            className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-400 to-amber-500 transition-all duration-300"
-            style={{ width: `${Math.max(0, subscriptionBarWidth)}%` }}
-          />
-          {/* الشريط الذهبي الغامق - فترة السماح (10 أيام) ملتصق بالشريط الذهبي */}
-          <div
-            className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-700 to-amber-800 transition-all duration-300"
-            style={{
-              width: `${Math.max(0, gracePeriodBarWidth)}%`,
-              right: `${Math.max(0, subscriptionBarWidth)}%`
-            }}
-          />
-        </div>
+      <div className="relative h-1 bg-muted rounded-full overflow-hidden">
+        {/* الشريط الذهبي - فترة الاشتراك (30 يوم) */}
+        <div
+          className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-400 to-amber-500 transition-all duration-300"
+          style={{ width: `${Math.max(0, subscriptionBarWidth)}%` }}
+        />
+        {/* الشريط الذهبي الغامق - فترة السماح (10 أيام) ملتصق بالشريط الذهبي */}
+        <div
+          className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-700 to-amber-800 transition-all duration-300"
+          style={{
+            width: `${Math.max(0, gracePeriodBarWidth)}%`,
+            right: `${Math.max(0, subscriptionBarWidth)}%`
+          }}
+        />
       </div>
     )
   }
@@ -363,9 +361,9 @@ export function CatalogUsers() {
     return (
       <div className="mt-3 border-t border-border/20 pt-3" dir="rtl">
         <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-2">
-          <span>الآن</span>
-          <span>{totalProducts > 0 ? `${totalProducts} منتج على خط الزمن` : 'لا توجد إضافات منتجات'}</span>
           <span>بداية الاستخدام</span>
+          <span>{totalProducts > 0 ? `${totalProducts} منتج على خط الزمن` : 'لا توجد إضافات منتجات'}</span>
+          <span>الآن</span>
         </div>
         <div className="relative h-8">
           <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-border" />
@@ -379,9 +377,9 @@ export function CatalogUsers() {
             return (
               <div
                 key={day.date}
-                className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[4px] border border-emerald-300 bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]"
+                className="absolute top-1/2 translate-x-1/2 -translate-y-1/2 rounded-[4px] border border-emerald-300 bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]"
                 style={{
-                  left: `${progress * 100}%`,
+                  right: `${progress * 100}%`,
                   width: dotSize,
                   height: dotSize
                 }}
@@ -549,44 +547,14 @@ export function CatalogUsers() {
           {users.length > 0 && (
             <div className="flex flex-wrap gap-2 justify-center rtl" dir="rtl">
               <button
-                onClick={() => setFilterType('خامل')}
+                onClick={() => setFilterType('الكل')}
                 className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
-                  filterType === 'خامل'
-                    ? 'bg-gray-500/30 text-gray-700 border-2 border-gray-500'
-                    : 'bg-gray-500/10 text-gray-700 border border-gray-500/30 hover:bg-gray-500/20'
+                  filterType === 'الكل'
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                 }`}
               >
-                😴 غير نشط ({traderData.filter(t => t.type === 'خامل').length})
-              </button>
-              <button
-                onClick={() => setFilterType('مبتدئ')}
-                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
-                  filterType === 'مبتدئ'
-                    ? 'bg-blue-500/30 text-blue-700 border-2 border-blue-500'
-                    : 'bg-blue-500/10 text-blue-700 border border-blue-500/30 hover:bg-blue-500/20'
-                }`}
-              >
-                🌱 مبتدئ ({traderData.filter(t => t.type === 'مبتدئ').length})
-              </button>
-              <button
-                onClick={() => setFilterType('نشط')}
-                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
-                  filterType === 'نشط'
-                    ? 'bg-green-500/30 text-green-700 border-2 border-green-500'
-                    : 'bg-green-500/10 text-green-700 border border-green-500/30 hover:bg-green-500/20'
-                }`}
-              >
-                ⚡ نشط ({traderData.filter(t => t.type === 'نشط').length})
-              </button>
-              <button
-                onClick={() => setFilterType('سوبر')}
-                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
-                  filterType === 'سوبر'
-                    ? 'bg-red-500/30 text-red-700 border-2 border-red-500'
-                    : 'bg-red-500/10 text-red-700 border border-red-500/30 hover:bg-red-500/20'
-                }`}
-              >
-                🚀 سوبر ({traderData.filter(t => t.type === 'سوبر').length})
+                الكل ({users.length})
               </button>
               <button
                 onClick={() => setFilterType('برو')}
@@ -599,14 +567,44 @@ export function CatalogUsers() {
                 👑 برو ({users.filter(u => u.plan === 'pro').length})
               </button>
               <button
-                onClick={() => setFilterType('الكل')}
+                onClick={() => setFilterType('سوبر')}
                 className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
-                  filterType === 'الكل'
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  filterType === 'سوبر'
+                    ? 'bg-red-500/30 text-red-700 border-2 border-red-500'
+                    : 'bg-red-500/10 text-red-700 border border-red-500/30 hover:bg-red-500/20'
                 }`}
               >
-                الكل ({users.length})
+                🚀 سوبر ({traderData.filter(t => t.type === 'سوبر').length})
+              </button>
+              <button
+                onClick={() => setFilterType('نشط')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'نشط'
+                    ? 'bg-green-500/30 text-green-700 border-2 border-green-500'
+                    : 'bg-green-500/10 text-green-700 border border-green-500/30 hover:bg-green-500/20'
+                }`}
+              >
+                ⚡ نشط ({traderData.filter(t => t.type === 'نشط').length})
+              </button>
+              <button
+                onClick={() => setFilterType('مبتدئ')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'مبتدئ'
+                    ? 'bg-blue-500/30 text-blue-700 border-2 border-blue-500'
+                    : 'bg-blue-500/10 text-blue-700 border border-blue-500/30 hover:bg-blue-500/20'
+                }`}
+              >
+                🌱 مبتدئ ({traderData.filter(t => t.type === 'مبتدئ').length})
+              </button>
+              <button
+                onClick={() => setFilterType('خامل')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'خامل'
+                    ? 'bg-gray-500/30 text-gray-700 border-2 border-gray-500'
+                    : 'bg-gray-500/10 text-gray-700 border border-gray-500/30 hover:bg-gray-500/20'
+                }`}
+              >
+                😴 غير نشط ({traderData.filter(t => t.type === 'خامل').length})
               </button>
             </div>
           )}
