@@ -16,6 +16,8 @@ interface User {
   plan: string
   whatsapp_number: string | null
   pro_activated_at: string | null
+  warning_sent_at: string | null
+  cancelled_sent_at: string | null
   created_at: string
   user_metadata?: any
 }
@@ -43,6 +45,7 @@ export function CatalogUsers() {
   const [filterType, setFilterType] = useState<'الكل' | 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر' | 'برو'>('الكل')
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
   const [upgradingUserId, setUpgradingUserId] = useState<string | null>(null)
+  const [renewingUserId, setRenewingUserId] = useState<string | null>(null)
   const [cancelingUserId, setCancelingUserId] = useState<string | null>(null)
   const [sendingWarningUserId, setSendingWarningUserId] = useState<string | null>(null)
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null)
@@ -103,6 +106,33 @@ export function CatalogUsers() {
       alert('فشل في ترقية المستخدم')
     } finally {
       setUpgradingUserId(null)
+    }
+  }
+
+  const handleRenewSubscription = async (userId: string) => {
+    if (!confirm('هل أنت متأكد من تجديد اشتراك هذا التاجر؟ سيتم تصفير فترة الاشتراك والبدء من البداية.')) return
+
+    setRenewingUserId(userId)
+    try {
+      const response = await fetch('/api/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, plan: 'pro', renew: true })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في تجديد الاشتراك')
+      }
+
+      await fetchUsers()
+      await fetchTraderData()
+      alert('تم تجديد اشتراك المستخدم بنجاح')
+    } catch (err) {
+      console.error('Error renewing subscription:', err)
+      alert('فشل في تجديد الاشتراك')
+    } finally {
+      setRenewingUserId(null)
     }
   }
 
@@ -738,6 +768,14 @@ export function CatalogUsers() {
                         )}
                         {user.plan === 'pro' && (
                           <>
+                            <button
+                              onClick={() => handleRenewSubscription(user.id)}
+                              disabled={renewingUserId === user.id}
+                              className="flex items-center gap-1 text-green-600 hover:text-green-700 transition-colors px-2 py-1 rounded border border-green-600/30 hover:border-green-600/50 disabled:opacity-50"
+                              title="تجديد الاشتراك"
+                            >
+                              <span className="text-sm">🔄</span>
+                            </button>
                             <button
                               onClick={() => handleCancelSubscription(user.id)}
                               disabled={cancelingUserId === user.id}

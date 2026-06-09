@@ -171,7 +171,7 @@ export function buildSubscriptionCancelledEmail(params: SubscriptionCancelledEma
       <div class="btn-group">
         <a href="https://api.whatsapp.com/send/?phone=201008116452&text=أريد%20إعادة%20تفعيل%20اشتراك%20Pro" class="btn btn-renew">إعادة تفعيل باقة Pro (عبر واتساب) 🚀</a>
         <a href="https://api.whatsapp.com/send/?phone=201008116452&text=مرحباً،%20عندي%20استفسار%20بخصوص%20متجري%20بعد%20انتهاء%20باقة%20Pro" class="btn btn-contact">تواصل معنا للدعم أو الاستفسار 💬</a>
-        <a href="https://play.google.com/store/apps/details?id=com.nextcatalog.app" class="btn btn-app">افتح التطبيق مباشرة من هنا �</a>
+        <a href="https://play.google.com/store/apps/details?id=com.nextcatalog.app" class="btn btn-app">افتح التطبيق مباشرة من هنا 📱</a>
       </div>
 
       <hr class="divider">

@@ -23,7 +23,7 @@ export async function GET() {
     // جلب بيانات المتاجر المرتبطة بالمستخدمين
     const { data: catalogs, error: catalogsError } = await supabaseAdmin
       .from('catalogs')
-      .select('user_id, name, display_name, plan, whatsapp_number, pro_activated_at')
+      .select('user_id, name, display_name, plan, whatsapp_number, pro_activated_at, warning_sent_at, cancelled_sent_at')
 
     if (catalogsError) {
       console.error('Error fetching catalogs:', catalogsError)
@@ -35,6 +35,8 @@ export async function GET() {
     const plansMap = new Map()
     const whatsappMap = new Map()
     const proActivatedAtMap = new Map()
+    const warningSentAtMap = new Map()
+    const cancelledSentAtMap = new Map()
     if (catalogs) {
       catalogs.forEach(catalog => {
         nameMap.set(catalog.user_id, catalog.name)
@@ -42,6 +44,8 @@ export async function GET() {
         plansMap.set(catalog.user_id, catalog.plan)
         whatsappMap.set(catalog.user_id, catalog.whatsapp_number)
         proActivatedAtMap.set(catalog.user_id, catalog.pro_activated_at)
+        warningSentAtMap.set(catalog.user_id, catalog.warning_sent_at)
+        cancelledSentAtMap.set(catalog.user_id, catalog.cancelled_sent_at)
       })
     }
 
@@ -56,6 +60,8 @@ export async function GET() {
       plan: plansMap.get(user.id) || 'free',
       whatsapp_number: whatsappMap.get(user.id) || null,
       pro_activated_at: proActivatedAtMap.get(user.id) || null,
+      warning_sent_at: warningSentAtMap.get(user.id) || null,
+      cancelled_sent_at: cancelledSentAtMap.get(user.id) || null,
       created_at: user.created_at,
       user_metadata: user.user_metadata
     }))
@@ -71,7 +77,7 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     const supabaseAdmin = createSupabaseAdminClient()
-    const { userId, plan } = await request.json()
+    const { userId, plan, renew } = await request.json()
 
     if (!userId || !plan) {
       return NextResponse.json(
@@ -92,7 +98,18 @@ export async function PATCH(request: Request) {
     // تحديث الخطة في جدول catalogs
     const updateData: any = { plan }
     if (plan === 'pro') {
-      updateData.pro_activated_at = new Date().toISOString()
+      // إذا كان تجديد، تصفير جميع التواريخ والبدء من البداية
+      if (renew) {
+        updateData.pro_activated_at = new Date().toISOString()
+        updateData.warning_sent_at = null
+        updateData.cancelled_sent_at = null
+      } else {
+        // إذا كان ترقية جديدة، فقط تعيين pro_activated_at
+        updateData.pro_activated_at = new Date().toISOString()
+      }
+    } else {
+      // إذا كان التحويل إلى basic أو free، مسح pro_activated_at
+      updateData.pro_activated_at = null
     }
     const { error: updateError } = await supabaseAdmin
       .from('catalogs')
@@ -346,7 +363,7 @@ export async function POST(request: Request) {
       })
     } else if (action === 'send_warning') {
       // إرسال تنبيه فقط
-      // حساب الأيام المتبقية
+      // حساب الأيام المتبقية في فترة السماح
       const proActivatedAt = catalog?.pro_activated_at
       let remainingDays = 0
 
@@ -354,7 +371,17 @@ export async function POST(request: Request) {
         const activatedDate = new Date(proActivatedAt)
         const now = new Date()
         const daysSinceActivation = Math.floor((now.getTime() - activatedDate.getTime()) / (1000 * 60 * 60 * 24))
-        remainingDays = Math.max(0, 30 - daysSinceActivation)
+
+        const subscriptionDays = 30 // فترة الاشتراك
+        const gracePeriodDays = 10 // فترة السماح
+
+        if (daysSinceActivation > subscriptionDays) {
+          // في فترة السماح: حساب الأيام المتبقية من فترة السماح
+          remainingDays = Math.max(0, gracePeriodDays - (daysSinceActivation - subscriptionDays))
+        } else {
+          // في فترة الاشتراك: حساب الأيام المتبقية من فترة الاشتراك + فترة السماح
+          remainingDays = Math.max(0, (subscriptionDays - daysSinceActivation) + gracePeriodDays)
+        }
       }
 
       if (isEmailServiceConfigured()) {

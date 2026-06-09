@@ -1,0 +1,2 @@
+[check-subscriptions]
+schedule = "0 0 * * *"  # يعمل يومياً في منتصف الليل (UTC)

@@ -188,7 +188,7 @@ export function buildSubscriptionWarningEmail(params: SubscriptionWarningEmailPa
       <div class="btn-group">
         <a href="https://api.whatsapp.com/send/?phone=201008116452&text=أريد%20تجديد%20اشتراك%20Pro" class="btn btn-renew">جدد اشتراكك دلوقتي (عبر واتساب) 🚀</a>
         <a href="https://api.whatsapp.com/send/?phone=201008116452&text=مرحباً،%20أريد%20الاستفسار%20عن%20تجديد%20باقة%20Pro" class="btn btn-contact">تواصل معنا للاستفسار 💬</a>
-        <a href="https://play.google.com/store/apps/details?id=com.nextcatalog.app" class="btn btn-app">افتح التطبيق مباشرة من هنا �</a>
+        <a href="https://play.google.com/store/apps/details?id=com.nextcatalog.app" class="btn btn-app">افتح التطبيق مباشرة من هنا 📱</a>
       </div>
 
       <hr class="divider">
