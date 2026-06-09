@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 import { useState, useEffect } from "react"
@@ -767,12 +767,12 @@ export function CatalogUsers() {
                         {user.plan === 'pro' && (
                           <>
                             <button
-                              onClick={() => handleCancelSubscription(user.id)}
-                              disabled={cancelingUserId === user.id}
-                              className="flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors px-2 py-1 rounded border border-red-600/30 hover:border-red-600/50 disabled:opacity-50"
-                              title="إيقاف الاشتراك"
+                              onClick={() => handleSendWarning(user.id)}
+                              disabled={sendingWarningUserId === user.id}
+                              className="flex items-center gap-1 text-orange-600 hover:text-orange-700 transition-colors px-2 py-1 rounded border border-orange-600/30 hover:border-orange-600/50 disabled:opacity-50"
+                              title="إرسال تنبيه"
                             >
-                              <span className="text-sm">�</span>
+                              <span className="text-sm">تنبيه</span>
                             </button>
                             <button
                               onClick={() => handleRenewSubscription(user.id)}
@@ -780,15 +780,15 @@ export function CatalogUsers() {
                               className="flex items-center gap-1 text-green-600 hover:text-green-700 transition-colors px-2 py-1 rounded border border-green-600/30 hover:border-green-600/50 disabled:opacity-50"
                               title="تجديد الاشتراك"
                             >
-                              <span className="text-sm">�</span>
+                              <span className="text-sm">تجديد</span>
                             </button>
                             <button
-                              onClick={() => handleSendWarning(user.id)}
-                              disabled={sendingWarningUserId === user.id}
-                              className="flex items-center gap-1 text-orange-600 hover:text-orange-700 transition-colors px-2 py-1 rounded border border-orange-600/30 hover:border-orange-600/50 disabled:opacity-50"
-                              title="إرسال تنبيه"
+                              onClick={() => handleCancelSubscription(user.id)}
+                              disabled={cancelingUserId === user.id}
+                              className="flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors px-2 py-1 rounded border border-red-600/30 hover:border-red-600/50 disabled:opacity-50"
+                              title="إيقاف الاشتراك"
                             >
-                              <span className="text-sm">⚠️</span>
+                              <span className="text-sm">إيقاف</span>
                             </button>
                           </>
                         )}
@@ -849,3 +849,4 @@ export function CatalogUsers() {
     </div>
   )
 }
+
