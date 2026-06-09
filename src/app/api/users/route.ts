@@ -21,7 +21,7 @@ export async function GET() {
     // جلب بيانات المتاجر المرتبطة بالمستخدمين
     const { data: catalogs, error: catalogsError } = await supabaseAdmin
       .from('catalogs')
-      .select('user_id, name, display_name, plan, whatsapp_number')
+      .select('user_id, name, display_name, plan, whatsapp_number, pro_activated_at')
 
     if (catalogsError) {
       console.error('Error fetching catalogs:', catalogsError)
@@ -32,12 +32,14 @@ export async function GET() {
     const displayNameMap = new Map()
     const plansMap = new Map()
     const whatsappMap = new Map()
+    const proActivatedAtMap = new Map()
     if (catalogs) {
       catalogs.forEach(catalog => {
         nameMap.set(catalog.user_id, catalog.name)
         displayNameMap.set(catalog.user_id, catalog.display_name)
         plansMap.set(catalog.user_id, catalog.plan)
         whatsappMap.set(catalog.user_id, catalog.whatsapp_number)
+        proActivatedAtMap.set(catalog.user_id, catalog.pro_activated_at)
       })
     }
 
@@ -51,6 +53,7 @@ export async function GET() {
       name: nameMap.get(user.id) || null,
       plan: plansMap.get(user.id) || 'free',
       whatsapp_number: whatsappMap.get(user.id) || null,
+      pro_activated_at: proActivatedAtMap.get(user.id) || null,
       created_at: user.created_at,
       user_metadata: user.user_metadata
     }))
@@ -85,9 +88,13 @@ export async function PATCH(request: Request) {
     }
 
     // تحديث الخطة في جدول catalogs
+    const updateData: any = { plan }
+    if (plan === 'pro') {
+      updateData.pro_activated_at = new Date().toISOString()
+    }
     const { error: updateError } = await supabaseAdmin
       .from('catalogs')
-      .update({ plan })
+      .update(updateData)
       .eq('user_id', userId)
 
     if (updateError) {

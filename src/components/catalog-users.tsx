@@ -15,6 +15,7 @@ interface User {
   store_display_name: string | null
   plan: string
   whatsapp_number: string | null
+  pro_activated_at: string | null
   created_at: string
   user_metadata?: any
 }
@@ -201,6 +202,68 @@ export function CatalogUsers() {
 
   const getTraderType = (userId: string) => {
     return traderData.find(t => t.userId === userId)
+  }
+
+  const ProSubscriptionBar = ({ proActivatedAt }: { proActivatedAt: string | null }) => {
+    if (!proActivatedAt) return null
+
+    const activatedDate = new Date(proActivatedAt)
+    const now = new Date()
+    const daysSinceActivation = Math.floor((now.getTime() - activatedDate.getTime()) / (1000 * 60 * 60 * 24))
+
+    const subscriptionDays = 30 // فترة الاشتراك
+    const gracePeriodDays = 10 // فترة السماح
+    const totalDays = subscriptionDays + gracePeriodDays
+
+    const remainingSubscriptionDays = Math.max(0, subscriptionDays - daysSinceActivation)
+    const remainingGracePeriodDays = Math.max(0, gracePeriodDays - Math.max(0, daysSinceActivation - subscriptionDays))
+
+    const subscriptionProgress = Math.min(100, Math.max(0, (daysSinceActivation / subscriptionDays) * 100))
+    const gracePeriodProgress = daysSinceActivation > subscriptionDays
+      ? Math.min(100, Math.max(0, ((daysSinceActivation - subscriptionDays) / gracePeriodDays) * 100))
+      : 0
+
+    const isExpired = daysSinceActivation > totalDays
+    const isInGracePeriod = daysSinceActivation > subscriptionDays && daysSinceActivation <= totalDays
+
+    return (
+      <div className="mt-3 border-t border-border/20 pt-3">
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-2">
+          <span>التفعيل</span>
+          <span>
+            {isExpired ? (
+              <span className="text-red-600 font-semibold">منتهي</span>
+            ) : isInGracePeriod ? (
+              <span className="text-orange-600 font-semibold">فترة سماح</span>
+            ) : (
+              <span className="text-amber-600 font-semibold">نشط</span>
+            )}
+          </span>
+          <span>
+            {isExpired ? 'انتهى' : isInGracePeriod ? `${remainingGracePeriodDays} يوم متبقي` : `${remainingSubscriptionDays} يوم متبقي`}
+          </span>
+        </div>
+        <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+          {/* الشريط الذهبي - فترة الاشتراك */}
+          <div
+            className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-400 to-amber-500 transition-all duration-300"
+            style={{ width: `${subscriptionProgress}%` }}
+          />
+          {/* الشريط الذهبي الغامق - فترة السماح */}
+          {gracePeriodProgress > 0 && (
+            <div
+              className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-700 to-amber-800 transition-all duration-300"
+              style={{ width: `${gracePeriodProgress}%` }}
+            />
+          )}
+        </div>
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1">
+          <span>0 يوم</span>
+          <span>30 يوم</span>
+          <span>40 يوم</span>
+        </div>
+      </div>
+    )
   }
 
   const ProductActivityTimeline = ({
@@ -657,6 +720,9 @@ export function CatalogUsers() {
                       accountCreatedAt={user.created_at}
                       activityDays={trader?.productActivityDays}
                     />
+                    {user.plan === 'pro' && (
+                      <ProSubscriptionBar proActivatedAt={user.pro_activated_at} />
+                    )}
                   </div>
                     </div>
                   )
