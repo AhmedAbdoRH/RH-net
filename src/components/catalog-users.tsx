@@ -844,7 +844,7 @@ export function CatalogUsers() {
                             value={notes[user.id] || ''}
                             onChange={(e) => setNotes(prev => ({ ...prev, [user.id]: e.target.value }))}
                             placeholder="أضف ملاحظة عن هذا التاجر..."
-                            className="flex-1 text-sm p-2 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            className="flex-1 text-sm p-2 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 bg-black text-white placeholder:text-muted-foreground"
                             rows={2}
                             autoFocus
                           />
