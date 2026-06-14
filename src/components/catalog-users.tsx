@@ -49,6 +49,8 @@ export function CatalogUsers() {
   const [cancelingUserId, setCancelingUserId] = useState<string | null>(null)
   const [sendingWarningUserId, setSendingWarningUserId] = useState<string | null>(null)
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null)
+  const [notes, setNotes] = useState<Record<string, string>>({})
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
 
   const handleCopyLink = (userId: string, storeName: string) => {
     const url = getStoreUrl(storeName)
@@ -58,6 +60,12 @@ export function CatalogUsers() {
         setTimeout(() => setCopiedStoreId(null), 2000)
       })
       .catch((err) => console.error("Could not copy link:", err))
+  }
+
+  const handleSaveNote = (userId: string, note: string) => {
+    setNotes(prev => ({ ...prev, [userId]: note }))
+    setEditingNoteId(null)
+    // TODO: Save to database
   }
 
   const handleDeleteUser = async (userId: string) => {
@@ -828,6 +836,50 @@ export function CatalogUsers() {
                     {user.plan === 'pro' && (
                       <ProSubscriptionBar proActivatedAt={user.pro_activated_at} />
                     )}
+                    {/* شريط الملاحظات */}
+                    <div className="mt-3 border-t border-border/20 pt-3">
+                      {editingNoteId === user.id ? (
+                        <div className="flex gap-2">
+                          <textarea
+                            value={notes[user.id] || ''}
+                            onChange={(e) => setNotes(prev => ({ ...prev, [user.id]: e.target.value }))}
+                            placeholder="أضف ملاحظة عن هذا التاجر..."
+                            className="flex-1 text-sm p-2 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            rows={2}
+                            autoFocus
+                          />
+                          <button
+                            onClick={() => handleSaveNote(user.id, notes[user.id] || '')}
+                            className="px-3 py-1 bg-primary text-primary-foreground text-sm rounded-md hover:bg-primary/90 transition-colors"
+                          >
+                            حفظ
+                          </button>
+                          <button
+                            onClick={() => setEditingNoteId(null)}
+                            className="px-3 py-1 bg-secondary text-secondary-foreground text-sm rounded-md hover:bg-secondary/80 transition-colors"
+                          >
+                            إلغاء
+                          </button>
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => setEditingNoteId(user.id)}
+                          className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors min-h-[2rem] p-2 rounded-md hover:bg-muted/50"
+                        >
+                          {notes[user.id] ? (
+                            <div className="flex items-start gap-2">
+                              <span className="text-base">📝</span>
+                              <span className="flex-1">{notes[user.id]}</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 text-muted-foreground/70">
+                              <span className="text-base">📝</span>
+                              <span>أضف ملاحظة...</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                     </div>
                   )
