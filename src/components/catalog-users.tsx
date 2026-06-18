@@ -1021,11 +1021,11 @@ export function CatalogUsers() {
                            onClick={() => handleToggleEngaged(user.id)}
                            disabled={savingEngagedId === user.id}
                            className={`px-3 py-1.5 text-sm border border-border rounded-md hover:bg-muted/50 transition-colors flex items-center gap-1.5 ${
-                             engaged[userId] ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+                             engaged[user.id] ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
                            }`}
                          >
                            <span>⚡</span>
-                           <span>{engaged[userId] ? 'متفاعل' : 'غير متفاعل'}</span>
+                           <span>{engaged[user.id] ? 'متفاعل' : 'غير متفاعل'}</span>
                          </button>
                          {savingEngagedId === user.id && (
                            <span className="absolute left-0 top-full mt-1 px-3 py-1.5 text-xs bg-muted text-muted-foreground rounded">
