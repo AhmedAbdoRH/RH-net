@@ -20,6 +20,7 @@ interface User {
   cancelled_sent_at: string | null
   notes: string | null
   contacted_by: string | null
+  is_engaged: boolean
   created_at: string
   user_metadata?: any
 }
@@ -57,6 +58,8 @@ export function CatalogUsers() {
   const [contactedBy, setContactedBy] = useState<Record<string, string | null>>({})
   const [openContactDropdown, setOpenContactDropdown] = useState<string | null>(null)
   const [savingContactId, setSavingContactId] = useState<string | null>(null)
+  const [engaged, setEngaged] = useState<Record<string, boolean>>({})
+  const [savingEngagedId, setSavingEngagedId] = useState<string | null>(null)
 
   const handleCopyLink = (userId: string, storeName: string) => {
     const url = getStoreUrl(storeName)
@@ -113,6 +116,32 @@ export function CatalogUsers() {
       alert('فشل في تحديث حالة التواصل')
     } finally {
       setSavingContactId(null)
+    }
+  }
+
+  const handleToggleEngaged = async (userId: string) => {
+    setSavingEngagedId(userId)
+    try {
+      const currentStatus = engaged[userId] || false
+      const newStatus = !currentStatus
+      
+      const response = await fetch('/api/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, isEngaged: newStatus })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في تحديث حالة التفاعل')
+      }
+
+      setEngaged(prev => ({ ...prev, [userId]: newStatus }))
+    } catch (err) {
+      console.error('Error updating is_engaged:', err)
+      alert('فشل في تحديث حالة التفاعل')
+    } finally {
+      setSavingEngagedId(null)
     }
   }
 
@@ -299,14 +328,17 @@ export function CatalogUsers() {
       setUsers(data.users || [])
       const notesMap: Record<string, string> = {}
       const contactedByMap: Record<string, string | null> = {}
+      const engagedMap: Record<string, boolean> = {}
       if (data.users) {
         data.users.forEach((u: any) => {
           if (u.notes) notesMap[u.id] = u.notes
           contactedByMap[u.id] = u.contacted_by || null
+          engagedMap[u.id] = u.is_engaged || false
         })
       }
       setNotes(notesMap)
       setContactedBy(contactedByMap)
+      setEngaged(engagedMap)
     } catch (err) {
       console.error('Error:', err)
       setError('حدث خطأ أثناء جلب البيانات')
@@ -938,49 +970,71 @@ export function CatalogUsers() {
                           )}
                         </div>
                       )}
-                    </div>
-                    {/* زر حالة التواصل */}
-                    <div className="relative mt-2">
-                      {contactedBy[user.id] ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-green-400">تم التواصل</span>
-                          <span className="text-sm text-muted-foreground">بواسطة: {contactedBy[user.id]}</span>
-                          <button
-                            onClick={() => setOpenContactDropdown(openContactDropdown === user.id ? null : user.id)}
-                            className="text-xs text-muted-foreground hover:text-foreground transition-colors underline"
-                          >
-                            تغيير
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setOpenContactDropdown(openContactDropdown === user.id ? null : user.id)}
-                          className="px-3 py-1.5 text-sm border border-border rounded-md hover:bg-muted/50 transition-colors text-muted-foreground flex items-center gap-1.5"
-                        >
-                          <span>📞</span>
-                          <span>لم يتم التواصل</span>
-                        </button>
-                      )}
-                      {openContactDropdown === user.id && (
-                        <div className="absolute right-0 top-full mt-1 z-50 bg-popover border border-border rounded-md shadow-lg p-1 min-w-[120px]">
-                          <button
-                            onClick={() => handleSetContactedBy(user.id, 'أحمد')}
-                            disabled={savingContactId === user.id}
-                            className="w-full text-right px-3 py-1.5 text-sm hover:bg-muted rounded transition-colors disabled:opacity-50"
-                          >
-                            أحمد
-                          </button>
-                          <button
-                            onClick={() => handleSetContactedBy(user.id, 'أبو العزم')}
-                            disabled={savingContactId === user.id}
-                            className="w-full text-right px-3 py-1.5 text-sm hover:bg-muted rounded transition-colors disabled:opacity-50"
-                          >
-                            أبو العزم
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+</div>
+                     {/* أزرار الحالة */}
+                     <div className="flex flex-wrap gap-2 mt-2">
+                       {/* زر حالة التواصل */}
+                       <div className="relative">
+                         {contactedBy[user.id] ? (
+                           <div className="flex items-center gap-2">
+                             <span className="text-sm text-green-400">تم التواصل</span>
+                             <span className="text-sm text-muted-foreground">بواسطة: {contactedBy[user.id]}</span>
+                             <button
+                               onClick={() => setOpenContactDropdown(openContactDropdown === user.id ? null : user.id)}
+                               className="text-xs text-muted-foreground hover:text-foreground transition-colors underline"
+                             >
+                               تغيير
+                             </button>
+                           </div>
+                         ) : (
+                           <button
+                             onClick={() => setOpenContactDropdown(openContactDropdown === user.id ? null : user.id)}
+                             className="px-3 py-1.5 text-sm border border-border rounded-md hover:bg-muted/50 transition-colors text-muted-foreground flex items-center gap-1.5"
+                           >
+                             <span>📞</span>
+                             <span>لم يتم التواصل</span>
+                           </button>
+                         )}
+                         {openContactDropdown === user.id && (
+                           <div className="absolute bottom-full left-0 mb-1 z-50 bg-popover border border-border rounded-md shadow-lg p-1 min-w-[120px]">
+                             <button
+                               onClick={() => handleSetContactedBy(user.id, 'أحمد')}
+                               disabled={savingContactId === user.id}
+                               className="w-full text-right px-3 py-1.5 text-sm hover:bg-muted rounded transition-colors disabled:opacity-50"
+                             >
+                               أحمد
+                             </button>
+                             <button
+                               onClick={() => handleSetContactedBy(user.id, 'أبو العزم')}
+                               disabled={savingContactId === user.id}
+                               className="w-full text-right px-3 py-1.5 text-sm hover:bg-muted rounded transition-colors disabled:opacity-50"
+                             >
+                               أبو العزم
+                             </button>
+                           </div>
+                         )}
+                       </div>
+                       
+                       {/* زر حالة التفاعل */}
+                       <div className="relative">
+                         <button
+                           onClick={() => handleToggleEngaged(user.id)}
+                           disabled={savingEngagedId === user.id}
+                           className={`px-3 py-1.5 text-sm border border-border rounded-md hover:bg-muted/50 transition-colors flex items-center gap-1.5 ${
+                             engaged[userId] ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+                           }`}
+                         >
+                           <span>⚡</span>
+                           <span>{engaged[userId] ? 'متفاعل' : 'غير متفاعل'}</span>
+                         </button>
+                         {savingEngagedId === user.id && (
+                           <span className="absolute left-0 top-full mt-1 px-3 py-1.5 text-xs bg-muted text-muted-foreground rounded">
+                             جاري التحديث...
+                           </span>
+                         )}
+                       </div>
+                     </div>
+                   </div>
                     </div>
                   )
                 })}

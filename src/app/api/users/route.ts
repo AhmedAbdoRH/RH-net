@@ -69,6 +69,8 @@ export async function GET() {
       warning_sent_at: warningSentAtMap.get(user.id) || null,
       cancelled_sent_at: cancelledSentAtMap.get(user.id) || null,
       notes: notesMap.get(user.id) || null,
+      contacted_by: contactedByMap.get(user.id) || null,
+      is_engaged: isEngagedMap.get(user.id) || false,
       created_at: user.created_at,
       user_metadata: user.user_metadata
     }))
@@ -84,7 +86,7 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     const supabaseAdmin = createSupabaseAdminClient()
-    const { userId, plan, renew, note } = await request.json()
+    const { userId, plan, renew, note, contactedBy, isEngaged } = await request.json()
 
     if (!userId) {
       return NextResponse.json(
@@ -93,6 +95,7 @@ export async function PATCH(request: Request) {
       )
     }
 
+    // Handle note update
     if (note !== undefined) {
       const { error: updateError } = await supabaseAdmin
         .from('catalogs')
@@ -108,6 +111,42 @@ export async function PATCH(request: Request) {
       }
 
       return NextResponse.json({ success: true, message: 'تم حفظ الملاحظة بنجاح' })
+    }
+
+    // Handle contacted_by update
+    if (contactedBy !== undefined) {
+      const { error: updateError } = await supabaseAdmin
+        .from('catalogs')
+        .update({ contacted_by: contactedBy })
+        .eq('user_id', userId)
+
+      if (updateError) {
+        console.error('Error updating contacted_by:', updateError)
+        return NextResponse.json(
+          { error: 'فشل في تحديث حالة التواصل' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true, message: 'تم تحديث حالة التواصل بنجاح' })
+    }
+
+    // Handle is_engaged update
+    if (isEngaged !== undefined) {
+      const { error: updateError } = await supabaseAdmin
+        .from('catalogs')
+        .update({ is_engaged: isEngaged })
+        .eq('user_id', userId)
+
+      if (updateError) {
+        console.error('Error updating is_engaged:', updateError)
+        return NextResponse.json(
+          { error: 'فشل في تحديث حالة التفاعل' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true, message: 'تم تحديث حالة التفاعل بنجاح' })
     }
 
     if (!plan) {
