@@ -23,7 +23,7 @@ export async function GET() {
     // جلب بيانات المتاجر المرتبطة بالمستخدمين
     const { data: catalogs, error: catalogsError } = await supabaseAdmin
       .from('catalogs')
-      .select('user_id, name, display_name, plan, whatsapp_number, pro_activated_at, warning_sent_at, cancelled_sent_at')
+      .select('user_id, name, display_name, plan, whatsapp_number, pro_activated_at, warning_sent_at, cancelled_sent_at, notes')
 
     if (catalogsError) {
       console.error('Error fetching catalogs:', catalogsError)
@@ -37,6 +37,7 @@ export async function GET() {
     const proActivatedAtMap = new Map()
     const warningSentAtMap = new Map()
     const cancelledSentAtMap = new Map()
+    const notesMap = new Map()
     if (catalogs) {
       catalogs.forEach(catalog => {
         nameMap.set(catalog.user_id, catalog.name)
@@ -46,6 +47,7 @@ export async function GET() {
         proActivatedAtMap.set(catalog.user_id, catalog.pro_activated_at)
         warningSentAtMap.set(catalog.user_id, catalog.warning_sent_at)
         cancelledSentAtMap.set(catalog.user_id, catalog.cancelled_sent_at)
+        notesMap.set(catalog.user_id, catalog.notes)
       })
     }
 
@@ -62,6 +64,7 @@ export async function GET() {
       pro_activated_at: proActivatedAtMap.get(user.id) || null,
       warning_sent_at: warningSentAtMap.get(user.id) || null,
       cancelled_sent_at: cancelledSentAtMap.get(user.id) || null,
+      notes: notesMap.get(user.id) || null,
       created_at: user.created_at,
       user_metadata: user.user_metadata
     }))
@@ -77,9 +80,33 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     const supabaseAdmin = createSupabaseAdminClient()
-    const { userId, plan, renew } = await request.json()
+    const { userId, plan, renew, note } = await request.json()
 
-    if (!userId || !plan) {
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'معرف المستخدم مطلوب' },
+        { status: 400 }
+      )
+    }
+
+    if (note !== undefined) {
+      const { error: updateError } = await supabaseAdmin
+        .from('catalogs')
+        .update({ notes: note })
+        .eq('user_id', userId)
+
+      if (updateError) {
+        console.error('Error updating note:', updateError)
+        return NextResponse.json(
+          { error: 'فشل في حفظ الملاحظة' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true, message: 'تم حفظ الملاحظة بنجاح' })
+    }
+
+    if (!plan) {
       return NextResponse.json(
         { error: 'معرف المستخدم والخطة مطلوبان' },
         { status: 400 }

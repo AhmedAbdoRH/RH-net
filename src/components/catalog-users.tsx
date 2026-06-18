@@ -18,6 +18,8 @@ interface User {
   pro_activated_at: string | null
   warning_sent_at: string | null
   cancelled_sent_at: string | null
+  notes: string | null
+  contacted_by: string | null
   created_at: string
   user_metadata?: any
 }
@@ -49,8 +51,12 @@ export function CatalogUsers() {
   const [cancelingUserId, setCancelingUserId] = useState<string | null>(null)
   const [sendingWarningUserId, setSendingWarningUserId] = useState<string | null>(null)
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null)
+  const [savingNoteId, setSavingNoteId] = useState<string | null>(null)
   const [notes, setNotes] = useState<Record<string, string>>({})
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
+  const [contactedBy, setContactedBy] = useState<Record<string, string | null>>({})
+  const [openContactDropdown, setOpenContactDropdown] = useState<string | null>(null)
+  const [savingContactId, setSavingContactId] = useState<string | null>(null)
 
   const handleCopyLink = (userId: string, storeName: string) => {
     const url = getStoreUrl(storeName)
@@ -62,10 +68,52 @@ export function CatalogUsers() {
       .catch((err) => console.error("Could not copy link:", err))
   }
 
-  const handleSaveNote = (userId: string, note: string) => {
-    setNotes(prev => ({ ...prev, [userId]: note }))
-    setEditingNoteId(null)
-    // TODO: Save to database
+  const handleSaveNote = async (userId: string, note: string) => {
+    setSavingNoteId(userId)
+    try {
+      const response = await fetch('/api/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, note })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في حفظ الملاحظة')
+      }
+
+      setNotes(prev => ({ ...prev, [userId]: note }))
+      setEditingNoteId(null)
+    } catch (err) {
+      console.error('Error saving note:', err)
+      alert('فشل في حفظ الملاحظة')
+    } finally {
+      setSavingNoteId(null)
+    }
+  }
+
+  const handleSetContactedBy = async (userId: string, person: string) => {
+    setSavingContactId(userId)
+    setOpenContactDropdown(null)
+    try {
+      const response = await fetch('/api/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, contactedBy: person })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في تحديث حالة التواصل')
+      }
+
+      setContactedBy(prev => ({ ...prev, [userId]: person }))
+    } catch (err) {
+      console.error('Error updating contacted_by:', err)
+      alert('فشل في تحديث حالة التواصل')
+    } finally {
+      setSavingContactId(null)
+    }
   }
 
   const handleDeleteUser = async (userId: string) => {
@@ -249,6 +297,16 @@ export function CatalogUsers() {
       }
 
       setUsers(data.users || [])
+      const notesMap: Record<string, string> = {}
+      const contactedByMap: Record<string, string | null> = {}
+      if (data.users) {
+        data.users.forEach((u: any) => {
+          if (u.notes) notesMap[u.id] = u.notes
+          contactedByMap[u.id] = u.contacted_by || null
+        })
+      }
+      setNotes(notesMap)
+      setContactedBy(contactedByMap)
     } catch (err) {
       console.error('Error:', err)
       setError('حدث خطأ أثناء جلب البيانات')
@@ -844,15 +902,16 @@ export function CatalogUsers() {
                             value={notes[user.id] || ''}
                             onChange={(e) => setNotes(prev => ({ ...prev, [user.id]: e.target.value }))}
                             placeholder="أضف ملاحظة عن هذا التاجر..."
-                            className="flex-1 text-sm p-2 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 bg-black text-white placeholder:text-muted-foreground"
+                            className="flex-1 text-sm p-2 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 bg-black text-white placeholder:text-gray-500"
                             rows={2}
                             autoFocus
                           />
                           <button
                             onClick={() => handleSaveNote(user.id, notes[user.id] || '')}
-                            className="px-3 py-1 bg-primary text-primary-foreground text-sm rounded-md hover:bg-primary/90 transition-colors"
+                            disabled={savingNoteId === user.id}
+                            className="px-3 py-1 bg-primary text-primary-foreground text-sm rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
                           >
-                            حفظ
+                            {savingNoteId === user.id ? 'جاري الحفظ...' : 'حفظ'}
                           </button>
                           <button
                             onClick={() => setEditingNoteId(null)}
@@ -877,6 +936,47 @@ export function CatalogUsers() {
                               <span>أضف ملاحظة...</span>
                             </div>
                           )}
+                        </div>
+                      )}
+                    </div>
+                    {/* زر حالة التواصل */}
+                    <div className="relative mt-2">
+                      {contactedBy[user.id] ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-green-400">تم التواصل</span>
+                          <span className="text-sm text-muted-foreground">بواسطة: {contactedBy[user.id]}</span>
+                          <button
+                            onClick={() => setOpenContactDropdown(openContactDropdown === user.id ? null : user.id)}
+                            className="text-xs text-muted-foreground hover:text-foreground transition-colors underline"
+                          >
+                            تغيير
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setOpenContactDropdown(openContactDropdown === user.id ? null : user.id)}
+                          className="px-3 py-1.5 text-sm border border-border rounded-md hover:bg-muted/50 transition-colors text-muted-foreground flex items-center gap-1.5"
+                        >
+                          <span>📞</span>
+                          <span>لم يتم التواصل</span>
+                        </button>
+                      )}
+                      {openContactDropdown === user.id && (
+                        <div className="absolute right-0 top-full mt-1 z-50 bg-popover border border-border rounded-md shadow-lg p-1 min-w-[120px]">
+                          <button
+                            onClick={() => handleSetContactedBy(user.id, 'أحمد')}
+                            disabled={savingContactId === user.id}
+                            className="w-full text-right px-3 py-1.5 text-sm hover:bg-muted rounded transition-colors disabled:opacity-50"
+                          >
+                            أحمد
+                          </button>
+                          <button
+                            onClick={() => handleSetContactedBy(user.id, 'أبو العزم')}
+                            disabled={savingContactId === user.id}
+                            className="w-full text-right px-3 py-1.5 text-sm hover:bg-muted rounded transition-colors disabled:opacity-50"
+                          >
+                            أبو العزم
+                          </button>
                         </div>
                       )}
                     </div>
