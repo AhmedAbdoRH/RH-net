@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState, useEffect } from "react"
-import { Users, Mail, Trash2, Copy, Check, ExternalLink } from "lucide-react"
+import { Users, Mail, Trash2, Copy, Check, ExternalLink, Download } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
@@ -373,7 +373,7 @@ ${url}`
     const date = new Date(dateString)
     const now = new Date()
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-    
+
     if (seconds < 60) return 'للتو'
     if (seconds < 3600) return `${Math.floor(seconds / 60)} دقيقة`
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} ساعة`
@@ -381,6 +381,72 @@ ${url}`
     if (seconds < 2592000) return `${Math.floor(seconds / 604800)} أسبوع`
     if (seconds < 31536000) return `${Math.floor(seconds / 2592000)} شهر`
     return `${Math.floor(seconds / 31536000)} سنة`
+  }
+
+  const handleDownloadData = () => {
+    let markdown = '# تقرير بيانات وإحصائيات التجار\n\n'
+    markdown += `تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}\n\n`
+    markdown += `---\n\n`
+
+    if (traderStats) {
+      markdown += '## إحصائيات عامة\n\n'
+      markdown += `- إجمالي التجار: ${users.length}\n`
+      markdown += `- برو: ${users.filter(u => u.plan === 'pro').length}\n`
+      markdown += `- بيزيك: ${users.filter(u => u.plan !== 'pro').length}\n\n`
+      markdown += '### توزيع أنواع التجار\n\n'
+      markdown += `- سوبر: ${traderStats.stats?.سوبر || 0}\n`
+      markdown += `- نشط: ${traderStats.stats?.نشط || 0}\n`
+      markdown += `- مبتدئ: ${traderStats.stats?.مبتدئ || 0}\n`
+      markdown += `- غير نشط: ${traderStats.stats?.خامل || 0}\n\n`
+      markdown += '### المتجاوبون\n\n'
+      markdown += `- متجاوب: ${Object.keys(engaged).filter(id => engaged[id]).length}\n`
+      markdown += `- غير متجاوب: ${Object.keys(engaged).filter(id => !engaged[id]).length}\n\n`
+      markdown += `---\n\n`
+    }
+
+    markdown += '## تفاصيل كل تاجر\n\n'
+
+    users.forEach((user, index) => {
+      const trader = getTraderType(user.id)
+      markdown += `### ${index + 1}. ${user.store_display_name || user.store_name}\n\n`
+      markdown += `- **اسم التاجر:** ${user.display_name}\n`
+      markdown += `- **البريد الإلكتروني:** ${user.email}\n`
+      markdown += `- **رقم الواتساب:** ${user.whatsapp_number || 'غير متوفر'}\n`
+      markdown += `- **نوع الخطة:** ${user.plan === 'pro' ? '👑 برو' : '💎 بيزيك'}\n`
+      markdown += `- **نوع التاجر:** ${trader ? `${trader.type} (${trader.productCount} منتج)` : 'غير محدد'}\n`
+      markdown += `- **تاريخ التسجيل:** ${formatDate(user.created_at)} (${getTimeAgo(user.created_at)})\n`
+      markdown += `- **حالة التفاعل:** ${engaged[user.id] ? '⚡ متجاوب' : '😴 غير متجاوب'}\n`
+      markdown += `- **من تواصل معه:** ${contactedBy[user.id] || 'لم يتم التواصل'}\n`
+      markdown += `- **الملاحظات:** ${notes[user.id] || 'لا توجد ملاحظات'}\n`
+
+      if (user.plan === 'pro') {
+        markdown += `- **تاريخ تفعيل البرو:** ${user.pro_activated_at ? formatDate(user.pro_activated_at) : 'غير متوفر'}\n`
+        markdown += `- **تاريخ إرسال التنبيه:** ${user.warning_sent_at ? formatDate(user.warning_sent_at) : 'لم يتم الإرسال'}\n`
+        markdown += `- **تاريخ الإلغاء:** ${user.cancelled_sent_at ? formatDate(user.cancelled_sent_at) : 'لم يتم الإلغاء'}\n`
+      }
+
+      if (user.store_name !== 'لا يوجد متجر') {
+        markdown += `- **رابط المتجر:** ${getStoreUrl(user.store_name)}\n`
+      }
+
+      if (trader && trader.productActivityDays && trader.productActivityDays.length > 0) {
+        markdown += `- **أيام النشاط:** ${trader.productActivityDays.length} يوم\n`
+        markdown += `- **أول منتج:** ${trader.firstProductAt ? formatDate(trader.firstProductAt) : 'غير متوفر'}\n`
+        markdown += `- **آخر منتج:** ${trader.latestProductAt ? formatDate(trader.latestProductAt) : 'غير متوفر'}\n`
+      }
+
+      markdown += '\n---\n\n'
+    })
+
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `تقرير-التجار-${new Date().toISOString().split('T')[0]}.md`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   const getTraderType = (userId: string) => {
@@ -722,6 +788,19 @@ ${url}`
                 }`}
               >
                 ⚡ متجاوب ({Object.keys(engaged).filter(id => engaged[id]).length})
+              </button>
+            </div>
+          )}
+
+          {/* زر تنزيل البيانات */}
+          {users.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-center rtl mt-4" dir="rtl">
+              <button
+                onClick={handleDownloadData}
+                className="px-6 py-3 rounded-full font-medium transition-all duration-200 bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 shadow-md hover:shadow-lg flex items-center gap-2"
+              >
+                <Download className="w-5 h-5" />
+                <span>تنزيل تقرير التجار</span>
               </button>
             </div>
           )}
