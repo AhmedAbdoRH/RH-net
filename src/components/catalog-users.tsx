@@ -45,7 +45,7 @@ export function CatalogUsers() {
   const [error, setError] = useState<string | null>(null)
   const [traderData, setTraderData] = useState<UserProduct[]>([])
   const [traderStats, setTraderStats] = useState<any>(null)
-  const [filterType, setFilterType] = useState<'الكل' | 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر' | 'برو'>('الكل')
+  const [filterType, setFilterType] = useState<'الكل' | 'خامل' | 'مبتدئ' | 'نشط' | 'سوبر' | 'برو' | 'متجاوب'>('الكل')
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
   const [upgradingUserId, setUpgradingUserId] = useState<string | null>(null)
   const [renewingUserId, setRenewingUserId] = useState<string | null>(null)
@@ -63,7 +63,10 @@ export function CatalogUsers() {
 
   const handleCopyLink = (userId: string, storeName: string) => {
     const url = getStoreUrl(storeName)
-    navigator.clipboard.writeText(url)
+    const welcomeMessage = `أهلا بيك في تاجر أونلاين
+دلوقتي بقى عندك متجر أونلاين ✨ رابط متجرك :
+${url}`
+    navigator.clipboard.writeText(welcomeMessage)
       .then(() => {
         setCopiedStoreId(userId)
         setTimeout(() => setCopiedStoreId(null), 2000)
@@ -707,6 +710,22 @@ export function CatalogUsers() {
             </div>
           )}
 
+          {/* زر فلتر المتجاوبين */}
+          {users.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-center rtl mt-2" dir="rtl">
+              <button
+                onClick={() => setFilterType('متجاوب')}
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                  filterType === 'متجاوب'
+                    ? 'bg-purple-500/30 text-purple-700 border-2 border-purple-500'
+                    : 'bg-purple-500/10 text-purple-700 border border-purple-500/30 hover:bg-purple-500/20'
+                }`}
+              >
+                ⚡ متجاوب ({Object.keys(engaged).filter(id => engaged[id]).length})
+              </button>
+            </div>
+          )}
+
           {/* قائمة المستخدمين المضغوطة مع المعلومات */}
           {users.length > 0 && (
             <div className="space-y-3 rtl" dir="rtl">
@@ -714,6 +733,7 @@ export function CatalogUsers() {
                 .filter((user) => {
                   if (filterType === 'الكل') return true
                   if (filterType === 'برو') return user.plan === 'pro'
+                  if (filterType === 'متجاوب') return engaged[user.id] === true
                   const traderType = getTraderType(user.id)?.type
                   return traderType === filterType
                 })
@@ -1025,7 +1045,7 @@ export function CatalogUsers() {
                            }`}
                          >
                            <span>⚡</span>
-                           <span>{engaged[user.id] ? 'متفاعل' : 'غير متفاعل'}</span>
+                           <span>{engaged[user.id] ? 'متجاوب' : 'غير متجاوب'}</span>
                          </button>
                          {savingEngagedId === user.id && (
                            <span className="absolute left-0 top-full mt-1 px-3 py-1.5 text-xs bg-muted text-muted-foreground rounded">
