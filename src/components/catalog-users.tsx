@@ -74,27 +74,86 @@ ${url}`
       .catch((err) => console.error("Could not copy link:", err))
   }
 
-  const handleSaveNote = async (userId: string, note: string) => {
+  const handleAddNote = async (userId: string, note: string) => {
     setSavingNoteId(userId)
     try {
-      const response = await fetch('/api/users', {
-        method: 'PATCH',
+      const response = await fetch(`/api/users/${userId}/notes`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, note })
+        body: JSON.stringify({ note })
       })
 
       if (!response.ok) {
         const data = await response.json()
-        throw new Error(data.error || 'فشل في حفظ الملاحظة')
+        throw new Error(data.error || 'فشل في إنشاء الملاحظة')
       }
 
-      setNotes(prev => ({ ...prev, [userId]: note }))
-      setEditingNoteId(null)
+      const data = await response.json()
+      // إضافة الملاحظة الجديدة إلى القائمة
+      setNotes(prev => ({
+        ...prev,
+        [userId]: [...(prev[userId] || []), data.note]
+      }))
     } catch (err) {
-      console.error('Error saving note:', err)
-      alert('فشل في حفظ الملاحظة')
+      console.error('Error adding note:', err)
+      alert('فشل في إنشاء الملاحظة')
     } finally {
       setSavingNoteId(null)
+    }
+  }
+
+  const handleUpdateNote = async (userId: string, noteId: string, note: string) => {
+    setSavingNoteId(userId)
+    try {
+      const response = await fetch(`/api/users/${userId}/notes/${noteId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في تحديث الملاحظة')
+      }
+
+      const data = await response.json()
+      // تحديث الملاحظة في القائمة
+      setNotes(prev => ({
+        ...prev,
+        [userId]: prev[userId]?.map((n: any) => 
+          n.id === noteId ? { ...n, note: data.note, updatedAt: data.updated_at } : n
+        ) || []
+      }))
+    } catch (err) {
+      console.error('Error updating note:', err)
+      alert('فشل في تحديث الملاحظة')
+    } finally {
+      setSavingNoteId(null)
+    }
+  }
+
+  const handleDeleteNote = async (userId: string, noteId: string) => {
+    setDeletingNoteId(noteId)
+    try {
+      const response = await fetch(`/api/users/${userId}/notes/${noteId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'فشل في حذف الملاحظة')
+      }
+
+      // حذف الملاحظة من القائمة
+      setNotes(prev => ({
+        ...prev,
+        [userId]: (prev[userId] || []).filter((n: any) => n.id !== noteId)
+      }))
+    } catch (err) {
+      console.error('Error deleting note:', err)
+      alert('فشل في حذف الملاحظة')
+    } finally {
+      setDeletingNoteId(null)
     }
   }
 
