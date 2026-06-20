@@ -52,7 +52,7 @@ export function CatalogUsers() {
   const [sendingWarningUserId, setSendingWarningUserId] = useState<string | null>(null)
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null)
   const [savingNoteId, setSavingNoteId] = useState<string | null>(null)
-  const [notes, setNotes] = useState<Record<string, Array<{id: string; note: string; createdAt: string; updatedAt: string>>>({})
+  const [notes, setNotes] = useState<Record<string, Array<{id: string; note: string; createdAt: string; updatedAt: string}>>>({})
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null)
   const [contactedBy, setContactedBy] = useState<Record<string, string | null>>({})
@@ -797,7 +797,18 @@ ${url}`
 
           {/* أزرار التصفية */}
           {users.length > 0 && (
-            <div className="flex flex-wrap gap-2 justify-center rtl" dir="rtl">
+            <>
+              {/* زر تنزيل البيانات */}
+              <div className="flex flex-wrap gap-2 justify-center rtl mb-3" dir="rtl">
+                <button
+                  onClick={handleDownloadData}
+                  className="px-6 py-3 rounded-full font-medium transition-all duration-200 bg-black text-white hover:bg-gray-900 shadow-md hover:shadow-lg flex items-center gap-2 border border-white/10"
+                >
+                  <Download className="w-5 h-5" />
+                  <span>تنزيل تقرير التجار</span>
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center rtl" dir="rtl">
               <button
                 onClick={() => setFilterType('الكل')}
                 className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
@@ -859,6 +870,7 @@ ${url}`
                 😴 غير نشط ({traderData.filter(t => t.type === 'خامل').length})
               </button>
             </div>
+            </>
           )}
 
           {/* زر فلتر المتجاوبين */}
@@ -873,19 +885,6 @@ ${url}`
                 }`}
               >
                 ⚡ متجاوب ({Object.keys(engaged).filter(id => engaged[id]).length})
-              </button>
-            </div>
-          )}
-
-          {/* زر تنزيل البيانات */}
-          {users.length > 0 && (
-            <div className="flex flex-wrap gap-2 justify-center rtl mt-4" dir="rtl">
-              <button
-                onClick={handleDownloadData}
-                className="px-6 py-3 rounded-full font-medium transition-all duration-200 bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 shadow-md hover:shadow-lg flex items-center gap-2"
-              >
-                <Download className="w-5 h-5" />
-                <span>تنزيل تقرير التجار</span>
               </button>
             </div>
           )}
@@ -1154,7 +1153,7 @@ ${url}`
                           )}
                         </div>
                       )}
-</div>
+                    </div>
                      {/* أزرار الحالة */}
                      <div className="flex flex-wrap gap-2 mt-2">
                        {/* زر حالة التواصل */}
