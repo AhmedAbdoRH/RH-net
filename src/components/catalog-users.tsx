@@ -18,7 +18,6 @@ interface User {
   pro_activated_at: string | null
   warning_sent_at: string | null
   cancelled_sent_at: string | null
-  notes: string | null
   contacted_by: string | null
   is_engaged: boolean
   created_at: string
@@ -53,8 +52,9 @@ export function CatalogUsers() {
   const [sendingWarningUserId, setSendingWarningUserId] = useState<string | null>(null)
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null)
   const [savingNoteId, setSavingNoteId] = useState<string | null>(null)
-  const [notes, setNotes] = useState<Record<string, string>>({})
+  const [notes, setNotes] = useState<Record<string, Array<{id: string; note: string; createdAt: string; updatedAt: string>>>({})
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
+  const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null)
   const [contactedBy, setContactedBy] = useState<Record<string, string | null>>({})
   const [openContactDropdown, setOpenContactDropdown] = useState<string | null>(null)
   const [savingContactId, setSavingContactId] = useState<string | null>(null)
@@ -329,16 +329,42 @@ ${url}`
       }
 
       setUsers(data.users || [])
-      const notesMap: Record<string, string> = {}
+      
+      // جلب الملاحظات لكل مستخدم
+      const notesMap: Record<string, Array<{id: string; note: string; createdAt: string; updatedAt: string}>> = {}
       const contactedByMap: Record<string, string | null> = {}
       const engagedMap: Record<string, boolean> = {}
+      
       if (data.users) {
+        // تهيئة خرائط مع قيم افتراضية
         data.users.forEach((u: any) => {
-          if (u.notes) notesMap[u.id] = u.notes
+          notesMap[u.id] = []
           contactedByMap[u.id] = u.contacted_by || null
           engagedMap[u.id] = u.is_engaged || false
         })
+        
+        // جلب الملاحظات الفعلية لكل مستخدم
+        for (const user of data.users) {
+          try {
+            const notesResponse = await fetch(`/api/users/${user.id}/notes?userId=${user.id}`)
+            if (notesResponse.ok) {
+              const notesData = await notesResponse.json()
+              if (notesData.notes) {
+                notesMap[user.id] = notesData.notes.map((note: any) => ({
+                  id: note.id,
+                  note: note.note,
+                  createdAt: note.created_at,
+                  updatedAt: note.updated_at
+                }))
+              }
+            }
+          } catch (noteError) {
+            console.error(`Error fetching notes for user ${user.id}:`, noteError)
+            // استمر مع الملاحظات الفارغة في case of error
+          }
+        }
       }
+      
       setNotes(notesMap)
       setContactedBy(contactedByMap)
       setEngaged(engagedMap)
