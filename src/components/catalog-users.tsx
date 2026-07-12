@@ -334,8 +334,8 @@ ${url}`
   }
 
   useEffect(() => {
-    fetchUsers()
-    fetchTraderData()
+    // جلب البيانات بالتوازي لتحسين الأداء
+    Promise.all([fetchUsers(), fetchTraderData()])
   }, [])
 
   const fetchTraderData = async () => {
@@ -402,26 +402,35 @@ ${url}`
           engagedMap[u.id] = u.is_engaged || false
         })
         
-        // جلب الملاحظات الفعلية لكل مستخدم
-        for (const user of data.users) {
+        // جلب الملاحظات الفعلية لكل مستخدم بالتوازي لتحسين الأداء
+        const notesPromises = data.users.map(async (user: any) => {
           try {
             const notesResponse = await fetch(`/api/users/${user.id}/notes?userId=${user.id}`)
             if (notesResponse.ok) {
               const notesData = await notesResponse.json()
               if (notesData.notes) {
-                notesMap[user.id] = notesData.notes.map((note: any) => ({
-                  id: note.id,
-                  note: note.note,
-                  createdAt: note.created_at,
-                  updatedAt: note.updated_at
-                }))
+                return {
+                  userId: user.id,
+                  notes: notesData.notes.map((note: any) => ({
+                    id: note.id,
+                    note: note.note,
+                    createdAt: note.created_at,
+                    updatedAt: note.updated_at
+                  }))
+                }
               }
             }
+            return { userId: user.id, notes: [] }
           } catch (noteError) {
             console.error(`Error fetching notes for user ${user.id}:`, noteError)
-            // استمر مع الملاحظات الفارغة في case of error
+            return { userId: user.id, notes: [] }
           }
-        }
+        })
+
+        const notesResults = await Promise.all(notesPromises)
+        notesResults.forEach(({ userId, notes }) => {
+          notesMap[userId] = notes
+        })
       }
       
       setNotes(notesMap)
@@ -578,19 +587,80 @@ ${url}`
 
     return (
       <div className="relative h-1 bg-muted rounded-full overflow-hidden">
-        {/* الشريط الذهبي - فترة الاشتراك (30 يوم) */}
+        {/* الشريط الذهبي - فترة الاشتراك (30 يوم) - من اليسار */}
         <div
-          className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-400 to-amber-500 transition-all duration-300"
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-300"
           style={{ width: `${Math.max(0, subscriptionBarWidth)}%` }}
         />
-        {/* الشريط الذهبي الغامق - فترة السماح (10 أيام) ملتصق بالشريط الذهبي */}
+        {/* الشريط الذهبي الغامق - فترة السماح (10 أيام) - ملتصق بالشريط الفاتح */}
         <div
-          className="absolute right-0 top-0 h-full bg-gradient-to-l from-amber-700 to-amber-800 transition-all duration-300"
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-700 to-amber-800 transition-all duration-300"
           style={{
             width: `${Math.max(0, gracePeriodBarWidth)}%`,
-            right: `${Math.max(0, subscriptionBarWidth)}%`
+            left: `${Math.max(0, subscriptionBarWidth)}%`
           }}
         />
+      </div>
+    )
+  }
+
+  const TrialPeriodBar = ({ createdAt }: { createdAt: string }) => {
+    const createdDate = new Date(createdAt)
+    const now = new Date()
+    const daysSinceCreation = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
+
+    const trialDays = 30 // فترة تجريبية 30 يوم
+    const gracePeriodDays = 10 // فترة السماح 10 أيام
+    const totalDays = trialDays + gracePeriodDays
+
+    // حساب نسبة المتبقي (ينقص من 100% إلى 0%)
+    const remainingDays = Math.max(0, totalDays - daysSinceCreation)
+    const remainingPercentage = (remainingDays / totalDays) * 100
+
+    // حساب نسبة كل جزء
+    const trialPercentage = (trialDays / totalDays) * 100
+    const gracePeriodPercentage = (gracePeriodDays / totalDays) * 100
+
+    // حساب عرض كل شريط بناءً على المتبقي
+    let trialBarWidth = 0
+    let gracePeriodBarWidth = 0
+
+    if (daysSinceCreation < trialDays) {
+      // في الفترة التجريبية: الشريط الليموني ينقص
+      trialBarWidth = trialPercentage - (daysSinceCreation / totalDays) * 100
+      gracePeriodBarWidth = gracePeriodPercentage
+    } else if (daysSinceCreation < totalDays) {
+      // في فترة السماح: الشريط الليموني = 0، الشريط الغامق ينقص
+      trialBarWidth = 0
+      const daysInGracePeriod = daysSinceCreation - trialDays
+      gracePeriodBarWidth = gracePeriodPercentage - (daysInGracePeriod / totalDays) * 100
+    } else {
+      // انتهى: كلاهما = 0
+      trialBarWidth = 0
+      gracePeriodBarWidth = 0
+    }
+
+    // لا تظهر الشريط إذا انتهت الفترة بالكامل
+    if (daysSinceCreation > totalDays) return null
+
+    return (
+      <div className="relative h-1 bg-muted rounded-full overflow-hidden mt-2">
+        {/* الشريط الليموني - فترة تجريبية (30 يوم) - من اليسار */}
+        <div
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-lime-400 to-lime-500 transition-all duration-300"
+          style={{ width: `${Math.max(0, trialBarWidth)}%` }}
+        />
+        {/* الشريط الليموني الغامق - فترة السماح (10 أيام) - ملتصق بالشريط الفاتح */}
+        <div
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-lime-700 to-lime-800 transition-all duration-300"
+          style={{
+            width: `${Math.max(0, gracePeriodBarWidth)}%`,
+            left: `${Math.max(0, trialBarWidth)}%`
+          }}
+        />
+        <div className="text-xs text-lime-400 mt-1 text-center">
+          {daysSinceCreation < trialDays ? `فترة تجريبية: ${remainingDays} يوم متبقي` : `فترة سماح: ${remainingDays} يوم متبقي`}
+        </div>
       </div>
     )
   }
@@ -1108,6 +1178,9 @@ ${url}`
                     />
                     {user.plan === 'pro' && (
                       <ProSubscriptionBar proActivatedAt={user.pro_activated_at} />
+                    )}
+                    {user.plan !== 'pro' && (
+                      <TrialPeriodBar createdAt={user.created_at} />
                     )}
                     {/* شريط الملاحظات */}
                     <div className="mt-3 border-t border-border/20 pt-3">
