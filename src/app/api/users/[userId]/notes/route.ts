@@ -38,9 +38,10 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: Request, { params }: { params: { userId: string } }) {
   try {
-    const { userId, note } = await request.json()
+    const userId = params.userId
+    const { note } = await request.json()
 
     if (!userId) {
       return NextResponse.json(
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
 
     if (!note || note.trim() === '') {
       return NextResponse.json(
-        { error: 'النote مطلوب且不能为空' },
+        { error: 'الملاحظة مطلوبة ولا يمكن أن تكون فارغة' },
         { status: 400 }
       )
     }
