@@ -52,7 +52,7 @@ export function CatalogUsers() {
   const [sendingWarningUserId, setSendingWarningUserId] = useState<string | null>(null)
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null)
   const [savingNoteId, setSavingNoteId] = useState<string | null>(null)
-  const [notes, setNotes] = useState<Record<string, Array<{id: string; note: string; createdAt: string; updatedAt: string}>>>({})
+  const [notes, setNotes] = useState<Record<string, string>>({})
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null)
   const [contactedBy, setContactedBy] = useState<Record<string, string | null>>({})
@@ -89,17 +89,22 @@ ${url}`
       }
 
       const data = await response.json()
-      // إضافة الملاحظة الجديدة إلى القائمة
+      // تحديث الملاحظة
       setNotes(prev => ({
         ...prev,
-        [userId]: [...(prev[userId] || []), data.note]
+        [userId]: note
       }))
+      setEditingNoteId(null)
     } catch (err) {
       console.error('Error adding note:', err)
       alert('فشل في إنشاء الملاحظة')
     } finally {
       setSavingNoteId(null)
     }
+  }
+
+  const handleSaveNote = async (userId: string, note: string) => {
+    await handleAddNote(userId, note)
   }
 
   const handleUpdateNote = async (userId: string, noteId: string, note: string) => {
@@ -388,48 +393,45 @@ ${url}`
       }
 
       setUsers(data.users || [])
-      
+
       // جلب الملاحظات لكل مستخدم
-      const notesMap: Record<string, Array<{id: string; note: string; createdAt: string; updatedAt: string}>> = {}
+      const notesMap: Record<string, string> = {}
       const contactedByMap: Record<string, string | null> = {}
       const engagedMap: Record<string, boolean> = {}
-      
+
       if (data.users) {
         // تهيئة خرائط مع قيم افتراضية
         data.users.forEach((u: any) => {
-          notesMap[u.id] = []
+          notesMap[u.id] = ''
           contactedByMap[u.id] = u.contacted_by || null
           engagedMap[u.id] = u.is_engaged || false
         })
-        
+
         // جلب الملاحظات الفعلية لكل مستخدم بالتوازي لتحسين الأداء
         const notesPromises = data.users.map(async (user: any) => {
           try {
             const notesResponse = await fetch(`/api/users/${user.id}/notes?userId=${user.id}`)
             if (notesResponse.ok) {
               const notesData = await notesResponse.json()
-              if (notesData.notes) {
+              if (notesData.notes && notesData.notes.length > 0) {
+                // أخذ آخر ملاحظة فقط
+                const lastNote = notesData.notes[notesData.notes.length - 1]
                 return {
                   userId: user.id,
-                  notes: notesData.notes.map((note: any) => ({
-                    id: note.id,
-                    note: note.note,
-                    createdAt: note.created_at,
-                    updatedAt: note.updated_at
-                  }))
+                  note: lastNote.note
                 }
               }
             }
-            return { userId: user.id, notes: [] }
+            return { userId: user.id, note: '' }
           } catch (noteError) {
             console.error(`Error fetching notes for user ${user.id}:`, noteError)
-            return { userId: user.id, notes: [] }
+            return { userId: user.id, note: '' }
           }
         })
 
         const notesResults = await Promise.all(notesPromises)
-        notesResults.forEach(({ userId, notes }) => {
-          notesMap[userId] = notes
+        notesResults.forEach(({ userId, note }) => {
+          notesMap[userId] = note
         })
       }
       
