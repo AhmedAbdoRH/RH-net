@@ -107,6 +107,13 @@ ${url}`
     await handleAddNote(userId, note)
   }
 
+  const handleNoteKeyDown = (e: React.KeyboardEvent, userId: string) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSaveNote(userId, notes[userId] || '')
+    }
+  }
+
   const handleUpdateNote = async (userId: string, noteId: string, note: string) => {
     setSavingNoteId(userId)
     try {
@@ -137,10 +144,11 @@ ${url}`
     }
   }
 
-  const handleDeleteNote = async (userId: string, noteId: string) => {
-    setDeletingNoteId(noteId)
+  const handleDeleteNote = async (userId: string, noteId?: string) => {
+    setDeletingNoteId(userId)
     try {
-      const response = await fetch(`/api/users/${userId}/notes/${noteId}`, {
+      // حذف جميع الملاحظات للمستخدم
+      const response = await fetch(`/api/users/${userId}/notes`, {
         method: 'DELETE'
       })
 
@@ -149,10 +157,10 @@ ${url}`
         throw new Error(data.error || 'فشل في حذف الملاحظة')
       }
 
-      // حذف الملاحظة من القائمة
+      // مسح الملاحظة
       setNotes(prev => ({
         ...prev,
-        [userId]: (prev[userId] || []).filter((n: any) => n.id !== noteId)
+        [userId]: ''
       }))
     } catch (err) {
       console.error('Error deleting note:', err)
@@ -1191,7 +1199,8 @@ ${url}`
                           <textarea
                             value={notes[user.id] || ''}
                             onChange={(e) => setNotes(prev => ({ ...prev, [user.id]: e.target.value }))}
-                            placeholder="أضف ملاحظة عن هذا التاجر..."
+                            onKeyDown={(e) => handleNoteKeyDown(e, user.id)}
+                            placeholder="أضف ملاحظة عن هذا التاجر... (اضغط Enter للحفظ)"
                             className="flex-1 text-sm p-2 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 bg-black text-white placeholder:text-gray-500"
                             rows={2}
                             autoFocus
@@ -1213,15 +1222,25 @@ ${url}`
                       ) : (
                         <div
                           onClick={() => setEditingNoteId(user.id)}
-                          className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors min-h-[2rem] p-2 rounded-md hover:bg-muted/50"
+                          className="text-sm text-yellow-500 cursor-pointer hover:text-yellow-400 transition-colors min-h-[2rem] p-2 rounded-md hover:bg-yellow-500/10 relative group"
                         >
                           {notes[user.id] ? (
                             <div className="flex items-start gap-2">
                               <span className="text-base">📝</span>
                               <span className="flex-1">{notes[user.id]}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleDeleteNote(user.id)
+                                }}
+                                disabled={deletingNoteId === user.id}
+                                className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-600 text-xs px-2 py-1 rounded transition-opacity disabled:opacity-50"
+                              >
+                                {deletingNoteId === user.id ? 'جاري الحذف...' : 'حذف'}
+                              </button>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2 text-muted-foreground/70">
+                            <div className="flex items-center gap-2 text-yellow-500/70">
                               <span className="text-base">📝</span>
                               <span>أضف ملاحظة...</span>
                             </div>

@@ -46,7 +46,11 @@ export function SiteHeader() {
   const fetchStats = async () => {
     try {
       const response = await fetch('/api/users')
-      if (!response.ok) throw new Error('Failed to fetch stats')
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Failed to fetch stats:', errorData.error || response.statusText)
+        throw new Error(errorData.error || 'Failed to fetch stats')
+      }
 
       const data = await response.json()
       if (data.users) {
@@ -64,6 +68,12 @@ export function SiteHeader() {
       }
     } catch (error) {
       console.error('Error fetching stats:', error)
+      // تعيين قيم افتراضية في حالة الفشل
+      setStats({
+        totalUsers: 0,
+        proUsers: 0,
+        lastUserDate: 'غير متوفر'
+      })
     } finally {
       setLoading(false)
     }

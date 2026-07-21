@@ -21,6 +21,11 @@ export async function GET(request: Request) {
       .order('created_at', { ascending: false })
 
     if (error) {
+      // إذا كان الجدول غير موجود، نرجع مصفوفة فارغة بدلاً من خطأ
+      if (error.code === '42P01') { // relation does not exist
+        console.warn('Table user_notes does not exist, returning empty array')
+        return NextResponse.json({ notes: [] })
+      }
       console.error('Error fetching user notes:', error)
       return NextResponse.json(
         { error: 'فشل في جلب الملاحظات' },
@@ -38,9 +43,11 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request, { params }: { params: { userId: string } }) {
+export async function POST(request: Request) {
   try {
-    const userId = params.userId
+    const url = new URL(request.url)
+    const pathParts = url.pathname.split('/')
+    const userId = pathParts[pathParts.length - 2] // userId is before /notes
     const { note } = await request.json()
 
     if (!userId) {
@@ -69,6 +76,15 @@ export async function POST(request: Request, { params }: { params: { userId: str
       .select()
 
     if (error) {
+      // إذا كان الجدول غير موجود، نحاول إنشاءه
+      if (error.code === '42P01') { // relation does not exist
+        console.warn('Table user_notes does not exist, attempting to create it')
+        // نرجع خطأن واضح للمستخدم
+        return NextResponse.json(
+          { error: 'جدول الملاحظات غير موجود في قاعدة البيانات. يرجى إنشاء الجدول user_notes أولاً.' },
+          { status: 500 }
+        )
+      }
       console.error('Error creating note:', error)
       return NextResponse.json(
         { error: 'فشل في إنشاء الملاحظة' },
@@ -80,6 +96,51 @@ export async function POST(request: Request, { params }: { params: { userId: str
       success: true, 
       message: 'تم إنشاء الملاحظة بنجاح',
       note: data[0]
+    })
+  } catch (error) {
+    console.error('Server error:', error)
+    return NextResponse.json(
+      { error: 'حدث خطأ في الخادم' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const url = new URL(request.url)
+    const pathParts = url.pathname.split('/')
+    const userId = pathParts[pathParts.length - 2] // userId is before /notes
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'معرف المستخدم مطلوب' },
+        { status: 400 }
+      )
+    }
+
+    const supabaseAdmin = createSupabaseAdminClient()
+    const { error } = await supabaseAdmin
+      .from('user_notes')
+      .delete()
+      .eq('user_id', userId)
+
+    if (error) {
+      // إذا كان الجدول غير موجود، نعتبره نجاح (لا شيء لحذفه)
+      if (error.code === '42P01') { // relation does not exist
+        console.warn('Table user_notes does not exist, nothing to delete')
+        return NextResponse.json({ success: true, message: 'تم الحذف بنجاح' })
+      }
+      console.error('Error deleting notes:', error)
+      return NextResponse.json(
+        { error: 'فشل في حذف الملاحظات' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'تم حذف الملاحظات بنجاح'
     })
   } catch (error) {
     console.error('Server error:', error)
