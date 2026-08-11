@@ -1,17 +1,22 @@
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const sourceDir = path.join(__dirname, '..', '.next');
 const targetDir = path.join(__dirname, '..', 'public');
 
-// Create target directory if it doesn't exist
-if (!fs.existsSync(targetDir)) {
-  fs.mkdirSync(targetDir, { recursive: true });
+// Clean target directory first
+if (fs.existsSync(targetDir)) {
+  fs.rmSync(targetDir, { recursive: true, force: true });
+  console.log('Cleaned existing public directory');
 }
 
-// Copy function that handles files and directories recursively
+// Create target directory
+fs.mkdirSync(targetDir, { recursive: true });
+
+// Copy function that resolves symlinks
 function copyRecursive(src, dest) {
-  const stat = fs.statSync(src);
+  const stat = fs.lstatSync(src);
   
   if (stat.isDirectory()) {
     // Create destination directory
@@ -26,8 +31,19 @@ function copyRecursive(src, dest) {
       const destPath = path.join(dest, file);
       copyRecursive(srcPath, destPath);
     });
+  } else if (stat.isSymbolicLink()) {
+    // Resolve symlink and copy the actual file
+    const realPath = fs.realpathSync(src);
+    const realStat = fs.statSync(realPath);
+    
+    if (realStat.isDirectory()) {
+      copyRecursive(realPath, dest);
+    } else {
+      const content = fs.readFileSync(realPath);
+      fs.writeFileSync(dest, content);
+    }
   } else {
-    // Copy file
+    // Copy regular file
     const content = fs.readFileSync(src);
     fs.writeFileSync(dest, content);
   }
