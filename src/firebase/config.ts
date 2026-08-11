@@ -1,11 +1,11 @@
-// It is safe to store this configuration client-side
-// All access is defined by firebase security rules
+// This is intentionally safe for client-side use, but the actual values should be provided
+// from environment variables in production. Keep placeholders here to avoid leaking secrets.
 export const firebaseConfig = {
-  "projectId": "domainview",
-  "appId": "1:226934922867:web:db492564c92b9b95f79406",
-  "storageBucket": "domainview.firebasestorage.app",
-  "apiKey": "AIzaSyA-AuKkPZiuQdA-NIPjObheWabwnrqwG7g",
-  "authDomain": "domainview.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "226934922867"
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'demo-domainview-project',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || 'demo-app-id',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'demo-domainview.firebasestorage.app',
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'demo-firebase-api-key',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'demo-domainview.firebaseapp.com',
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || '',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '000000000000',
 };

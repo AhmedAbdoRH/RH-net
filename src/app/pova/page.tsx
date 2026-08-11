@@ -34,10 +34,10 @@ export default function PovaPage() {
   const [buttonsVisible, setButtonsVisible] = React.useState(false);
   
   const apiKeysData = [
-    { key: 'AIzaSyAwPSkhtVxkIHvLEph99ipAcjtq3ZIqjy4', name: 'سمارت تيم' },
-    { key: 'AIzaSyADRxtILZAQ7EeJA9fKju7tj_YkMErqZH0', name: 'السماح للمفروشات' },
-    { key: 'AIzaSyAY7XTQpSR4nws-xRIhABZn3f3kYdGIVDs', name: 'بيرفيوم امبسدور' },
-    { key: 'AIzaSyDohlhUWuaygB35M2EY-JB1_F1xztx_lO4', name: 'سمارت تيم ماسنجر' }
+    { key: 'demo-firebase-api-key-1', name: 'Demo Project 1' },
+    { key: 'demo-firebase-api-key-2', name: 'Demo Project 2' },
+    { key: 'demo-firebase-api-key-3', name: 'Demo Project 3' },
+    { key: 'demo-firebase-api-key-4', name: 'Demo Project 4' }
   ];
   
   const handleSecretClick = (e: React.MouseEvent) => {

@@ -5,13 +5,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const firebaseConfig = {
-  "projectId": "domainview",
-  "appId": "1:226934922867:web:db492564c92b9b95f79406",
-  "storageBucket": "domainview.firebasestorage.app",
-  "apiKey": "AIzaSyA-AuKkPZiuQdA-NIPjObheWabwnrqwG7g",
-  "authDomain": "domainview.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "226934922867"
+  projectId: process.env.FIREBASE_PROJECT_ID || 'demo-domainview-project',
+  appId: process.env.FIREBASE_APP_ID || 'demo-app-id',
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'demo-domainview.firebasestorage.app',
+  apiKey: process.env.FIREBASE_API_KEY || 'demo-firebase-api-key',
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'demo-domainview.firebaseapp.com',
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID || '',
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '000000000000',
 };
 
 const app = initializeApp(firebaseConfig);
