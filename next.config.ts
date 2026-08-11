@@ -21,6 +21,9 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  output: 'export',
+  trailingSlash: true,
+  distDir: 'public',
 };
 
 export default nextConfig;
