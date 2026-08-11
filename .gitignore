@@ -48,3 +48,9 @@ firestore-debug.log
 backup_*.zip
 firestore_backup_*.json
 .env
+
+# Local Netlify folder
+.netlify
+
+# Additional build artifacts
+.netlify
