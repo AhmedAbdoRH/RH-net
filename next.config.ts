@@ -1,9 +1,11 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   typescript: {
     ignoreBuildErrors: true,
+  },
+  turbopack: {
+    root: __dirname,
   },
   images: {
     remotePatterns: [
@@ -18,7 +20,7 @@ const nextConfig: NextConfig = {
         hostname: 'i.ibb.co',
         port: '',
         pathname: '/**',
-      }
+      },
     ],
   },
 };
