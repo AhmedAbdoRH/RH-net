@@ -27,9 +27,10 @@ interface AllTodosPanelProps {
     loading: boolean;
     allDomains?: Domain[];
     domainStatuses?: Record<string, 'checking' | 'online' | 'offline'>;
+    largeText?: boolean;
 }
 
-export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomains, domainStatuses }: AllTodosPanelProps) {
+export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomains, domainStatuses, largeText = false }: AllTodosPanelProps) {
     const [groupedTodos, setGroupedTodos] = React.useState<GroupedTodos>(initialGroupedTodos);
     const [newGeneralTodo, setNewGeneralTodo] = React.useState('');
     const [addingTodo, setAddingTodo] = React.useState(false);
@@ -98,6 +99,12 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
             if (!a.isHighPriority && b.isHighPriority) return 1;
             return (a.order || 0) - (b.order || 0);
         });
+    };
+
+    // استخدم أرقامًا سالبة للمهام الجديدة حتى تسبق المهام القديمة، مع بقاء المميزة أولًا.
+    const getNextTodoOrder = (todos: (Todo & { isNew?: boolean })[]) => {
+        const lowestOrder = todos.reduce((lowest, todo) => Math.min(lowest, todo.order ?? 0), 0);
+        return lowestOrder - 1;
     };
 
     // Correctly placed useMemo for sorting groups by priority
@@ -292,10 +299,11 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
 
         try {
             const currentTodos = groupedTodos[GENERAL_TASKS_KEY] || [];
+            const firstNewOrder = getNextTodoOrder(currentTodos) - (lines.length - 1);
 
             if (lines.length === 1) {
                 const tempId = `temp-${Date.now()}`;
-                const newOrder = currentTodos.length;
+                const newOrder = firstNewOrder;
                 const newTodo: Todo & { isNew?: boolean } = {
                     text: lines[0],
                     completed: false,
@@ -324,7 +332,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                     id: `temp-${Date.now()}-${index}`,
                     createdAt: new Date().toISOString(),
                     isHighPriority: false,
-                    order: currentTodos.length + index,
+                    order: firstNewOrder + index,
                     isNew: true
                 }));
 
@@ -334,7 +342,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                 }));
 
                 await Promise.all(lines.map((line, index) =>
-                    addTodo({ text: line, completed: false, isHighPriority: false, order: currentTodos.length + index })
+                    addTodo({ text: line, completed: false, isHighPriority: false, order: firstNewOrder + index })
                 ));
             }
 
@@ -484,6 +492,15 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
 
     const LongPressButton = ({ topicName, children }: { topicName: string; children: React.ReactNode }) => {
         const [pressTimer, setPressTimer] = React.useState<NodeJS.Timeout | null>(null);
+        const topicDomain = allDomains?.find(domain => domain.domainName.slice(0, -4).replace(/-/g, ' ') === topicName);
+        const topicStatus = topicDomain?.id ? domainStatuses?.[topicDomain.id] : undefined;
+        const topicColorClass = topicStatus === 'online'
+            ? 'border-green-500/45 bg-green-500/5 hover:bg-green-500/10 hover:border-green-400/70'
+            : topicStatus === 'offline'
+                ? 'border-red-500/45 bg-red-500/5 hover:bg-red-500/10 hover:border-red-400/70'
+                : topicStatus === 'checking'
+                    ? 'border-yellow-500/45 bg-yellow-500/5 hover:bg-yellow-500/10 hover:border-yellow-400/70'
+                    : 'border-border/70 hover:border-sky-400/60';
 
         const handleMouseDown = () => {
             const timer = setTimeout(() => {
@@ -515,7 +532,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
-                className="text-sm cursor-pointer h-9 px-2 py-1"
+                className={cn("cursor-pointer h-9 px-2 py-1 transition-colors", largeText ? "text-base" : "text-sm", topicColorClass)}
             >
                 {children}
             </Button>
@@ -587,6 +604,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
     const renderTodoItem = (todo: Todo & { isNew?: boolean }, index: number, groupName: string) => {
       if (!todo.id) return null;
       const isCompleting = toggledTodos.includes(todo.id);
+      const displayTodoText = todo.domainId === 'ahmed-abdo' ? `Tagr Online - ${todo.text}` : todo.text;
       const isEditing = editingTodoId === todo.id;
       return (
         <Draggable key={todo.id} draggableId={todo.id} index={index} isDragDisabled={isEditing}>
@@ -624,7 +642,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                                 if (e.key === 'Enter') handleSaveEdit(todo.id!);
                                 if (e.key === 'Escape') handleCancelEdit();
                             }}
-                            className="h-8 text-sm"
+                            className={cn("h-8", largeText ? "text-base" : "text-sm")}
                             autoFocus
                         />
                         <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleSaveEdit(todo.id!)}>
@@ -639,9 +657,9 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                         <label
                             htmlFor={`all-todo-${todo.id}`}
                             onClick={handleLabelClick}
-                            className={cn("flex-1 text-sm select-all whitespace-pre-wrap relative", todo.completed && "strikethrough-label")}
+                            className={cn("flex-1 select-all whitespace-pre-wrap relative", largeText ? "text-base" : "text-sm", todo.completed && "strikethrough-label")}
                         >
-                            {todo.text}
+                            {displayTodoText}
                         </label>
                         <div className="flex items-center gap-1">
                             <button onClick={() => handleTogglePriority(todo.id!, todo.isHighPriority || false)} className="p-1">
@@ -667,11 +685,13 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
 
     return (
         <>
-            {/* Topic buttons for general tasks - separate from todo list */}
-            <Card className="bg-card/80 backdrop-blur-sm mb-2">
+            {/* لوحة المواقع وقائمة المهام: بطاقتان مستقلتان ومتجاورتان على الشاشات الكبيرة */}
+            <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
+            {/* لوحة المواقع */}
+            <Card className="bg-card/80 backdrop-blur-sm">
                 <CardContent className="pt-6">
                     {/* RHM domains */}
-                    <div className="flex flex-wrap gap-0 items-center mb-2 justify-center">
+                    <div className="flex flex-wrap gap-2 items-center mb-2 justify-center">
                         {mainTopics.filter(t => t.isRHM).map((topic) => (
                             <LongPressButton key={topic.name} topicName={topic.name}>
                                 {topic.icon.startsWith('http') ? (
@@ -689,7 +709,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                         <div className="w-full h-px bg-border my-2"></div>
                     )}
                     {/* Other projects domains */}
-                    <div className="flex flex-wrap gap-0 items-center justify-center">
+                    <div className="flex flex-wrap gap-2 items-center justify-center">
                         {mainTopics.filter(t => !t.isRHM).map((topic) => (
                             <LongPressButton key={topic.name} topicName={topic.name}>
                                 {topic.icon.startsWith('http') ? (
@@ -705,7 +725,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                 </CardContent>
             </Card>
 
-            {/* Todo list */}
+            {/* قائمة المهام */}
             <Card className="bg-card/80 backdrop-blur-sm">
                 <CardContent className="pt-6">
                     <form onSubmit={handleAddGeneralTodo} className="flex gap-2 mb-6 items-center">
@@ -730,7 +750,7 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                                     handleAddGeneralTodo(e);
                                 }
                             }}
-                            className="bg-background min-h-[40px] resize-none"
+                            className={cn("bg-background min-h-[40px] resize-none", largeText ? "text-base" : "text-sm")}
                             rows={1}
                         />
                         <Button type="submit" size="icon" disabled={addingTodo}>
@@ -739,14 +759,16 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                     </form>
 
                 {sortedGroups.length === 0 && !addingTodo ? (
-                    <p className="text-center text-muted-foreground py-4">لا توجد أي مهام في جميع المشاريع.</p>
+                    <p className={cn("text-center text-muted-foreground py-4", largeText ? "text-base" : "text-sm")}>لا توجد أي مهام في جميع المشاريع.</p>
                 ) : (
                     <div className="space-y-4">
                         {sortedGroups.map((groupName, index) => (
                            <div key={groupName}>
-                                <h3 className="font-semibold mb-2 flex items-center gap-2">
-                                    {groupName}
-                                </h3>
+                                {groupName !== GENERAL_TASKS_KEY && (
+                                    <h3 className={cn("font-semibold mb-2 flex items-center gap-2", largeText ? "text-lg" : "text-base")}>
+                                        {groupName}
+                                    </h3>
+                                )}
                                 <DragDropContext onDragEnd={(result) => handleDragEnd(result, groupName)}>
                                   <Droppable droppableId={`group-${groupName}`}>
                                     {(provided) => (
@@ -762,8 +784,10 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
                         ))}
                     </div>
                 )}
+
             </CardContent>
         </Card>
+            </div>
 
         {/* Data Sheet Dialog */}
         <Dialog open={isDataSheetOpen} onOpenChange={setDataSheetOpen}>

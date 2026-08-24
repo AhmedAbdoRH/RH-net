@@ -498,10 +498,11 @@ export function DomainDashboard({
             const colSpan = (project === 'pova' || project === 'firefly') ? 6 : 5;
             return (
               <Collapsible asChild key={domain.id}>
-                <TableBody>
+                <TableBody className="border-b-2 border-zinc-600/65 bg-zinc-700/10 last:border-b-0">
                   <TableRow>
                     <TableCell colSpan={colSpan}>
-                      <div className='flex items-start'>
+                      <div className='flex flex-col'>
+                        <div className='flex items-start'>
                         <div className='flex-grow'>
                           <div className="flex items-center gap-2">
                             {domain.id && renderStatusDot(domain.id)}
@@ -510,11 +511,6 @@ export function DomainDashboard({
                               {domain.isOnlineCatalog && <Image src="https://i.ibb.co/MDBbpm5r/Online-Catalog-12.png" alt="Online Catalog" width={16} height={16} />}
                             </a>
                           </div>
-                          <div className='mt-2'>
-                            <div className="text-right">{`${format(parseISO(domain.renewalDate), 'dd/MM/yyyy')}`}</div>
-                            <Progress value={progress} className={cn("h-2 mt-1", progress === 100 && "bg-blue-800")} />
-                          </div>
-                          {renderInstallments(domain)}
                         </div>
                         <div className='flex items-center gap-4 px-4'>
                           {(project === 'pova' || project === 'firefly') ? (
@@ -644,6 +640,12 @@ export function DomainDashboard({
                           </CollapsibleTrigger>
                         </div>
                       </div>
+                      <div className='mt-2 w-full'>
+                        <div className="text-right">{`${format(parseISO(domain.renewalDate), 'dd/MM/yyyy')}`}</div>
+                        <Progress value={progress} className={cn("h-2 mt-1 bg-[#111111] w-full", progress === 100 && "bg-amber-600")} />
+                      </div>
+                      {renderInstallments(domain)}
+                    </div>
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -658,7 +660,7 @@ export function DomainDashboard({
         {sortedDomains.map(domain => {
           const progress = getRenewalProgress(domain.renewalDate);
           return (
-            <Card key={domain.id} className="card-base rounded-xl overflow-hidden">
+            <Card key={domain.id} className="card-base rounded-xl overflow-hidden border border-zinc-600/65 shadow-[0_0_0_1px_rgba(82,82,91,0.3)]">
               <Collapsible>
                 <div className="w-full overflow-hidden">
                   <CardContent className="p-4 space-y-4">
@@ -671,11 +673,6 @@ export function DomainDashboard({
                             {domain.isOnlineCatalog && <Image src="https://i.ibb.co/MDBbpm5r/Online-Catalog-12.png" alt="Online Catalog" width={16} height={16} />}
                           </a>
                         </div>
-                        <div className='mt-2'>
-                          <div className="text-right text-sm text-muted-foreground">{`${format(parseISO(domain.renewalDate), 'dd/MM/yyyy')}`}</div>
-                          <Progress value={progress} className={cn("h-2 mt-1", progress === 100 && "bg-blue-800")} />
-                        </div>
-                        {renderInstallments(domain)}
                       </div>
                       <CollapsibleTrigger asChild>
                         <Button variant="ghost" size="sm" className="w-9 p-0 data-[state=open]:rotate-180">
@@ -684,6 +681,11 @@ export function DomainDashboard({
                         </Button>
                       </CollapsibleTrigger>
                     </div>
+                    <div className='mt-2 w-full'>
+                      <div className="text-right text-sm text-muted-foreground">{`${format(parseISO(domain.renewalDate), 'dd/MM/yyyy')}`}</div>
+                      <Progress value={progress} className={cn("h-2 mt-1 bg-[#111111] w-full", progress === 100 && "bg-amber-600")} />
+                    </div>
+                    {renderInstallments(domain)}
 
                     <div className='flex items-center justify-between gap-4'>
                       <div className="flex items-center gap-2">

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RHM ONLINE CATALOG PROJECT HUB</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDKHlDDZ4GFGI8u6oOhfOulD_XFzL3qZBQ",
+      authDomain: "hadaf-pa.firebaseapp.com",
+      projectId: "hadaf-pa",
+      storageBucket: "hadaf-pa.appspot.com",
+      messagingSenderId: "755281209375",
+      appId: "1:755281209375:web:3a9040a2f0031ea2b14d2a",
+      measurementId: "G-XNBQ73GMJ2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.db = db;
+  </script>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Tab Styles */
+    .tab-container {
+      display: flex;
+      border-bottom: 2px solid #333;
+      margin-bottom: 20px;
+    }
+
+    .tab-button {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: transparent;
+      border: none;
+      color: #aaa;
+      font-size: 18px;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab-button.active {
+      color: #1e88e5;
+      border-bottom-color: #1e88e5;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+    /* End Tab Styles */
+
+    .header-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .page-subtitle {
+      font-size: 18px;
+      color: #b0b0b0;
+      margin-top: 5px;
+    }
+
+    .top-section {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .large-number {
+      font-size: 36px;
+      margin-bottom: 10px;
+      color: #4caf50;
+    }
+
+    .details p {
+      margin: 5px 0;
+    }
+    
+    .sub-details p {
+        margin: 2px 0;
+        font-size: 12px;
+        color: #555;
+    }
+
+    .input-section {
+      margin-bottom: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      padding: 20px;
+      background-color: #1e1e1e;
+      border-radius: 8px;
+    }
+    
+    .input-row {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .currency-options {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    input[type="text"], input[type="number"] {
+      padding: 12px;
+      border: 1px solid #444;
+      background-color: #333;
+      color: #fff;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 250px;
+      box-sizing: border-box;
+    }
+
+    /* === New Styles for Input Group === */
+    .input-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+    }
+    .input-group input:first-child { /* The right input in RTL */
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: 1px solid #555;
+    }
+    .input-group input:last-child { /* The left input in RTL */
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    /* === End New Styles === */
+
+    button {
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .positive-button { background-color: #4caf50; }
+    .positive-button:hover { background-color: #388e3c; }
+    .negative-button { background-color: #f44336; }
+    .negative-button:hover { background-color: #d32f2f; }
+
+    .table-container {
+      margin: 20px auto 0;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: right; 
+      border-bottom: 1px solid #444;
+      white-space: nowrap; 
+    }
+    
+    th {
+      background-color: #1e88e5;
+      color: white;
+    }
+
+    /* === New Style for table expense description === */
+    .expense-desc-small {
+        font-size: 11px;
+        color: #9e9e9e;
+        margin-top: 4px;
+        white-space: normal; /* Allow description to wrap if long */
+    }
+    
+    .positive-row { background-color: rgba(76, 175, 80, 0.15); }
+    .negative-row { background-color: rgba(244, 67, 54, 0.15); }
+    .sale-row { background-color: rgba(30, 136, 229, 0.15); }
+
+    .delete-button {
+      background-color: #1f1f1f;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .delete-button:hover { background-color: #444; }
+
+    .show-more-button {
+      background-color: #8B4513;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      margin: 20px auto;
+    }
+    .show-more-button:hover { background-color: #A0522D; }
+    .show-more-button::before { content: "▼"; font-size: 12px; }
+
+    @media (max-width: 768px) {
+      .input-row, .input-group { flex-direction: column; gap: 10px; }
+      .input-group input:first-child, .input-group input:last-child {
+          border-radius: 5px !important;
+          border-left: 1px solid #444 !important;
+      }
+      th, td { font-size: 12px; padding: 8px; }
+      .page-title { font-size: 22px; }
+      .page-subtitle { font-size: 16px; }
+      .large-number { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+
+  <!-- Tab Buttons -->
+  <div class="tab-container">
+    <button class="tab-button active" data-tab="financialTab"> التمويل والنفقات</button>
+    <button class="tab-button" data-tab="salesTab">البيع والأرباح  </button>
+  </div>
+
+  <!-- Tab 1: Financial Management -->
+  <div id="financialTab" class="tab-content active">
+    <div class="header-section">
+      <div class="page-title">مشروع أونلاين كاتلوج</div>
+      <p class="page-subtitle">التمويل والنفقات  </p>
+    </div>
+    <div class="top-section">
+      <div class="large-number" id="totalIncome">$0.00</div>
+      <div class="details">
+        <p>الرصيد بالريال: <span id="amountSAR">0.00 ريال</span></p>
+        <p>الرصيد بالجنيه: <span id="amountEGP">0.00 جنيه</span></p>
+      </div>
+    </div>
+    <div class="input-section">
+      <div class="input-row">
+        <input type="text" id="projectName" placeholder="العملية" />
+        <input type="number" id="projectCost" placeholder="المبلغ" />
+      </div>
+       <div class="input-row">
+        <div class="currency-options">
+          <label><input type="radio" name="currency" value="SAR" /> ريال</label>
+          <label><input type="radio" name="currency" value="USD" /> دولار</label>
+          <label><input type="radio" name="currency" value="EGP" checked /> جنيه</label>
+        </div>
+      </div>
+      <div class="input-row">
+        <button class="positive-button" id="addPositive">إضافة تمويل</button>
+        <button class="negative-button" id="addNegative">إضافة نفقات</button>
+      </div>
+    </div>
+    <div class="table-container">
+      <h3>سجل العمليات</h3>
+      <table>
+        <thead>
+          <tr><th>العملية</th><th>التاريخ</th><th>المبلغ</th><th>حذف</th></tr>
+        </thead>
+        <tbody id="projectsTable"></tbody>
+      </table>
+      <button id="showMoreButton" class="show-more-button">إظهار المزيد</button>
+    </div>
+  </div>
+
+  <!-- Tab 2: Sales Operations -->
+  <div id="salesTab" class="tab-content">
+    <div class="header-section">
+      <div class="page-title">مشروع أونلاين كاتلوج 
+     </div>
+      <p class="page-subtitle"> صافي الأرباح </p>
+    </div>
+    <div class="top-section">
+      <div class="large-number" id="totalProfitDisplay">$0.00</div>
+      <div class="details sub-details">
+        <p>إجمالي الأرباح بالريال: <span id="profitSAR">0.00 ريال</span></p>
+        <p>إجمالي الأرباح بالجنيه: <span id="profitEGP">0.00 جنيه</span></p>
+      </div>
+    </div>
+    <div class="input-section">
+        <div class="input-row">
+            <input type="text" id="saleName" placeholder="اسم عملية البيع" />
+            <input type="number" id="saleAmount" placeholder="إجمالي مبلغ البيع" />
+        </div>
+        <!-- === Modified Expense Inputs in a Group === -->
+        <div class="input-group">
+            <input type="number" id="expenseCost" placeholder="تكلفة النفقات" />
+            <input type="text" id="expenseDescription" placeholder="وصف النفقات" />
+        </div>
+        <div class="input-row">
+             <div class="currency-options">
+                <label><input type="radio" name="sale_currency" value="SAR" /> ريال</label>
+                <label><input type="radio" name="sale_currency" value="USD" /> دولار</label>
+                <label><input type="radio" name="sale_currency" value="EGP" checked/> جنيه</label>
+            </div>
+        </div>
+        <div class="input-row">
+            <button class="positive-button" id="addSale">إضافة عملية بيع</button>
+        </div>
+    </div>
+    <div class="table-container">
+      <h3>سجل المبيعات</h3>
+      <table>
+        <!-- === Modified Table Headers === -->
+        <thead>
+          <tr>
+            <th>العملية</th>
+            <th>مبلغ البيع</th>
+            <th>النفقات</th>
+            <th>صافي الربح</th>
+            <th>التاريخ</th>
+            <th>حذف</th>
+          </tr>
+        </thead>
+        <tbody id="salesTable"></tbody>
+      </table>
+      <button id="showMoreSalesButton" class="show-more-button">إظهار المزيد</button>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+    import { collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+    
+    const db = window.db;
+    let exchangeRate = 47.5; 
+
+    // --- Tab Switching Logic ---
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            tabButtons.forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+            tabContents.forEach(content => content.classList.remove("active"));
+            document.getElementById(button.dataset.tab).classList.add("active");
+        });
+    });
+
+    // --- Helper Functions ---
+    async function fetchExchangeRate() {
+      try {
+        const response = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
+        const data = await response.json();
+        exchangeRate = data.rates.EGP || 47.5;
+        updateFinancialTotal();
+        updateSalesTotal();
+      } catch (error) {
+        console.error("Error fetching exchange rate:", error);
+      }
+    }
+
+    function convertToUSD(amount, currency) {
+      if (!amount || !currency) return 0;
+      switch (currency) {
+        case "SAR": return amount / 3.75;
+        case "EGP": return amount / exchangeRate;
+        default: return amount;
+      }
+    }
+    
+    // ===============================================
+    // SECTION 1: FINANCIAL MANAGEMENT LOGIC
+    // ===============================================
+    let allTransactions = [];
+    let visibleTransactions = 10;
+
+    async function addFinancialTransaction(isPositive) {
+      const name = document.getElementById("projectName").value.trim();
+      let cost = parseFloat(document.getElementById("projectCost").value) || 0;
+      if (!name || cost <= 0) {
+        alert("يرجى إدخال اسم العملية وتكلفة صالحة.");
+        return;
+      }
+      const selectedCurrency = document.querySelector('input[name="currency"]:checked').value;
+      cost = convertToUSD(cost, selectedCurrency);
+      if (!isPositive) cost = -cost;
+      
+      await addDoc(collection(db, "transactions"), { name, cost, timestamp: serverTimestamp() });
+      loadFinancialTransactions();
+      document.getElementById("projectName").value = "";
+      document.getElementById("projectCost").value = "";
+    }
+
+    async function deleteFinancialTransaction(id) {
+      await deleteDoc(doc(db, "transactions", id));
+      loadFinancialTransactions();
+    }
+
+    async function loadFinancialTransactions() {
+      const q = query(collection(db, "transactions"), orderBy("timestamp", "desc"));
+      const querySnapshot = await getDocs(q);
+      allTransactions = querySnapshot.docs.map(docSnapshot => ({ id: docSnapshot.id, ...docSnapshot.data() }));
+      updateFinancialTable();
+      updateFinancialTotal();
+    }
+
+    function updateFinancialTable() {
+      const table = document.getElementById("projectsTable");
+      table.innerHTML = "";
+      const transactionsToShow = allTransactions.slice(0, visibleTransactions);
+      transactionsToShow.forEach(transaction => {
+        const rowClass = transaction.cost > 0 ? 'positive-row' : 'negative-row';
+        const date = transaction.timestamp ? new Date(transaction.timestamp.seconds * 1000).toLocaleDateString("ar-EG") : '...';
+        const row = `
+          <tr class="${rowClass}">
+            <td>${transaction.name}</td>
+            <td>${date}</td>
+            <td>$${transaction.cost.toFixed(2)}</td>
+            <td><button class='delete-button' onclick='window.deleteFinancialTransaction("${transaction.id}")'>حذف</button></td>
+          </tr>`;
+        table.insertAdjacentHTML("beforeend", row);
+      });
+      document.getElementById("showMoreButton").style.display = allTransactions.length > visibleTransactions ? "flex" : "none";
+    }
+
+    function updateFinancialTotal() {
+      const totalIncome = allTransactions.reduce((sum, t) => sum + t.cost, 0);
+      document.getElementById("totalIncome").textContent = `$${totalIncome.toFixed(2)}`;
+      document.getElementById("amountSAR").textContent = `${(totalIncome * 3.75).toFixed(2)} ريال`;
+      document.getElementById("amountEGP").textContent = `${(totalIncome * exchangeRate).toFixed(2)} جنيه`;
+    }
+
+    // ===============================================
+    // SECTION 2: SALES OPERATIONS LOGIC (MODIFIED)
+    // ===============================================
+    let allSales = [];
+    let visibleSales = 10;
+
+    async function addSale() {
+        const name = document.getElementById("saleName").value.trim();
+        const saleAmount = parseFloat(document.getElementById("saleAmount").value) || 0;
+        const expenseCost = parseFloat(document.getElementById("expenseCost").value) || 0;
+        const expenseDescription = document.getElementById("expenseDescription").value.trim() || 'لا يوجد وصف';
+
+        if (!name || saleAmount <= 0) {
+            alert("يرجى إكمال اسم العملية ومبلغ البيع.");
+            return;
+        }
+        
+        const selectedCurrency = document.querySelector('input[name="sale_currency"]:checked').value;
+        
+        const saleAmountUSD = convertToUSD(saleAmount, selectedCurrency);
+        const expenseCostUSD = convertToUSD(expenseCost, selectedCurrency);
+        const netProfit = saleAmountUSD - expenseCostUSD;
+
+        await addDoc(collection(db, "sales"), {
+            name,
+            saleAmount: saleAmountUSD,
+            expenseCost: expenseCostUSD,
+            expenseDescription: expenseDescription,
+            netProfit: netProfit,
+            timestamp: serverTimestamp()
+        });
+        
+        loadSales();
+        document.getElementById("saleName").value = "";
+        document.getElementById("saleAmount").value = "";
+        document.getElementById("expenseCost").value = "";
+        document.getElementById("expenseDescription").value = "";
+    }
+
+    async function deleteSale(id) {
+        await deleteDoc(doc(db, "sales", id));
+        loadSales();
+    }
+
+    async function loadSales() {
+        const q = query(collection(db, "sales"), orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
+        allSales = querySnapshot.docs.map(docSnapshot => ({ id: docSnapshot.id, ...docSnapshot.data() }));
+        updateSalesTable();
+        updateSalesTotal();
+    }
+
+    function updateSalesTable() {
+        const table = document.getElementById("salesTable");
+        table.innerHTML = "";
+        const salesToShow = allSales.slice(0, visibleSales);
+
+        salesToShow.forEach(sale => {
+            const date = sale.timestamp ? new Date(sale.timestamp.seconds * 1000).toLocaleDateString("ar-EG") : '...';
+            
+            const desc = sale.expenseDescription || 'نفقات عامة';
+            const cost = sale.expenseCost ?? sale.totalExpenses ?? 0;
+            
+            // === Modified Row for Combined Expense Cell ===
+            const row = `
+                <tr class="sale-row">
+                    <td>${sale.name}</td>
+                    <td>$${(sale.saleAmount || 0).toFixed(2)}</td>
+                    <td>
+                        <div>$${cost.toFixed(2)}</div>
+                        <div class="expense-desc-small">${desc}</div>
+                    </td>
+                    <td><b>$${(sale.netProfit || 0).toFixed(2)}</b></td>
+                    <td>${date}</td>
+                    <td><button class='delete-button' onclick='window.deleteSale("${sale.id}")'>حذف</button></td>
+                </tr>`;
+            table.insertAdjacentHTML("beforeend", row);
+        });
+        
+        document.getElementById("showMoreSalesButton").style.display = allSales.length > visibleSales ? "flex" : "none";
+    }
+
+    function updateSalesTotal() {
+        const totalProfit = allSales.reduce((sum, s) => sum + (s.netProfit || 0), 0);
+        document.getElementById("totalProfitDisplay").textContent = `$${totalProfit.toFixed(2)}`;
+        document.getElementById("profitSAR").textContent = `${(totalProfit * 3.75).toFixed(2)} ريال`;
+        document.getElementById("profitEGP").textContent = `${(totalProfit * exchangeRate).toFixed(2)} جنيه`;
+    }
+
+    // ===============================================
+    // INITIALIZATION & GLOBAL LISTENERS
+    // ===============================================
+    window.deleteFinancialTransaction = deleteFinancialTransaction;
+    window.deleteSale = deleteSale;
+    
+    document.getElementById("addPositive").addEventListener("click", () => addFinancialTransaction(true));
+    document.getElementById("addNegative").addEventListener("click", () => addFinancialTransaction(false));
+    document.getElementById("showMoreButton").addEventListener("click", () => {
+        visibleTransactions += 10; updateFinancialTable();
+    });
+
+    document.getElementById("addSale").addEventListener("click", addSale);
+    document.getElementById("showMoreSalesButton").addEventListener("click", () => {
+        visibleSales += 10; updateSalesTable();
+    });
+
+    fetchExchangeRate();
+    loadFinancialTransactions();
+    loadSales();
+</script>
+</body>
+</html>

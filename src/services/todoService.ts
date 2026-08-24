@@ -178,9 +178,9 @@ export const deleteTodosForDomain = async (domainId: string): Promise<void> => {
 export const GENERAL_TASKS_KEY = 'مهام عامة';
 
 // New function to get all todos and group them by domain name
-export const getAllTodosGroupedByDomain = async (): Promise<
-  Record<string, Todo[]>
-> => {
+export const getAllTodosGroupedByDomain = async (
+  excludedDomainIds: string[] = []
+): Promise<Record<string, Todo[]>> => {
   // 1. Fetch all domains to create a map of ID -> Name
   const domainsSnapshot = await getDocs(domainsCollectionRef).catch(serverError => {
      const permissionError = new FirestorePermissionError({
@@ -215,6 +215,10 @@ export const getAllTodosGroupedByDomain = async (): Promise<
     [GENERAL_TASKS_KEY]: []
   };
   todos.forEach((todo) => {
+    if (todo.domainId && excludedDomainIds.includes(todo.domainId)) {
+      return;
+    }
+
     if (todo.domainId) {
         const domainName = domainMap.get(todo.domainId);
         if (domainName) {
