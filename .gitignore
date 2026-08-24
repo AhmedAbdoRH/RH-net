@@ -48,3 +48,12 @@ firestore-debug.log
 backup_*.zip
 firestore_backup_*.json
 .env
+
+# Local deployment artifacts
+/.open-next/
+/cf-bundle/
+/.wrangler/
+/.netlify/
+/.freebuff/
+/deploy-cloudflare*.log
+/wrangler-*.log

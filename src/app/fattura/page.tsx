@@ -62,16 +62,6 @@ export default function FatturaPage() {
     const originalTitle = document.title;
     const invoiceName = getInvoiceName();
 
-    try {
-      await navigator.clipboard.writeText(invoiceName);
-      toast({
-        title: "تم النسخ!",
-        description: `"${invoiceName}" تم نسخه إلى الحافظة.`,
-      });
-    } catch {
-      // النسخ اختياري؛ لا نمنع طباعة الفاتورة إذا رفض المتصفح الوصول للحافظة.
-    }
-
     document.title = invoiceName;
     await handleSaveInvoice();
     window.print();
