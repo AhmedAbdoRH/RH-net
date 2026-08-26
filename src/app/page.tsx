@@ -14,7 +14,7 @@ import { AllTodosPanel } from '@/components/all-todos-panel';
 import { TodosSidePanel } from '@/components/todos-side-panel';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from '@/components/ui/button';
-import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Receipt, NotebookPen, FileText, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss, Database } from 'lucide-react';
+import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Receipt, NotebookPen, FileText, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss, Database, BriefcaseBusiness } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FaultsSheet } from '@/components/faults-sheet';
 import { GeneralPaperSheet } from '@/components/general-paper-sheet';
@@ -256,7 +256,16 @@ export default function WebPage() {
           <Receipt className="h-5 w-5" />
         </Button>
       </Link>
-      
+      <Link href="/sales">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-10 w-10 rounded-full bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          title="مركز محترفي المبيعات — من ضمن أعمالنا"
+        >
+          <BriefcaseBusiness className="h-5 w-5" />
+        </Button>
+      </Link>
       
       <Button
         variant="ghost"
