@@ -6,13 +6,37 @@ import { Toaster } from "@/components/ui/toaster"
 import { FirebaseProvider } from '@/firebase/provider';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { LeaderboardFooter } from '@/components/leaderboard-footer';
+import { PwaRegister } from '@/components/pwa-register';
 
 export const metadata: Metadata = {
-  title: 'تاجر أونلاين',
+  title: 'RHM Digital',
+  applicationName: 'RHM Digital',
   description: 'إدارة النطاقات وتتبع تواريخ التجديد والتكاليف بسهولة.',
-  icons: {
-    icon: '/logo.png',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: 'RHM Digital',
+    statusBarStyle: 'black-translucent',
   },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: '/icon-square.png', type: 'image/png', sizes: 'any' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: '/icons/apple-touch-icon.png',
+  },
+};
+
+export const viewport = {
+  themeColor: '#2563eb',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -37,6 +61,7 @@ export default function RootLayout({
           </FirebaseClientProvider>
         </FirebaseProvider>
         <Toaster />
+        <PwaRegister />
       </body>
     </html>
   );

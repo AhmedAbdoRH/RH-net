@@ -3,10 +3,10 @@ import { createSupabaseAdminClient } from '@/lib/supabase-admin'
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { noteId: string } }
+  { params }: { params: Promise<{ userId: string; noteId: string }> }
 ) {
   try {
-    const noteId = params.noteId
+    const { noteId } = await params
     
     if (!noteId) {
       return NextResponse.json(

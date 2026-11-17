@@ -90,7 +90,7 @@ export default function PovaPage() {
 
       const initialDomainStatuses: Record<string, 'checking' | 'online' | 'offline'> = {};
       domainsWithProject.forEach(d => {
-        if (d.id) initialDomainStatuses[d.id] = 'checking';
+        if (d.id && !d.isArchived) initialDomainStatuses[d.id] = 'checking';
       });
       setDomainStatuses(initialDomainStatuses);
       
@@ -99,7 +99,7 @@ export default function PovaPage() {
       refreshTodos();
 
       for (const domain of domainsWithProject) {
-        if (domain.id) {
+        if (domain.id && !domain.isArchived) {
           checkDomainStatus({ domainName: domain.domainName })
             .then(({ isOnline }) => {
               setDomainStatuses(prev => ({ ...prev, [domain.id!]: isOnline ? 'online' : 'offline' }));
@@ -140,7 +140,7 @@ export default function PovaPage() {
   }, [domainTodos]);
 
   const filteredDomainsForStatusPanel = React.useMemo(() => {
-    return allDomains.filter(d => d.projects?.includes('pova'));
+    return allDomains.filter(d => d.projects?.includes('pova') && !d.isArchived);
   }, [allDomains]);
 
 

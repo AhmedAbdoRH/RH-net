@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { AllTodosPanel } from '@/components/all-todos-panel';
+import { RotatingQuestions } from '@/components/rotating-questions';
 import type { Todo, Domain } from '@/lib/types';
 
 interface TodosSidePanelProps {
@@ -28,6 +29,7 @@ export function TodosSidePanel({
                 allDomains={allDomains}
                 domainStatuses={domainStatuses}
                 largeText={true}
+                tasksHeaderContent={<RotatingQuestions />}
             />
         </div>
     );

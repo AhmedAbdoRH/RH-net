@@ -1,11 +1,5 @@
 import { NextResponse } from 'next/server';
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-import { firebaseConfig } from '@/firebase/config';
-
-// Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
+import { getFirestoreDoc, setFirestoreDoc } from '@/lib/firestore-rest';
 
 const LEADERBOARD_URL = "https://artificialanalysis.ai/leaderboards/models";
 
@@ -25,11 +19,10 @@ const INITIAL_DATA = [
 
 export async function GET() {
   try {
-    const docRef = doc(db, "leaderboards", "performance");
-    const docSnap = await getDoc(docRef);
+    const existing = await getFirestoreDoc("leaderboards", "performance");
 
-    if (docSnap.exists()) {
-      return NextResponse.json(docSnap.data());
+    if (existing) {
+      return NextResponse.json(existing);
     }
 
     // If no data in Firestore, return initial data and save it
@@ -40,7 +33,8 @@ export async function GET() {
     };
 
     // Save to Firestore asynchronously
-    setDoc(docRef, data).catch(err => console.error("Error saving initial data to Firestore:", err));
+    setFirestoreDoc("leaderboards", "performance", data)
+      .catch(err => console.error("Error saving initial data to Firestore:", err));
 
     return NextResponse.json(data);
   } catch (error) {
@@ -65,7 +59,7 @@ export async function POST() {
       models: INITIAL_DATA
     };
 
-    await setDoc(doc(db, "leaderboards", "performance"), data);
+    await setFirestoreDoc("leaderboards", "performance", data);
 
     return NextResponse.json(data);
   } catch (error) {

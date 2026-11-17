@@ -1,23 +1,32 @@
 
-export type Project = 'RHM' | 'pova' | 'other' | 'firefly';
+export type Project = 'RHM' | 'pova' | 'other' | 'firefly' | 'android';
 
 export type Domain = {
   id?: string; // Firestore uses string IDs
   domainName: string;
+  faviconUrl?: string;
   status: 'active' | 'inactive';
   collectionDate: string; // ISO 8601 format
   renewalDate: string; // ISO 8601 format
   dataSheet: string;
   outstandingBalance?: number;
   renewalCostClient: number | '';
+  renewalCost?: number | '';
+  renewalCostCurrency?: 'USD' | 'EGP';
+  renewalCostClientCurrency?: 'USD' | 'EGP';
   renewalCostOffice: number | '';
+  renewalCostOfficeCurrency?: 'USD' | 'EGP';
   renewalCostPova?: number | '';
+  renewalCostPovaCurrency?: 'USD' | 'EGP';
   renewalCostFirefly?: number | '';
+  renewalCostFireflyCurrency?: 'USD' | 'EGP';
   projects?: Project[];
   hasInstallments?: boolean;
   installmentCount?: number | '';
   installmentsPaid?: number;
   isOnlineCatalog?: boolean;
+  isArchived?: boolean;
+  archivedAt?: string; // ISO 8601 format - تاريخ الأرشفة
 };
 
 export type Todo = {

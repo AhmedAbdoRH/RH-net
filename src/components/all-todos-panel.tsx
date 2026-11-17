@@ -28,9 +28,11 @@ interface AllTodosPanelProps {
     allDomains?: Domain[];
     domainStatuses?: Record<string, 'checking' | 'online' | 'offline'>;
     largeText?: boolean;
+    /** Optional content rendered at the very top of the tasks card (above the todo list). */
+    tasksHeaderContent?: React.ReactNode;
 }
 
-export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomains, domainStatuses, largeText = false }: AllTodosPanelProps) {
+export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomains, domainStatuses, largeText = false, tasksHeaderContent }: AllTodosPanelProps) {
     const [groupedTodos, setGroupedTodos] = React.useState<GroupedTodos>(initialGroupedTodos);
     const [newGeneralTodo, setNewGeneralTodo] = React.useState('');
     const [addingTodo, setAddingTodo] = React.useState(false);
@@ -62,10 +64,11 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
     const [newTopicName, setNewTopicName] = React.useState('');
     const [newTopicIcon, setNewTopicIcon] = React.useState('📌');
 
-    // Add domains as topics on mount
+    // Add domains as topics on mount — استبعاد المواقع المؤرشفة من كروت المواقع
     React.useEffect(() => {
         if (allDomains && allDomains.length > 0) {
             const domainTopics = allDomains
+                .filter(domain => !domain.isArchived)
                 .map(domain => {
                     const domainName = domain.domainName.slice(0, -4).replace(/-/g, ' '); // Replace hyphens with spaces
                     const fullDomain = domain.domainName;
@@ -594,8 +597,11 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
     if (loading && Object.keys(groupedTodos).length === 0) {
         return (
             <Card>
-                <CardContent className="pt-6 flex justify-center items-center h-48">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <CardContent className="pt-6">
+                    {tasksHeaderContent}
+                    <div className={`flex justify-center items-center h-48 ${tasksHeaderContent ? 'mt-4' : ''}`}>
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
                 </CardContent>
             </Card>
         );
@@ -728,7 +734,8 @@ export function AllTodosPanel({ onUpdate, initialGroupedTodos, loading, allDomai
             {/* قائمة المهام */}
             <Card className="bg-card/80 backdrop-blur-sm">
                 <CardContent className="pt-6">
-                    <form onSubmit={handleAddGeneralTodo} className="flex gap-2 mb-6 items-center">
+                    {tasksHeaderContent}
+                    <form onSubmit={handleAddGeneralTodo} className={`flex gap-2 mb-6 items-center ${tasksHeaderContent ? 'mt-4' : ''}`}>
                         <button
                             type="button"
                             onClick={() => setNewTodoIsHighPriority(!newTodoIsHighPriority)}

@@ -1,13 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-import { firebaseConfig } from '@/firebase/config';
-
-// Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
+import { getFirestoreDoc, setFirestoreDoc } from '@/lib/firestore-rest';
 
 // Dynamic import for CommonJS modules
 let axios: typeof import('axios');
@@ -20,24 +12,31 @@ async function loadScraperDeps() {
   }
 }
 
-const URL = "https://arena.ai/ar/leaderboard/code";
-const DATA_FILE_PATH = path.join(process.cwd(), 'public', 'data.json');
+const URL_SOURCE = "https://arena.ai/ar/leaderboard/code";
 
-export async function GET() {
+/**
+ * ملاحظة: لا نستخدم `fs` / `process.cwd()` هنا لأنهما غير متوفرين في
+ * Cloudflare Workers. نجيب النسخة الاحتياطية عبر fetch للأصل الثابت.
+ */
+async function readFallbackData(requestUrl: string) {
+  const res = await fetch(new URL('/data.json', requestUrl));
+  if (!res.ok) return null;
+  return await res.json();
+}
+
+export async function GET(request: Request) {
   try {
     // Try to fetch from Firestore first
-    const docRef = doc(db, "leaderboards", "arena");
-    const docSnap = await getDoc(docRef);
+    const existing = await getFirestoreDoc("leaderboards", "arena");
 
-    if (docSnap.exists()) {
-      return NextResponse.json(docSnap.data());
+    if (existing) {
+      return NextResponse.json(existing);
     }
 
-    // Fallback to local file if Firestore is empty
-    if (fs.existsSync(DATA_FILE_PATH)) {
-      const fileContents = fs.readFileSync(DATA_FILE_PATH, 'utf8');
-      const data = JSON.parse(fileContents);
-      return NextResponse.json(data);
+    // Fallback to static asset if Firestore is empty
+    const fallback = await readFallbackData(request.url);
+    if (fallback) {
+      return NextResponse.json(fallback);
     }
 
     return NextResponse.json(
@@ -46,6 +45,13 @@ export async function GET() {
     );
   } catch (error) {
     console.error('Error reading arena data:', error);
+    // Keep the leaderboard usable when Firestore is temporarily unavailable.
+    try {
+      const fallback = await readFallbackData(request.url);
+      if (fallback) return NextResponse.json(fallback);
+    } catch (fallbackError) {
+      console.error('Error reading arena fallback data:', fallbackError);
+    }
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
@@ -58,7 +64,7 @@ export async function POST() {
     await loadScraperDeps();
     
     console.log("🚀 Starting manual scrape...");
-    const { data: html } = await axios.default.get(URL, {
+    const { data: html } = await axios.default.get(URL_SOURCE, {
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
       }
@@ -96,26 +102,15 @@ export async function POST() {
     });
 
     const result = {
-      source: URL,
+      source: URL_SOURCE,
       updatedAt: new Date().toISOString(),
       total: rows.length,
       leaderboard: rows
     };
 
     // Save to Firestore
-    await setDoc(doc(db, "leaderboards", "arena"), result);
+    await setFirestoreDoc("leaderboards", "arena", result);
     console.log(`✅ Arena.ai data updated successfully in Firestore! Total entries: ${rows.length}`);
-
-    // Try to update local file as well (best effort, for dev/backup)
-    try {
-      const publicDir = path.dirname(DATA_FILE_PATH);
-      if (!fs.existsSync(publicDir)) {
-        fs.mkdirSync(publicDir, { recursive: true });
-      }
-      fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(result, null, 2), "utf-8");
-    } catch (fsError) {
-      console.warn("Could not write to local file system (expected in production):", fsError);
-    }
 
     return NextResponse.json(result);
   } catch (error) {

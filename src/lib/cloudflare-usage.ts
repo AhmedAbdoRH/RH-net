@@ -26,8 +26,8 @@ async function queryWorkersUsage(start: string, end: string) {
   const query = `query WorkersUsage($accountTag: string!, $start: Time!, $end: Time!) {
     viewer { accounts(filter: { accountTag: $accountTag }) {
       workersInvocationsAdaptive(limit: 10000, filter: { datetime_geq: $start, datetime_leq: $end }) {
-        dimensions { datetimeHour scriptName }
-        sum { requests cpuTimeUs subrequests }
+        dimensions { datetimeHour scriptName status }
+        sum { requests cpuTimeUs subrequests errors }
       }
       pagesFunctionsInvocationsAdaptiveGroups(limit: 10000, filter: { datetime_geq: $start, datetime_leq: $end }) {
         dimensions { datetimeHour scriptName }
@@ -58,11 +58,18 @@ export async function getCloudflareUsage() {
   const usageRows = await queryWorkersUsage(dayStart.toISOString(), now.toISOString());
   const monthStartDate = monthStart(now);
   const monthRows = await queryWorkersUsage(monthStartDate.toISOString(), now.toISOString());
-  const workerMap = new Map<string, { requests: number; cpuTime: number; subrequests: number }>();
+  const workerMap = new Map<string, { requests: number; cpuTime: number; subrequests: number; exceededResources: number; errors: number }>();
   for (const row of usageRows.workers) {
     const name = row.dimensions?.scriptName || 'unknown';
-    const current = workerMap.get(name) || { requests: 0, cpuTime: 0, subrequests: 0 };
+    const status = row.dimensions?.status;
+    const current = workerMap.get(name) || { requests: 0, cpuTime: 0, subrequests: 0, exceededResources: 0, errors: 0 };
     current.requests += Number(row.sum?.requests || 0);
+    current.cpuTime += Number(row.sum?.cpuTimeUs || 0) / 1000;
+    current.subrequests += Number(row.sum?.subrequests || 0);
+    if (status === 'exceededResources') {
+      current.exceededResources += Number(row.sum?.requests || 0);
+    }
+    current.errors += Number(row.sum?.errors || 0);
     workerMap.set(name, current);
   }
   let pagesFunctionsRequests = 0;
@@ -77,8 +84,19 @@ export async function getCloudflareUsage() {
   }
   const monthlyWorkersRequests = monthRows.workers.reduce((sum: number, row: { sum?: { requests?: number | string } }) => sum + Number(row.sum?.requests || 0), 0);
   const monthlyPagesFunctionsRequests = monthRows.pagesFunctions.reduce((sum: number, row: { sum?: { requests?: number | string } }) => sum + Number(row.sum?.requests || 0), 0);
-  const workerBreakdown = [...workerMap.entries()].map(([name, usage]) => ({ name, ...usage, percentage: (usage.requests / DAILY_REQUEST_LIMIT) * 100 })).sort((a, b) => b.requests - a.requests);
+  const workerBreakdown = [...workerMap.entries()].map(([name, usage]) => ({
+    name,
+    requests: usage.requests,
+    cpuTimeMs: usage.cpuTime,
+    cpuAverageMs: usage.requests ? usage.cpuTime / usage.requests : 0,
+    subrequests: usage.subrequests,
+    exceededResources: usage.exceededResources,
+    errors: usage.errors,
+    percentage: (usage.requests / DAILY_REQUEST_LIMIT) * 100,
+  })).sort((a, b) => b.requests - a.requests);
   const workersRequests = workerBreakdown.reduce((sum, item) => sum + item.requests, 0);
+  const totalExceededResources = workerBreakdown.reduce((sum, item) => sum + item.exceededResources, 0);
+  const highestCpuWorker = [...workerBreakdown].sort((a, b) => b.cpuAverageMs - a.cpuAverageMs)[0] || null;
   const dailyUsage = workersRequests + pagesFunctionsRequests;
   const elapsedHours = Math.max((now.getTime() - dayStart.getTime()) / 3600000, 1 / 60);
   const hourlyRate = dailyUsage / elapsedHours;
@@ -97,7 +115,7 @@ export async function getCloudflareUsage() {
   }));
 
   return {
-    plan: 'free', dailyUsage, workersRequests, pagesFunctionsRequests, workersCpuTimeMs, cpuAverageMs: workersRequests ? workersCpuTimeMs / workersRequests : 0, workersSubrequests, subrequestsAverage: workersRequests ? workersSubrequests / workersRequests : 0, monthlyUsage: monthlyWorkersRequests + monthlyPagesFunctionsRequests, monthlyWorkersRequests, monthlyPagesFunctionsRequests, dailyLimit: DAILY_REQUEST_LIMIT, monthlyLimit: DAILY_REQUEST_LIMIT * 31, percentage: (dailyUsage / DAILY_REQUEST_LIMIT) * 100,
+    plan: 'free', dailyUsage, workersRequests, pagesFunctionsRequests, workersCpuTimeMs, cpuAverageMs: workersRequests ? workersCpuTimeMs / workersRequests : 0, highestCpuWorker, workersSubrequests, subrequestsAverage: workersRequests ? workersSubrequests / workersRequests : 0, totalExceededResources, monthlyUsage: monthlyWorkersRequests + monthlyPagesFunctionsRequests, monthlyWorkersRequests, monthlyPagesFunctionsRequests, dailyLimit: DAILY_REQUEST_LIMIT, monthlyLimit: DAILY_REQUEST_LIMIT * 31, percentage: (dailyUsage / DAILY_REQUEST_LIMIT) * 100,
     resetAt: resetAt.toISOString(), projectedLimitTime, updatedAt: now.toISOString(), workerBreakdown,
     workers: workers.map(worker => ({ name: worker.id, routes: (worker.routes || []).map((route: any) => ({ pattern: route.pattern, failOpen: route.request_limit_fail_open !== false })) })),
     pages: pagesWithBuilds,

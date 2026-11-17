@@ -6,15 +6,18 @@ import { ArenaLeaderboard } from './arena-leaderboard';
 import { PerformanceLeaderboard } from './performance-leaderboard';
 import { SweBenchLeaderboard } from './swe-bench-leaderboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { usePathname } from 'next/navigation';
+import { PwaInstallButton } from './pwa-install-button';
 
 export function LeaderboardFooter() {
   const [mounted, setMounted] = React.useState(false);
+  const pathname = usePathname();
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted || pathname.startsWith('/share/')) return null;
 
   return (
     <footer className="mt-12 border-t border-border/60 bg-card/30 backdrop-blur-md pb-12">
@@ -41,6 +44,11 @@ export function LeaderboardFooter() {
             <SweBenchLeaderboard type="pro" />
           </TabsContent>
         </Tabs>
+
+        {/* زر تثبيت التطبيق في الأسفل */}
+        <div className="mt-8 flex justify-center">
+          <PwaInstallButton />
+        </div>
       </div>
     </footer>
   );

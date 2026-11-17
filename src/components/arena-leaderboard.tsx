@@ -41,14 +41,16 @@ export function ArenaLeaderboard() {
       const res = await fetch('/api/arena', { 
         method: showRefreshing ? 'POST' : 'GET' 
       });
-      if (!res.ok) throw new Error('Failed to fetch data');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || `تعذر تحميل البيانات (HTTP ${res.status})`);
+      }
       const jsonData = await res.json();
       setData(jsonData);
       // Trigger animation after a short delay
       setTimeout(() => setAnimated(true), 100);
     } catch (err) {
-      console.error(err);
-      setError('تعذر تحميل البيانات. يرجى التأكد من تشغيل السكرابر.');
+      setError(err instanceof Error ? err.message : 'تعذر تحميل البيانات. حاول مرة أخرى.');
     } finally {
       setLoading(false);
       setRefreshing(false);

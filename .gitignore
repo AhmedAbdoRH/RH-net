@@ -57,3 +57,11 @@ firestore_backup_*.json
 /.freebuff/
 /deploy-cloudflare*.log
 /wrangler-*.log
+/dist/
+.vinext/
+.cloudflare/
+.cf-prep-backup/
+
+# Cloudflare local secrets
+.dev.vars
+.dev.vars.*

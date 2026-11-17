@@ -1,0 +1,33 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/icon.png
+  Cache-Control: public, max-age=86400
+
+/icon-square.png
+  Cache-Control: public, max-age=86400
+
+/logo.png
+  Cache-Control: public, max-age=86400
+
+/favicon.ico
+  Cache-Control: public, max-age=86400
+
+/manifest.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: public, max-age=86400
+
+/sw.js
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=0, must-revalidate
+  Service-Worker-Allowed: /
+
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable

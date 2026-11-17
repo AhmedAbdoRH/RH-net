@@ -1,0 +1,80 @@
+
+> nextn@0.1.0 typecheck
+> tsc --noEmit
+
+.next/dev/types/validator.ts(171,31): error TS2344: Type 'typeof import("C:/Users/Ahmed/RH-net-2/src/app/api/users/[userId]/notes/[noteId]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/users/[userId]/notes/[noteId]">'.
+  Types of property 'DELETE' are incompatible.
+    Type '(request: Request, { params }: { params: { noteId: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; message: string; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ userId: string; noteId: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ userId: string; noteId: string; }>; }' is not assignable to type '{ params: { noteId: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'noteId' is missing in type 'Promise<{ userId: string; noteId: string; }>' but required in type '{ noteId: string; }'.
+.next/types/validator.ts(171,31): error TS2344: Type 'typeof import("C:/Users/Ahmed/RH-net-2/src/app/api/users/[userId]/notes/[noteId]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/users/[userId]/notes/[noteId]">'.
+  Types of property 'DELETE' are incompatible.
+    Type '(request: Request, { params }: { params: { noteId: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; message: string; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ userId: string; noteId: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ userId: string; noteId: string; }>; }' is not assignable to type '{ params: { noteId: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'noteId' is missing in type 'Promise<{ userId: string; noteId: string; }>' but required in type '{ noteId: string; }'.
+src/app/firefly/page.tsx(89,21): error TS2345: Argument of type '{ projects: string[]; id?: string | undefined; domainName: string; status: "active" | "inactive"; collectionDate: string; renewalDate: string; dataSheet: string; outstandingBalance?: number | undefined; ... 7 more ...; isOnlineCatalog?: boolean | undefined; }[]' is not assignable to parameter of type 'SetStateAction<Domain[]>'.
+  Type '{ projects: string[]; id?: string | undefined; domainName: string; status: "active" | "inactive"; collectionDate: string; renewalDate: string; dataSheet: string; outstandingBalance?: number | undefined; ... 7 more ...; isOnlineCatalog?: boolean | undefined; }[]' is not assignable to type 'Domain[]'.
+    Type '{ projects: string[]; id?: string; domainName: string; status: "active" | "inactive"; collectionDate: string; renewalDate: string; dataSheet: string; outstandingBalance?: number; renewalCostClient: number | ""; ... 6 more ...; isOnlineCatalog?: boolean; }' is not assignable to type 'Domain'.
+      Types of property 'projects' are incompatible.
+        Type 'string[]' is not assignable to type 'Project[]'.
+          Type 'string' is not assignable to type 'Project'.
+src/app/firefly/page.tsx(315,20): error TS2322: Type '{ project: "firefly"; allDomains: Domain[]; allTodos: Record<string, Todo[]>; domainStatuses: Record<string, "checking" | "online" | "offline">; loading: boolean; onDomainChange: () => Promise<...>; onTodoChange: () => Promise<...>; }' is not assignable to type 'IntrinsicAttributes & DomainDashboardProps'.
+  Property 'allTodos' does not exist on type 'IntrinsicAttributes & DomainDashboardProps'.
+src/app/page.tsx(139,21): error TS2345: Argument of type '{ projects: string[]; id?: string | undefined; domainName: string; status: "active" | "inactive"; collectionDate: string; renewalDate: string; dataSheet: string; outstandingBalance?: number | undefined; ... 7 more ...; isOnlineCatalog?: boolean | undefined; }[]' is not assignable to parameter of type 'SetStateAction<Domain[]>'.
+  Type '{ projects: string[]; id?: string | undefined; domainName: string; status: "active" | "inactive"; collectionDate: string; renewalDate: string; dataSheet: string; outstandingBalance?: number | undefined; ... 7 more ...; isOnlineCatalog?: boolean | undefined; }[]' is not assignable to type 'Domain[]'.
+    Type '{ projects: string[]; id?: string; domainName: string; status: "active" | "inactive"; collectionDate: string; renewalDate: string; dataSheet: string; outstandingBalance?: number; renewalCostClient: number | ""; ... 6 more ...; isOnlineCatalog?: boolean; }' is not assignable to type 'Domain'.
+      Types of property 'projects' are incompatible.
+        Type 'string[]' is not assignable to type 'Project[]'.
+          Type 'string' is not assignable to type 'Project'.
+src/app/pova/page.tsx(89,21): error TS2345: Argument of type '{ projects: string[]; id?: string | undefined; domainName: string; status: "active" | "inactive"; collectionDate: string; renewalDate: string; dataSheet: string; outstandingBalance?: number | undefined; ... 7 more ...; isOnlineCatalog?: boolean | undefined; }[]' is not assignable to parameter of type 'SetStateAction<Domain[]>'.
+  Type '{ projects: string[]; id?: string | undefined; domainName: string; status: "active" | "inactive"; collectionDate: string; renewalDate: string; dataSheet: string; outstandingBalance?: number | undefined; ... 7 more ...; isOnlineCatalog?: boolean | undefined; }[]' is not assignable to type 'Domain[]'.
+    Type '{ projects: string[]; id?: string; domainName: string; status: "active" | "inactive"; collectionDate: string; renewalDate: string; dataSheet: string; outstandingBalance?: number; renewalCostClient: number | ""; ... 6 more ...; isOnlineCatalog?: boolean; }' is not assignable to type 'Domain'.
+      Types of property 'projects' are incompatible.
+        Type 'string[]' is not assignable to type 'Project[]'.
+          Type 'string' is not assignable to type 'Project'.
+src/app/pova/page.tsx(315,20): error TS2322: Type '{ project: "pova"; allDomains: Domain[]; allTodos: Record<string, Todo[]>; domainStatuses: Record<string, "checking" | "online" | "offline">; loading: boolean; onDomainChange: () => Promise<...>; onTodoChange: () => Promise<...>; }' is not assignable to type 'IntrinsicAttributes & DomainDashboardProps'.
+  Property 'allTodos' does not exist on type 'IntrinsicAttributes & DomainDashboardProps'.
+src/components/catalog-users.tsx(135,33): error TS2339: Property 'map' does not exist on type 'string'.
+src/components/domain-dashboard.tsx(321,7): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/components/domain-dashboard.tsx(879,21): error TS2322: Type 'Date | null' is not assignable to type 'Matcher | Matcher[] | undefined'.
+  Type 'null' is not assignable to type 'Matcher | Matcher[] | undefined'.
+src/components/domain-dashboard.tsx(1033,60): error TS2352: Conversion of type 'string' to type 'Date' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/components/domain-dashboard.tsx(1039,35): error TS2352: Conversion of type 'string' to type 'Date' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/components/domain-dashboard.tsx(1040,80): error TS2322: Type 'Date' is not assignable to type 'string'.
+src/components/site-header.tsx(168,95): error TS2554: Expected 1 arguments, but got 0.
+src/firebase/error-emitter.ts(6,33): error TS2351: This expression is not constructable.
+  Type 'typeof import("C:/Users/Ahmed/RH-net-2/node_modules/tiny-emitter/index")' has no construct signatures.
+supabase/functions/check-subscriptions/index.ts(2,30): error TS2307: Cannot find module 'jsr:@supabase/supabase-js@2' or its corresponding type declarations.
+supabase/functions/check-subscriptions/index.ts(4,21): error TS2304: Cannot find name 'Deno'.
+supabase/functions/check-subscriptions/index.ts(5,28): error TS2304: Cannot find name 'Deno'.
+supabase/functions/check-subscriptions/index.ts(9,1): error TS2304: Cannot find name 'Deno'.
+supabase/functions/check-subscriptions/index.ts(9,19): error TS7006: Parameter 'req' implicitly has an 'any' type.
+supabase/functions/check-subscriptions/index.ts(175,14): error TS2304: Cannot find name 'Deno'.
+supabase/functions/check-subscriptions/index.ts(212,14): error TS2304: Cannot find name 'Deno'.
+supabase/functions/check-subscriptions/index.ts(315,24): error TS2304: Cannot find name 'Deno'.
+supabase/functions/check-subscriptions/index.ts(316,27): error TS2304: Cannot find name 'Deno'.
+supabase/functions/check-subscriptions/index.ts(317,26): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-cancellation-email/email.ts(12,24): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-cancellation-email/email.ts(13,27): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-cancellation-email/email.ts(14,26): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-cancellation-email/email.ts(54,12): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-cancellation-email/index.ts(2,30): error TS2307: Cannot find module 'jsr:@supabase/supabase-js@2' or its corresponding type declarations.
+supabase/functions/send-cancellation-email/index.ts(6,21): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-cancellation-email/index.ts(7,28): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-cancellation-email/index.ts(11,1): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-cancellation-email/index.ts(11,19): error TS7006: Parameter 'req' implicitly has an 'any' type.
+supabase/functions/send-cancellation-email/index.ts(52,16): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-warning-email/email.ts(12,24): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-warning-email/email.ts(13,27): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-warning-email/email.ts(14,26): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-warning-email/email.ts(54,12): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-warning-email/index.ts(2,30): error TS2307: Cannot find module 'jsr:@supabase/supabase-js@2' or its corresponding type declarations.
+supabase/functions/send-warning-email/index.ts(6,21): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-warning-email/index.ts(7,28): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-warning-email/index.ts(11,1): error TS2304: Cannot find name 'Deno'.
+supabase/functions/send-warning-email/index.ts(11,19): error TS7006: Parameter 'req' implicitly has an 'any' type.
+supabase/functions/send-warning-email/index.ts(78,16): error TS2304: Cannot find name 'Deno'.

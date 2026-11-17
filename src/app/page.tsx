@@ -14,17 +14,22 @@ import { AllTodosPanel } from '@/components/all-todos-panel';
 import { TodosSidePanel } from '@/components/todos-side-panel';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from '@/components/ui/button';
-import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Receipt, NotebookPen, FileText, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss, Database, BriefcaseBusiness } from 'lucide-react';
+import { ChevronDown, DollarSign, PiggyBank, ShieldAlert, Receipt, NotebookPen, FileText, Globe, Building2, LayoutGrid, CreditCard, Droplets, Wind, Rss, Database, BriefcaseBusiness, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FaultsSheet } from '@/components/faults-sheet';
 import { GeneralPaperSheet } from '@/components/general-paper-sheet';
 
-import { CatalogUsers } from '@/components/catalog-users';
 import { SiteHeader } from '@/components/site-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CloudflareUsagePanel } from '@/components/cloudflare-usage-panel';
 import { SupabaseUsagePanel } from '@/components/supabase-usage-panel';
 
+const CLIENT_USD_TO_EGP_RATE = 50;
+const OFFICE_USD_TO_EGP_RATE = 47.5;
+const costInUsd = (amount: number | '' | undefined, currency: 'USD' | 'EGP' | undefined, rate: number) => {
+  const value = Number(amount) || 0;
+  return currency === 'EGP' ? value / rate : value;
+};
 
 const StatCard = ({ title, value, icon, className }: { title: string, value: string, icon: React.ElementType, className?: string }) => {
   const Icon = icon;
@@ -40,6 +45,29 @@ const StatCard = ({ title, value, icon, className }: { title: string, value: str
     </Card>
   );
 };
+
+function ShareOfficeLink({ office }: { office: string }) {
+  const [copied, setCopied] = React.useState(false);
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/share/${office}`);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <div className="flex justify-end px-2 pt-2">
+      <Button variant="outline" size="sm" onClick={copyLink}>
+        {copied ? <Check className="ml-2 h-4 w-4" /> : <Copy className="ml-2 h-4 w-4" />}
+        {copied ? 'تم نسخ رابط المشاركة' : 'نسخ رابط المشاركة'}
+      </Button>
+    </div>
+  );
+}
 
 
 export default function WebPage() {
@@ -147,7 +175,7 @@ export default function WebPage() {
 
       const initialDomainStatuses: Record<string, 'checking' | 'online' | 'offline'> = {};
       domainsWithProject.forEach(d => {
-        if (d.id) initialDomainStatuses[d.id] = 'checking';
+        if (d.id && !d.isArchived) initialDomainStatuses[d.id] = 'checking';
       });
       setDomainStatuses(initialDomainStatuses);
 
@@ -156,7 +184,7 @@ export default function WebPage() {
       refreshTodos();
 
       for (const domain of domainsWithProject) {
-        if (domain.id) {
+        if (domain.id && !domain.isArchived) {
           checkDomainStatus({ domainName: domain.domainName })
             .then(({ isOnline }) => {
               setDomainStatuses(prev => ({ ...prev, [domain.id!]: isOnline ? 'online' : 'offline' }));
@@ -189,9 +217,9 @@ export default function WebPage() {
   }, [refreshAllStatuses]);
 
   const RHMStats = React.useMemo(() => {
-    const RHMDomains = allDomains.filter(d => d.projects?.includes('RHM'));
+    const RHMDomains = allDomains.filter(d => d.projects?.includes('RHM') && !d.isArchived);
     const totalIncome = RHMDomains.reduce((acc, domain) => {
-      const clientCost = Number(domain.renewalCostClient) || 0;
+      const clientCost = costInUsd(domain.renewalCostClient, domain.renewalCostClientCurrency, CLIENT_USD_TO_EGP_RATE);
       if (domain.hasInstallments && domain.installmentCount && domain.installmentsPaid) {
         const totalInstallments = Number(domain.installmentCount);
         const paidInstallments = domain.installmentsPaid;
@@ -200,8 +228,8 @@ export default function WebPage() {
       return acc + clientCost;
     }, 0);
     const netProfit = RHMDomains.reduce((acc, domain) => {
-      const clientCost = Number(domain.renewalCostClient) || 0;
-      const officeCost = Number(domain.renewalCostOffice) || 0;
+      const clientCost = costInUsd(domain.renewalCostClient, domain.renewalCostClientCurrency, CLIENT_USD_TO_EGP_RATE);
+      const officeCost = costInUsd(domain.renewalCostOffice, domain.renewalCostOfficeCurrency, OFFICE_USD_TO_EGP_RATE);
       if (domain.hasInstallments && domain.installmentCount && domain.installmentsPaid) {
         const totalInstallments = Number(domain.installmentCount);
         const paidInstallments = domain.installmentsPaid;
@@ -326,7 +354,7 @@ export default function WebPage() {
               {/* Logo الذي يظهر العناصر المخفية عند الضغط عليه */}
               <div className="relative cursor-pointer" onClick={handleSecretClick}>
                 <img
-                  src="https://rhm-digital.com/favicon.ico"
+                  src="/icon-square.png"
                   alt="RHM Digital"
                   className="h-10 w-10 rounded-lg"
                 />
@@ -355,11 +383,14 @@ export default function WebPage() {
                       <div className="px-2 py-1 border-b border-border/60">
                         <TabsList>
                           <TabsTrigger value="rhm">مشاريع RHM</TabsTrigger>
+                          <TabsTrigger value="pova">مكتب Pova</TabsTrigger>
+                          <TabsTrigger value="firefly">مكتب Firefly</TabsTrigger>
+                          <TabsTrigger value="android">تطبيقات اندرويد</TabsTrigger>
                           <TabsTrigger value="other">المشاريع الأخرى</TabsTrigger>
-                          <TabsTrigger value="catalog">تطبيق الكتالوج</TabsTrigger>
                         </TabsList>
                       </div>
                       <TabsContent value="rhm" className="m-0">
+                        <ShareOfficeLink office="rhm" />
                         <div className="px-2 pt-0">
                           <DomainDashboard
                             project="RHM"
@@ -386,7 +417,44 @@ export default function WebPage() {
                           </div>
                         </div>
                       </TabsContent>
+                      <TabsContent value="pova" className="m-0">
+                        <ShareOfficeLink office="pova" />
+                        <div className="p-2">
+                          <DomainDashboard
+                            project="pova"
+                            allDomains={allDomains}
+                            domainStatuses={domainStatuses}
+                            loading={loading}
+                            onDomainChange={refreshAllStatuses}
+                          />
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="firefly" className="m-0">
+                        <ShareOfficeLink office="firefly" />
+                        <div className="p-2">
+                          <DomainDashboard
+                            project="firefly"
+                            allDomains={allDomains}
+                            domainStatuses={domainStatuses}
+                            loading={loading}
+                            onDomainChange={refreshAllStatuses}
+                          />
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="android" className="m-0">
+                        <ShareOfficeLink office="android" />
+                        <div className="p-2">
+                          <DomainDashboard
+                            project="android"
+                            allDomains={allDomains}
+                            domainStatuses={domainStatuses}
+                            loading={loading}
+                            onDomainChange={refreshAllStatuses}
+                          />
+                        </div>
+                      </TabsContent>
                       <TabsContent value="other" className="m-0">
+                        <ShareOfficeLink office="other" />
                         <div className="p-2">
                           <DomainDashboard
                             project="other"
@@ -397,11 +465,6 @@ export default function WebPage() {
                           />
                         </div>
                       </TabsContent>
-                      <TabsContent value="catalog" className="m-0">
-                        <div className="p-2">
-                          <CatalogUsers />
-                        </div>
-                      </TabsContent>
                     </Tabs>
                   </CardContent>
                 </Card>
@@ -409,7 +472,7 @@ export default function WebPage() {
             </main>
 
             {/* قائمة المهام - قسم مستقل */}
-            <aside className="w-full">
+            <aside className="w-full space-y-4">
               <TodosSidePanel
                 onUpdate={refreshTodos}
                 initialGroupedTodos={allGroupedTodos}
